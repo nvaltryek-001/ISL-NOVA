@@ -67,7 +67,7 @@ export function ExplorerPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <p className="font-mono text-[11px] text-ink-500">{s.sign_id}</p>
-                        <p className="mt-0.5 font-display text-lg font-semibold text-white">{s.canonical_sign_name}</p>
+                        <p className="mt-0.5 font-display text-lg font-semibold text-fg">{s.canonical_sign_name}</p>
                       </div>
                       {s.bookmarked && <Icon name="bookmark" className="text-nova-300" label="Bookmarked" />}
                     </div>
@@ -171,7 +171,7 @@ export function SignDetailPage({ id }: { id: string }) {
 
   return (
     <div className="space-y-5">
-      <Link to="/signs" className="inline-flex items-center gap-1 text-sm text-ink-400 hover:text-white"><Icon name="chevron" size={14} className="rotate-180" />All signs</Link>
+      <Link to="/signs" className="inline-flex items-center gap-1 text-sm text-ink-400 hover:text-fg"><Icon name="chevron" size={14} className="rotate-180" />All signs</Link>
       <PageHeader kicker={`${s.sign_id} · ${s.category_label}`} title={s.canonical_sign_name}
         actions={<>
           {user && <Button icon="bookmark" variant={s.bookmarked ? 'primary' : 'secondary'} onClick={() => bmM.mutate(!s.bookmarked)} aria-pressed={s.bookmarked}>{s.bookmarked ? 'Bookmarked' : 'Bookmark'}</Button>}
@@ -196,7 +196,7 @@ export function SignDetailPage({ id }: { id: string }) {
               return (
                 <li key={l} className="flex flex-wrap items-center gap-3 py-3">
                   <span className="w-20 text-sm text-ink-400">{LANG_LABEL[l]}</span>
-                  <span className={`flex-1 text-lg ${t?.text ? 'text-white' : 'text-ink-500 italic'}`}>{t?.text || 'Pending review'}</span>
+                  <span className={`flex-1 text-lg ${t?.text ? 'text-fg' : 'text-ink-500 italic'}`}>{t?.text || 'Pending review'}</span>
                   <StatusBadge status={t?.status ?? 'pending'} />
                   {t?.text && <Button size="sm" variant="ghost" icon="speaker" aria-label={`Speak ${LANG_LABEL[l]} meaning`} onClick={() => { const r = speak(t.text, l, prefs.speechRate); if (r.reason) toast(r.reason, 'info'); }} />}
                   {can(user, 'translations:write') && <Button size="sm" icon="edit" aria-label={`Edit ${LANG_LABEL[l]} meaning`} onClick={() => setTr({ lang: l, text: t?.text ?? '', status: t?.status === 'verified' ? 'verified' : 'draft' })}>Edit</Button>}
@@ -242,7 +242,7 @@ export function SignDetailPage({ id }: { id: string }) {
           <ul className="space-y-3 text-sm">
             {s.references.map((r) => (
               <li key={r.id} className="rounded-lg border border-ink-700 p-3">
-                <p className="font-medium text-white">{r.source_name} <Badge tone="signal">{r.license}</Badge></p>
+                <p className="font-medium text-fg">{r.source_name} <Badge tone="signal">{r.license}</Badge></p>
                 {r.notes && <p className="muted mt-1 text-xs">{r.notes}</p>}
                 {r.training_permitted && <p className="mt-1 text-xs text-ink-300">Training: {r.training_permitted}</p>}
                 {r.source_url && <a href={r.source_url} target="_blank" rel="noreferrer noopener" className="mt-1 inline-block text-xs text-nova-300 hover:underline">{r.doi ? `doi:${r.doi}` : r.source_url}</a>}
@@ -258,7 +258,7 @@ export function SignDetailPage({ id }: { id: string }) {
             {!Object.keys(s.recordings).length && <p className="muted text-xs">No local recordings yet.</p>}
           </dl>
           <p className="label mb-2 mt-5">Related signs</p>
-          <div className="flex flex-wrap gap-1.5">{s.related.map((r) => <Link key={r.sign_id} to={`/signs/${r.sign_id}`} className="rounded-full border border-ink-600 px-2.5 py-1 text-xs text-ink-200 hover:border-nova-400 hover:text-white">{r.canonical_sign_name}</Link>)}</div>
+          <div className="flex flex-wrap gap-1.5">{s.related.map((r) => <Link key={r.sign_id} to={`/signs/${r.sign_id}`} className="rounded-full border border-ink-600 px-2.5 py-1 text-xs text-ink-200 hover:border-nova-400 hover:text-fg">{r.canonical_sign_name}</Link>)}</div>
         </Card>
       </div>
 

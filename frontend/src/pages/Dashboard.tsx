@@ -14,7 +14,7 @@ type Dash = {
 };
 
 const READINESS_COLORS: Record<string, string> = {
-  no_data: '#2c3657', collecting: '#22d3ee', insufficient_data: '#fbbf24', ready_for_review: '#a78bfa', approved_for_training: '#34d399', excluded: '#f43f5e',
+  no_data: 'var(--color-ink-600)', collecting: '#22d3ee', insufficient_data: '#fbbf24', ready_for_review: '#a78bfa', approved_for_training: '#34d399', excluded: '#f43f5e',
 };
 
 export function DashboardPage() {
@@ -25,10 +25,12 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader kicker="ISL NOVA" title={user ? `Welcome, ${user.display_name}` : 'Indian Sign Language platform'}
-        actions={<><Quick to="/live" icon="camera" label="Start recognition" primary /><Quick to="/signs" icon="book" label="Explore signs" /></>}>
-        Every number here is read live from the database and model registry. Nothing is estimated or simulated.
-      </PageHeader>
+      <section className="hero-band rise [&>div]:mb-0">
+        <PageHeader kicker="ISL NOVA · Beyond gestures. Towards understanding." title={user ? `Welcome, ${user.display_name}` : 'Indian Sign Language platform'}
+          actions={<><Quick to="/live" icon="camera" label="Start recognition" primary /><Quick to="/signs" icon="book" label="Explore signs" /></>}>
+          Every number here is read live from the database and model registry. Nothing is estimated or simulated.
+        </PageHeader>
+      </section>
 
       <ErrorNote error={error} retry={refetch} />
       {loading && !data && <Loading rows={4} />}
@@ -129,7 +131,7 @@ function Row({ k, v }: { k: string; v: React.ReactNode }) {
 
 function Quick({ to, icon, label, primary }: { to: string; icon: IconName; label: string; primary?: boolean }) {
   return (
-    <Link to={to} className={`inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-medium transition-colors ${primary ? 'bg-nova-500 text-white hover:bg-nova-400' : 'border border-ink-600 bg-ink-800 text-ink-100 hover:bg-ink-700'}`}>
+    <Link to={to} className={`inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-medium transition-colors ${primary ? 'bg-nova-500 text-white hover:bg-nova-400' : 'border border-ink-600 bg-ink-850 text-ink-100 shadow-sm hover:bg-ink-800'}`}>
       <Icon name={icon} size={16} />{label}
     </Link>
   );

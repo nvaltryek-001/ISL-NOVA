@@ -54,7 +54,7 @@ function ActiveModel() {
           {!t ? <Loading /> : (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               {[['Top-1', fmt.pct(t.top1)], ['Top-5', fmt.pct(t.top5)], ['Macro-F1', fmt.pct(t.macro_f1)], ['Weighted-F1', fmt.pct(t.weighted_f1)], ['ECE', t.ece?.toFixed(3)], ['Test samples', t.n], ['Latency / sample', `${metrics.data.latency_ms_per_sample_batch} ms`], ['Model size', fmt.bytes(metrics.data.model_size_bytes)]].map(([k, v]) => (
-                <div key={String(k)} className="rounded-xl bg-ink-800 p-3"><p className="label">{k}</p><p className="mt-1 font-display text-2xl font-semibold text-white">{v}</p></div>
+                <div key={String(k)} className="rounded-xl bg-ink-800 p-3"><p className="label">{k}</p><p className="mt-1 font-display text-2xl font-semibold text-fg">{v}</p></div>
               ))}
             </div>
           )}

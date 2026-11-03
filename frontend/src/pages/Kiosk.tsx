@@ -48,7 +48,7 @@ export function KioskPage() {
   const meaning = top?.meanings?.[lang]?.text;
 
   return (
-    <div className="min-h-dvh bg-black p-4 text-white md:p-8">
+    <div className="min-h-dvh bg-ink-900 p-4 text-fg md:p-8">
       <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3"><img src="/favicon.svg" alt="" className="size-12" /><span className="font-display text-3xl font-semibold">ISL NOVA</span></div>
         <div className="flex flex-wrap gap-2" role="group" aria-label="Language">
@@ -65,7 +65,7 @@ export function KioskPage() {
           </Button>
         </div>
         <div className="space-y-4">
-          <section className="rounded-3xl border-2 border-white p-6" aria-live="polite">
+          <section className="rounded-3xl border-2 border-fg p-6" aria-live="polite">
             {!model.data?.available ? <p className="text-2xl">Sign recognition is not available on this kiosk yet. Please use the phrases below.</p>
               : !pred ? <p className="text-2xl text-ink-200">Your result will appear here.</p>
               : <>
@@ -80,7 +80,7 @@ export function KioskPage() {
             <h2 className="mb-3 text-xl font-semibold">Quick phrases</h2>
             {!quick.length ? <p className="text-lg text-ink-200">No verified quick phrases for {LANGS[lang]} yet.</p> : (
               <div className="grid gap-3 sm:grid-cols-2">
-                {quick.map((q) => <button key={q.id} onClick={() => speak(q.text, q.language, p.speechRate)} className="flex min-h-20 items-center gap-3 rounded-2xl border-2 border-white px-5 text-left text-2xl hover:bg-white hover:text-black" lang={q.language}><Icon name="speaker" size={28} />{q.text}</button>)}
+                {quick.map((q) => <button key={q.id} onClick={() => speak(q.text, q.language, p.speechRate)} className="flex min-h-20 items-center gap-3 rounded-2xl border-2 border-fg px-5 text-left text-2xl hover:bg-fg hover:text-ink-900" lang={q.language}><Icon name="speaker" size={28} />{q.text}</button>)}
               </div>
             )}
           </section>

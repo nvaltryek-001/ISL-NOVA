@@ -10,11 +10,11 @@ import { Icon, type IconName } from './icons';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'signal';
 const V: Record<Variant, string> = {
-  primary: 'bg-nova-500 text-white hover:bg-nova-400 shadow-[0_8px_24px_-12px_rgba(139,92,246,.9)]',
-  secondary: 'bg-ink-800 text-ink-100 border border-ink-600 hover:border-ink-500 hover:bg-ink-700',
-  ghost: 'text-ink-300 hover:bg-ink-800 hover:text-white',
-  danger: 'bg-rose-600/90 text-white hover:bg-rose-500',
-  signal: 'bg-signal text-ink-950 hover:bg-cyan-300',
+  primary: 'bg-nova-500 text-white hover:bg-nova-600 shadow-[0_8px_24px_-12px_color-mix(in_oklab,var(--color-nova-500)_80%,transparent)]',
+  secondary: 'bg-ink-850 text-ink-100 border border-ink-600 shadow-sm hover:border-ink-500 hover:bg-ink-800',
+  ghost: 'text-ink-300 hover:bg-ink-800 hover:text-fg',
+  danger: 'bg-rose-600 text-white hover:bg-rose-700',
+  signal: 'bg-signal text-on-accent hover:brightness-110',
 };
 
 export function Button({ variant = 'secondary', size = 'md', icon, loading, children, className, ...rest }:
@@ -37,7 +37,7 @@ export function Card({ children, className, title, action, subtitle }: { childre
       {(title || action) && (
         <header className="mb-4 flex items-start justify-between gap-3">
           <div>
-            {title && <h2 className="text-[15px] font-semibold text-white">{title}</h2>}
+            {title && <h2 className="text-[15px] font-semibold text-fg">{title}</h2>}
             {subtitle && <p className="muted mt-0.5 text-sm">{subtitle}</p>}
           </div>
           {action}
@@ -108,12 +108,12 @@ export function Dialog({ open, onClose, title, children, footer, wide }: { open:
   }, [open]);
   return (
     <dialog ref={ref} onClose={onClose} onCancel={onClose} aria-labelledby={hid}
-      className={clsx('m-auto w-[calc(100%-2rem)] rounded-2xl border border-ink-600 bg-ink-850 p-0 text-ink-100 shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm', wide ? 'max-w-3xl' : 'max-w-lg')}>
+      className={clsx('m-auto w-[calc(100%-2rem)] rounded-2xl border border-ink-600 bg-ink-850 p-0 text-ink-100 shadow-[var(--shadow-pop)] backdrop:bg-ink-950/70 backdrop:backdrop-blur-sm', wide ? 'max-w-3xl' : 'max-w-lg')}>
       {open && (
         <div className="flex max-h-[85vh] flex-col">
           <header className="flex items-center justify-between border-b border-ink-700 px-5 py-4">
             <h2 id={hid} className="text-base font-semibold">{title}</h2>
-            <button className="rounded-md p-1 text-ink-400 hover:bg-ink-700 hover:text-white" onClick={onClose} aria-label="Close dialog"><Icon name="close" /></button>
+            <button className="rounded-md p-1 text-ink-400 hover:bg-ink-700 hover:text-fg" onClick={onClose} aria-label="Close dialog"><Icon name="close" /></button>
           </header>
           <div className="overflow-y-auto px-5 py-4">{children}</div>
           {footer && <footer className="flex justify-end gap-2 border-t border-ink-700 px-5 py-3">{footer}</footer>}
@@ -142,7 +142,7 @@ export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: { id: 
     <div role="tablist" className="flex max-w-full gap-1 overflow-x-auto rounded-xl border border-ink-700 bg-ink-850 p-1">
       {tabs.map((t) => (
         <button key={t.id} role="tab" aria-selected={value === t.id} onClick={() => onChange(t.id)}
-          className={clsx('whitespace-nowrap rounded-lg px-3 py-1.5 text-sm transition-colors', value === t.id ? 'bg-ink-700 text-white' : 'text-ink-400 hover:text-ink-100')}>
+          className={clsx('whitespace-nowrap rounded-lg px-3 py-1.5 text-sm transition-colors', value === t.id ? 'bg-ink-700 text-fg' : 'text-ink-400 hover:text-ink-100')}>
           {t.label}{t.count !== undefined && <span className="ml-1.5 text-xs text-ink-400">{t.count}</span>}
         </button>
       ))}
@@ -198,7 +198,7 @@ export function Stat({ label, value, sub, tone = 'neutral', icon }: { label: str
   return (
     <div className="card rise flex flex-col gap-1 p-4">
       <div className="flex items-center justify-between"><span className="label">{label}</span>{icon && <Icon name={icon} className={accent} />}</div>
-      <span className="font-display text-3xl font-semibold tabular-nums text-white">{value}</span>
+      <span className="font-display text-3xl font-semibold tabular-nums text-fg">{value}</span>
       {sub && <span className="muted text-xs">{sub}</span>}
     </div>
   );
@@ -222,7 +222,7 @@ export function PageHeader({ title, kicker, children, actions }: { title: string
     <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div className="min-w-0">
         {kicker && <p className="label mb-1.5 text-nova-300">{kicker}</p>}
-        <h1 className="text-2xl font-semibold text-white md:text-[28px]">{title}</h1>
+        <h1 className="text-2xl font-semibold text-fg md:text-[28px]">{title}</h1>
         {children && <div className="muted mt-1.5 max-w-3xl text-[15px]">{children}</div>}
       </div>
       {actions && <div className="flex min-w-0 max-w-full flex-wrap gap-2">{actions}</div>}
@@ -236,7 +236,7 @@ export function Toasts() {
     <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex w-80 max-w-[calc(100%-2rem)] flex-col gap-2" aria-live="polite">
       {items.map((t) => (
         <div key={t.id} className={clsx('rise pointer-events-auto flex items-start gap-2 rounded-xl border px-4 py-3 text-sm shadow-xl',
-          t.kind === 'error' ? 'border-rose-500/40 bg-ink-850 text-rose-200' : t.kind === 'info' ? 'border-cyan-400/30 bg-ink-850 text-cyan-100' : 'border-emerald-500/30 bg-ink-850 text-emerald-200')}>
+          t.kind === 'error' ? 'border-rose-500/40 bg-ink-850 text-rose-200 shadow-[var(--shadow-pop)]' : t.kind === 'info' ? 'border-cyan-400/30 bg-ink-850 text-cyan-100 shadow-[var(--shadow-pop)]' : 'border-emerald-500/30 bg-ink-850 text-emerald-200 shadow-[var(--shadow-pop)]')}>
           <Icon name={t.kind === 'error' ? 'alert' : t.kind === 'info' ? 'info' : 'check'} className="mt-0.5 shrink-0" />
           <span>{t.text}</span>
         </div>

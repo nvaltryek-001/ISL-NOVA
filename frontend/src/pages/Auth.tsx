@@ -52,7 +52,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
         <div className="relative flex h-full flex-col justify-between p-12">
           <div className="flex items-center gap-3"><img src="/favicon.svg" alt="" className="size-10" /><span className="font-display text-xl font-semibold">ISL NOVA</span></div>
           <div className="max-w-md">
-            <h1 className="font-display text-4xl font-semibold leading-tight text-white">Beyond gestures.<br /><span className="bg-gradient-to-r from-nova-300 to-signal bg-clip-text text-transparent">Towards understanding.</span></h1>
+            <h1 className="font-display text-4xl font-semibold leading-tight text-fg">Beyond gestures.<br /><span className="bg-gradient-to-r from-nova-300 to-signal bg-clip-text text-transparent">Towards understanding.</span></h1>
             <p className="mt-4 text-ink-300">An open platform for Indian Sign Language recognition, learning and consent-first dataset building.</p>
             <ul className="mt-8 space-y-3 text-sm text-ink-300">
               {['200 vocabulary slots with traceable, licensed sources', 'Signer-independent evaluation, no fabricated accuracy', 'Video stays on your device during live recognition'].map((t) => (
@@ -66,8 +66,8 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
       <div className="flex items-center justify-center p-6">
         <form onSubmit={submit} className="w-full max-w-sm space-y-5" noValidate>
           <div>
-            <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm text-ink-400 hover:text-white lg:hidden"><img src="/favicon.svg" alt="" className="size-7" />ISL NOVA</Link>
-            <h2 className="font-display text-2xl font-semibold text-white">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2>
+            <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm text-ink-400 hover:text-fg lg:hidden"><img src="/favicon.svg" alt="" className="size-7" />ISL NOVA</Link>
+            <h2 className="font-display text-2xl font-semibold text-fg">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2>
             <p className="muted mt-1 text-sm">{mode === 'login' ? 'Sign in to save history, progress and bookmarks.' : 'New accounts start with the learner role.'}</p>
           </div>
           <ErrorNote error={error} />

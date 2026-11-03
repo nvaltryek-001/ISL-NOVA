@@ -138,7 +138,7 @@ export function LivePage() {
               <div className="space-y-4">
                 <div>
                   <p className="label">{pred.state === 'recognized' ? 'Recognised sign' : 'Best guess (uncertain)'}</p>
-                  <p className="mt-1 font-display text-4xl font-semibold text-white">{top?.label}</p>
+                  <p className="mt-1 font-display text-4xl font-semibold text-fg">{top?.label}</p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Select aria-label="Meaning language" value={lang} onChange={(e) => setLang(e.target.value as keyof typeof LANGS)} className="h-8 w-auto py-0 text-xs">
                       {Object.entries(LANGS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -156,7 +156,7 @@ export function LivePage() {
               </div>
             ) : (
               <div className="space-y-2 text-sm">
-                <p className="font-medium text-white">{pred.state === 'unknown' ? 'Not a sign the model knows' : pred.state === 'insufficient_input' ? 'Not enough usable input' : 'Model unavailable'}</p>
+                <p className="font-medium text-fg">{pred.state === 'unknown' ? 'Not a sign the model knows' : pred.state === 'insufficient_input' ? 'Not enough usable input' : 'Model unavailable'}</p>
                 <ul className="list-disc space-y-1 pl-5 text-ink-300">{pred.reasons.map((r) => <li key={r}>{r}</li>)}</ul>
                 {pred.state === 'insufficient_input' && <p className="muted">Keep both hands in frame, face the camera, and use even lighting.</p>}
               </div>

@@ -38,7 +38,7 @@ export function VideoAnalysisPage() {
       <Card>
         <div onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); pick(e.dataTransfer.files[0]); }}
           className="grid-bg flex flex-col items-center gap-3 rounded-xl border border-dashed border-ink-600 p-10 text-center">
-          <p className="font-medium text-white">Drop a video here or choose a file</p>
+          <p className="font-medium text-fg">Drop a video here or choose a file</p>
           <p className="muted text-sm">MP4, WebM or MOV · up to {MAX_MB} MB · content type checked server-side</p>
           <input ref={input} type="file" accept="video/mp4,video/webm,video/quicktime" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} aria-label="Video file" />
           <Button variant="primary" icon="upload" loading={up.pending} onClick={() => input.current?.click()}>Choose video</Button>
@@ -66,7 +66,7 @@ export function VideoAnalysisPage() {
             <div className="space-y-4 text-sm">
               <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 {[['Decodable', r.video.decodable ? 'Yes' : 'No'], ['Duration', `${r.video.duration_s ?? '-'} s`], ['Resolution', `${r.video.width}×${r.video.height}`], ['FPS', r.video.fps ? Number(r.video.fps).toFixed(1) : '-']].map(([k, v]) => (
-                  <div key={k} className="rounded-lg bg-ink-800 p-3"><dt className="label">{k}</dt><dd className="mt-1 text-white">{v}</dd></div>
+                  <div key={k} className="rounded-lg bg-ink-800 p-3"><dt className="label">{k}</dt><dd className="mt-1 text-fg">{v}</dd></div>
                 ))}
               </dl>
               {r.extractor && !r.extractor.available && <Notice tone="warn" title="Server-side landmark extractor is not configured">{r.extractor.reason}. Set ISL_NOVA_HAND_MODEL on the server to enable the frame timeline and inference.</Notice>}
@@ -74,7 +74,7 @@ export function VideoAnalysisPage() {
                 <div>
                   <p className="label mb-2">Hand-tracking timeline ({r.timeline.length} frames)</p>
                   <div className="flex h-8 overflow-hidden rounded-md" role="img" aria-label="Per-frame hand detection">
-                    {r.timeline.map((t: any) => <span key={t.frame} className="flex-1" style={{ background: t.left && t.right ? '#a78bfa' : t.left || t.right ? '#22d3ee' : '#1f2740' }} />)}
+                    {r.timeline.map((t: any) => <span key={t.frame} className="flex-1" style={{ background: t.left && t.right ? '#a78bfa' : t.left || t.right ? '#22d3ee' : 'var(--color-ink-700)' }} />)}
                   </div>
                   <p className="muted mt-1 text-xs">Violet: two hands · cyan: one hand · dark: none</p>
                 </div>

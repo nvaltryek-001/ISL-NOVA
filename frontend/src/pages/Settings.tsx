@@ -3,7 +3,7 @@ import { Button, Card, Empty, ErrorNote, Field, Input, PageHeader, Select, Statu
 import { api } from '../lib/api';
 import { useMutation, useQuery } from '../lib/query';
 import { Link } from '../lib/router';
-import { auth, prefs, toast, type User, useAuth, usePrefs } from '../lib/store';
+import { auth, prefs, type Theme, toast, type User, useAuth, usePrefs } from '../lib/store';
 
 export function SettingsPage() {
   const { user } = useAuth();
@@ -40,6 +40,7 @@ export function SettingsPage() {
         </Card>
         <Card title="Accessibility" subtitle="Stored on this device">
           <div className="space-y-3 text-sm">
+            <Field label="Theme">{(id) => <Select id={id} value={p.theme} onChange={(e) => prefs.set({ theme: e.target.value as Theme })}><option value="light">Light</option><option value="dark">Dark</option><option value="system">Match my device</option></Select>}</Field>
             {([['highContrast', 'High contrast'], ['reducedMotion', 'Reduce motion'], ['largeText', 'Larger text']] as const).map(([k, label]) => (
               <label key={k} className="flex items-center justify-between gap-3 rounded-lg border border-ink-700 px-3 py-2.5">
                 {label}
@@ -54,7 +55,7 @@ export function SettingsPage() {
           {!notes.data?.length ? <p className="muted text-sm">No notifications.</p> : (
             <ul className="space-y-2 text-sm">{notes.data.map((n) => (
               <li key={n.id} className={`rounded-lg border p-3 ${n.read_at ? 'border-ink-700 opacity-70' : 'border-nova-500/40'}`}>
-                <p className="font-medium text-white">{n.title}</p>{n.body && <p className="muted">{n.body}</p>}
+                <p className="font-medium text-fg">{n.title}</p>{n.body && <p className="muted">{n.body}</p>}
                 <p className="mt-1 flex justify-between text-xs text-ink-500">{fmt.date(n.created_at)}{!n.read_at && <button className="text-nova-300 hover:underline" onClick={() => read.mutate(n.id)}>Mark read</button>}</p>
               </li>
             ))}</ul>

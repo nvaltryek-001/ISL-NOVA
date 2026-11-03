@@ -50,7 +50,7 @@ export function ResearchPage() {
       </div>
       <div className="grid gap-4 xl:grid-cols-2">
         <Card title="Protocol documents" subtitle="Versioned in the repository">
-          <ul className="grid gap-1.5 sm:grid-cols-2">{DOCS.map(([t, p]) => <li key={p}><a className="block rounded-lg border border-ink-700 px-3 py-2 text-sm hover:border-nova-400 hover:text-white" href={`${REPO}/${p}`} target="_blank" rel="noreferrer noopener">{t}</a></li>)}</ul>
+          <ul className="grid gap-1.5 sm:grid-cols-2">{DOCS.map(([t, p]) => <li key={p}><a className="block rounded-lg border border-ink-700 px-3 py-2 text-sm hover:border-nova-400 hover:text-fg" href={`${REPO}/${p}`} target="_blank" rel="noreferrer noopener">{t}</a></li>)}</ul>
         </Card>
         <Card title="Key references" subtitle="Verified bibliographic records">
           <ul className="space-y-3 text-sm">{REFS.map((r) => <li key={r.key}><p className="text-ink-200">{r.cite}</p><a className="text-xs text-nova-300 hover:underline" href={`https://doi.org/${r.doi}`} target="_blank" rel="noreferrer noopener">doi:{r.doi}</a></li>)}</ul>

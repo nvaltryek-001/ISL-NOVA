@@ -78,10 +78,11 @@ export function can(user: User | null, perm: string) {
   return !!user && user.roles.some((r) => PERMS[perm]?.includes(r));
 }
 
-export type Prefs = { highContrast: boolean; reducedMotion: boolean; largeText: boolean; speechRate: number; language: 'en' | 'hi' | 'kn' };
+export type Theme = 'light' | 'dark' | 'system';
+export type Prefs = { theme: Theme; highContrast: boolean; reducedMotion: boolean; largeText: boolean; speechRate: number; language: 'en' | 'hi' | 'kn' };
 
 function loadPrefs(): Prefs {
-  const d: Prefs = { highContrast: false, reducedMotion: false, largeText: false, speechRate: 1, language: 'en' };
+  const d: Prefs = { theme: 'light', highContrast: false, reducedMotion: false, largeText: false, speechRate: 1, language: 'en' };
   try { return { ...d, ...JSON.parse(localStorage.getItem('isl-nova-prefs') || '{}') }; } catch { return d; }
 }
 
@@ -95,12 +96,21 @@ prefs.subscribe(() => {
 export function applyPrefs(p: Prefs) {
   if (typeof document === 'undefined') return;
   const c = document.documentElement.classList;
+  c.toggle('dark', resolvedTheme(p.theme) === 'dark');
   c.toggle('hc', p.highContrast);
   c.toggle('reduce-motion', p.reducedMotion);
   c.toggle('large-text', p.largeText);
 }
 
 export const usePrefs = () => useStore(prefs, (s) => s);
+
+export function resolvedTheme(t: Theme): 'light' | 'dark' {
+  if (t !== 'system') return t;
+  return typeof matchMedia !== 'undefined' && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+if (typeof matchMedia !== 'undefined') {
+  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => prefs.get().theme === 'system' && applyPrefs(prefs.get()));
+}
 
 export type Toast = { id: number; kind: 'ok' | 'error' | 'info'; text: string };
 export const toasts = createStore<{ items: Toast[] }>({ items: [] });

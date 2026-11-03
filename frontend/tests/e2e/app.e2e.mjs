@@ -56,6 +56,14 @@ describe('screenshots (E2E_SCREENSHOTS=1)', { skip: !SHOTS }, () => {
     await m.page.waitForTimeout(600);
     await m.page.screenshot({ path: `${shotsDir}/mobile-dashboard.png` });
     await m.ctx.close();
+    const d = await newPage(browser, srv.base);
+    await d.page.goto('/');
+    await d.page.evaluate(() => localStorage.setItem('isl-nova-prefs', JSON.stringify({ theme: 'dark' })));
+    await d.page.reload();
+    await d.page.getByText('Vocabulary by category').waitFor();
+    await d.page.waitForTimeout(600);
+    await d.page.screenshot({ path: `${shotsDir}/dashboard-dark.png` });
+    await d.ctx.close();
   });
 });
 
@@ -168,7 +176,12 @@ describe('vocabulary', () => {
     await page.getByRole('button', { name: '→ verified' }).click();
     await page.getByRole('dialog').getByLabel('Review note').fill('Form confirmed by reviewer');
     await page.getByRole('button', { name: 'Confirm' }).click();
+    await page.getByRole('dialog').waitFor({ state: 'hidden' });
+    // once verified, the only forward action offered is "→ review pending"
+    await page.getByRole('button', { name: '→ review pending' }).waitFor();
     await page.getByText('Form confirmed by reviewer').waitFor();
+    const detail = await (await fetch(`${srv.base}/api/v1/signs/ISL012`)).json();
+    assert.equal(detail.verification_status, 'verified');
     const stats = await (await fetch(`${srv.base}/api/v1/dataset/stats`)).json();
     assert.equal(stats.verified_classes, 1);
     assert.deepEqual(errors, []);
@@ -301,6 +314,23 @@ describe('modules render with real data', () => {
     await page.getByRole('button', { name: /Teacher/ }).first().click();
     await page.waitForFunction(() => document.querySelector('textarea')?.value === 'School Teacher');
     await page.getByText(/2 meanings are unverified/).waitFor();
+    await ctx.close();
+  });
+
+  test('light theme is the default and the toggle switches to dark and back', async () => {
+    const { page, ctx, errors } = await newPage(browser, srv.base);
+    await page.goto('/');
+    const isDark = () => page.evaluate(() => document.documentElement.classList.contains('dark'));
+    assert.equal(await isDark(), false);
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    assert.equal(bg, 'rgb(246, 247, 251)');
+    await page.getByRole('button', { name: 'Switch to dark theme' }).click();
+    assert.equal(await isDark(), true);
+    await page.reload();
+    assert.equal(await isDark(), true, 'theme choice persists');
+    await page.getByRole('button', { name: 'Switch to light theme' }).click();
+    assert.equal(await isDark(), false);
+    assert.deepEqual(errors, []);
     await ctx.close();
   });
 

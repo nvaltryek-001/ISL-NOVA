@@ -70,7 +70,7 @@ export function VizPage() {
       for (const [a, b] of edges) { const [x1, y1] = proj(pts[a]); const [x2, y2] = proj(pts[b]); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); }
       ctx.stroke();
     };
-    if (f.pose) draw(f.pose, POSE_EDGES, '#4a5578');
+    if (f.pose) draw(f.pose, POSE_EDGES, getComputedStyle(c).getPropertyValue('--color-ink-500').trim() || '#4a5578');
     if (f.left) draw(f.left, HAND_EDGES, '#a78bfa');
     if (f.right) draw(f.right, HAND_EDGES, '#22d3ee');
   }, [seq, i, yaw, pitch]);

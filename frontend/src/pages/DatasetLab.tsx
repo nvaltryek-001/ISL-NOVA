@@ -71,7 +71,7 @@ function Overview() {
         </Card>
         <Card title="External source">
           <p className="text-sm text-ink-200">{s.external_source.name}</p>
-          <p className="mt-1 font-display text-3xl font-semibold text-white">{s.external_source.videos_listed.toLocaleString()}</p>
+          <p className="mt-1 font-display text-3xl font-semibold text-fg">{s.external_source.videos_listed.toLocaleString()}</p>
           <p className="muted text-xs">videos listed in the official train/val/test split for these 200 classes</p>
           <div className="mt-3"><Badge tone={s.external_source.downloaded ? 'ok' : 'warn'}>{s.external_source.downloaded ? 'Imported' : 'Not downloaded in this deployment'}</Badge></div>
           <p className="muted mt-3 text-xs">See docs/DATASET_PROTOCOL.md for the import command (56.8 GB from Zenodo).</p>
@@ -260,7 +260,7 @@ function Studio() {
         <Card title="2 · Sign to record">
           <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search vocabulary…" aria-label="Search sign to record" />
           <ul className="mt-2 space-y-1">{signs.data?.items.map((s) => <li key={s.sign_id}><button onClick={() => { setSign(s); setQ(''); }} className="flex w-full justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-ink-700">{s.canonical_sign_name}<span className="font-mono text-xs text-ink-500">{s.sign_id}</span></button></li>)}</ul>
-          {sign && <div className="mt-3 flex items-center justify-between rounded-xl border border-nova-500/40 bg-nova-500/5 p-3"><div><p className="font-mono text-xs text-ink-400">{sign.sign_id}</p><p className="font-display text-xl font-semibold text-white">{sign.canonical_sign_name}</p></div><StatusBadge status={sign.verification_status} /></div>}
+          {sign && <div className="mt-3 flex items-center justify-between rounded-xl border border-nova-500/40 bg-nova-500/5 p-3"><div><p className="font-mono text-xs text-ink-400">{sign.sign_id}</p><p className="font-display text-xl font-semibold text-fg">{sign.canonical_sign_name}</p></div><StatusBadge status={sign.verification_status} /></div>}
         </Card>
         <Card title="Recording guidance">
           <ul className="list-disc space-y-1 pl-5 text-sm text-ink-300">

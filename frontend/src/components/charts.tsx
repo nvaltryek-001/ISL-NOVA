@@ -32,7 +32,7 @@ export function Segmented({ parts, label }: { parts: { label: string; value: num
       </div>
       <figcaption className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
         {parts.map((p) => (
-          <span key={p.label} className="inline-flex items-center gap-1.5 text-ink-300"><span className="size-2 rounded-full" style={{ background: p.color }} />{p.label}<b className="font-semibold tabular-nums text-white">{p.value}</b></span>
+          <span key={p.label} className="inline-flex items-center gap-1.5 text-ink-300"><span className="size-2 rounded-full" style={{ background: p.color }} />{p.label}<b className="font-semibold tabular-nums text-fg">{p.value}</b></span>
         ))}
       </figcaption>
     </figure>
@@ -48,7 +48,7 @@ export function LineChart({ series, height = 160, yMax = 1, label }: { series: {
     <figure aria-label={label}>
       <svg viewBox={`0 0 ${W} ${height}`} className="w-full" role="img" aria-label={label}>
         {[0, 0.5, 1].map((t) => (
-          <g key={t}><line x1={30} x2={W - 10} y1={y(t * yMax)} y2={y(t * yMax)} stroke="#1f2740" /><text x={0} y={y(t * yMax) + 4} fill="#7b86a8" fontSize={10}>{(t * yMax).toFixed(yMax <= 1 ? 1 : 0)}</text></g>
+          <g key={t}><line x1={30} x2={W - 10} y1={y(t * yMax)} y2={y(t * yMax)} style={{ stroke: 'var(--color-ink-700)' }} /><text x={0} y={y(t * yMax) + 4} style={{ fill: 'var(--color-ink-400)' }} fontSize={10}>{(t * yMax).toFixed(yMax <= 1 ? 1 : 0)}</text></g>
         ))}
         {series.map((s, si) => (
           <polyline key={s.name} fill="none" stroke={s.color ?? PALETTE[si]} strokeWidth={2} points={s.values.map((v, i) => `${x(i)},${y(v)}`).join(' ')} />
@@ -71,8 +71,8 @@ export function Heatmap({ matrix, labels, label }: { matrix: number[][]; labels:
           <span key={`l${i}`} className="pr-2 text-right text-[10px] text-ink-400">{cell >= 14 ? labels[i] : ''}</span>,
           ...row.map((v, j) => (
             <span key={`${i}-${j}`} title={`true ${labels[i]} → predicted ${labels[j]}: ${v}`}
-              className={clsx('grid place-items-center text-[10px]', i === j ? 'text-ink-950' : 'text-white')}
-              style={{ width: cell, height: cell, background: v ? `rgba(${i === j ? '52,211,153' : '167,139,250'},${0.15 + 0.85 * (v / max)})` : '#151b2d' }}>
+              className={clsx('grid place-items-center text-[10px]', i === j ? 'text-on-accent' : 'text-fg')}
+              style={{ width: cell, height: cell, background: v ? `rgba(${i === j ? '52,211,153' : '167,139,250'},${0.15 + 0.85 * (v / max)})` : 'var(--color-ink-800)' }}>
               {cell >= 28 && v ? v : ''}
             </span>
           )),
@@ -90,8 +90,8 @@ export function ProbBars({ items }: { items: { label: string; sub?: string; p: n
         <li key={t.label + i} className="grid grid-cols-[1.5rem_1fr_3.5rem] items-center gap-2 text-sm">
           <span className="text-xs tabular-nums text-ink-400">{i + 1}</span>
           <span>
-            <span className="flex justify-between"><span className={i === 0 ? 'font-medium text-white' : 'text-ink-200'}>{t.label}</span><span className="text-xs text-ink-500">{t.sub}</span></span>
-            <span className="mt-1 block h-1.5 rounded-full bg-ink-700"><span className="block h-full rounded-full" style={{ width: `${t.p * 100}%`, background: i === 0 ? '#22d3ee' : '#4a5578' }} /></span>
+            <span className="flex justify-between"><span className={i === 0 ? 'font-medium text-fg' : 'text-ink-200'}>{t.label}</span><span className="text-xs text-ink-500">{t.sub}</span></span>
+            <span className="mt-1 block h-1.5 rounded-full bg-ink-700"><span className="block h-full rounded-full" style={{ width: `${t.p * 100}%`, background: i === 0 ? 'var(--color-signal)' : 'var(--color-ink-500)' }} /></span>
           </span>
           <span className="text-right text-xs tabular-nums text-ink-300">{(t.p * 100).toFixed(1)}%</span>
         </li>

@@ -13,15 +13,16 @@ _Last updated: 2026-11-03, branch `feat/isl-nova-platform`._ Every result below 
 | PostgreSQL query compatibility | every distinct SQL statement executed by the test suite (163) run through `PREPARE` on PostgreSQL 16.15 | ✅ 0 errors |
 | Vocabulary reproducibility | `python dataset/scripts/build_vocabulary.py` then diff | ✅ identical output |
 | Frontend type check | `tsc --noEmit` (strict) | ✅ exit 0 |
-| Frontend unit tests | `npm test` | ✅ **15 passed** (includes 4 Python↔TypeScript feature-parity cases, max diff < 2×10⁻⁵) |
+| Frontend unit tests | `npm test` | ✅ **16 passed** (includes 4 Python↔TypeScript feature-parity cases, max diff < 2×10⁻⁵) |
 | Production build | `npm run build` | ✅ JS 405 kB, CSS 49 kB (minified, before gzip) |
-| End-to-end (Chromium, fake camera) | `npm run e2e` | ✅ **14 passed**; screenshot run (`E2E_SCREENSHOTS=1`) also passed |
+| End-to-end (Chromium, fake camera) | `npm run e2e` | ✅ **15 passed** (4 consecutive clean runs after the light-theme redesign); screenshot run (`E2E_SCREENSHOTS=1`) also passed |
 | Synthetic ML smoke test | `python -m isl_nova_ml.smoke` | ✅ all 4 model kinds train, calibrate, evaluate and register. **Metrics are synthetic and are not ISL results.** |
 | Docker image build + container health | `docker build .` and `/api/v1/health` (GitHub Actions) | ✅ passed in CI run 41678896858 (not buildable in the sandbox) |
 | Container layout + production start | files copied as in the Dockerfile; `ISL_NOVA_ENV=production` migrate + uvicorn | ✅ health ok, SPA served, 200 slots seeded; refuses to start without `JWT_SECRET` |
 | Deployment | - | ⛔ not deployed (no credentials) |
 
 ### Bugs found by the tests and fixed
+* Flaky review-workflow E2E check read stats before the verification dialog closed; now waits for the post-verification state.
 * **PostgreSQL only (found by CI):** erasing a signer violated the recordings → consent FK because PostgreSQL checks it before cascading. Fixed by deleting in explicit dependency order.
 * CI E2E flake: recording took longer than 15 s when MediaPipe really loaded on the runner; timeouts raised.
 * A synthetic class ID was written into the `recognition_history.chosen_sign` foreign key, causing an integrity error. Fixed by only storing vocabulary IDs.

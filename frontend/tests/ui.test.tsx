@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { Heatmap, ProbBars, Segmented } from '../src/components/charts.tsx';
 import { Badge, Button, Empty, Meter, Notice, StatusBadge, Stat, fmt } from '../src/components/ui.tsx';
 import { match } from '../src/lib/router.tsx';
-import { can, createStore, type User } from '../src/lib/store.ts';
+import { can, createStore, resolvedTheme, type User } from '../src/lib/store.ts';
 
 const user = (roles: string[]): User => ({ id: 1, email: 'a@b.c', display_name: 'A', roles, preferred_language: 'en', settings: {} });
 
@@ -79,4 +79,10 @@ test('formatters never invent values', () => {
   assert.equal(fmt.pct(0.1234), '12.3%');
   assert.equal(fmt.bytes(0), '-');
   assert.equal(fmt.date(null), '-');
+});
+
+test('explicit themes resolve to themselves; system falls back to light without matchMedia', () => {
+  assert.equal(resolvedTheme('light'), 'light');
+  assert.equal(resolvedTheme('dark'), 'dark');
+  assert.equal(resolvedTheme('system'), 'light');
 });

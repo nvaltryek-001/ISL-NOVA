@@ -71,7 +71,7 @@ export function CommunicatePage() {
               return (
                 <span key={i} className="inline-flex items-center gap-1.5 rounded-lg bg-ink-800 py-1 pl-2.5 pr-1 text-sm ring-1 ring-ink-600">
                   {m.text}{!m.verified && <span className="size-1.5 rounded-full bg-amber-400" title="Meaning not verified" />}
-                  <button className="rounded p-0.5 text-ink-400 hover:bg-ink-700 hover:text-white" onClick={() => { setSeq(seq.filter((_, j) => j !== i)); setEdited(false); }} aria-label={`Remove ${m.text}`}><Icon name="close" size={14} /></button>
+                  <button className="rounded p-0.5 text-ink-400 hover:bg-ink-700 hover:text-fg" onClick={() => { setSeq(seq.filter((_, j) => j !== i)); setEdited(false); }} aria-label={`Remove ${m.text}`}><Icon name="close" size={14} /></button>
                 </span>
               );
             })}
@@ -97,7 +97,7 @@ export function CommunicatePage() {
             {phrases.data.map((p) => (
               <li key={p.id} className="flex items-start justify-between gap-2 rounded-xl border border-ink-700 p-3">
                 <div>
-                  <p className="text-white" lang={p.language}>{p.text}</p>
+                  <p className="text-fg" lang={p.language}>{p.text}</p>
                   <p className="mt-1 flex gap-1.5 text-xs text-ink-500">{p.is_quick && <Badge tone="ok">Quick phrase</Badge>}<span>{LANGS[p.language as Lang]} · {p.sign_ids.length} signs</span></p>
                 </div>
                 <div className="flex shrink-0">

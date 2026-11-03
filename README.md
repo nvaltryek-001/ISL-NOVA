@@ -67,6 +67,8 @@ Indian Sign Language has few openly licensed, consented datasets. Many recogniti
 | **3D Visualisation** *(experimental)* | Record or load real landmark sequences; orbit, frame stepping, speed, wrist trajectories |
 | **Admin & Kiosk** | User roles, feedback inbox, audit log; full-screen high-contrast kiosk with large targets, verified quick phrases and one-tap session reset |
 
+**Design:** a clean **light theme by default** (white cards on a soft violet-tinted canvas, deep-violet accents, AA-contrast status colours) with a one-click **dark theme** toggle in the header, or *match my device* in Settings. Both themes share one token system (`frontend/src/styles.css`).
+
 Accessibility throughout: keyboard navigation and visible focus, skip link, labelled controls, high-contrast, reduced-motion and large-text modes, and a responsive layout tested at 390 px.
 
 ## 🏗 Architecture
@@ -112,7 +114,10 @@ All screenshots were captured by the Playwright suite from the running applicati
 | ![Dataset Lab readiness funnel](docs/screenshots/dataset-lab.png) **Dataset Lab.** Readiness funnel and per-class table. | ![Sign explorer grid](docs/screenshots/sign-explorer.png) **Sign Explorer.** 200 slots, searchable. |
 | ![Communication composer](docs/screenshots/communication.png) **Communication.** Composer with unverified-meaning warnings. | ![Kiosk mode](docs/screenshots/kiosk.png) **Kiosk.** High-contrast, large targets. |
 
-<details><summary>More: AI Laboratory feature contract · mobile</summary>
+<details><summary>More: dark theme · AI Laboratory · mobile</summary>
+
+<img src="docs/screenshots/dashboard-dark.png" alt="Dashboard in dark theme" width="100%" />
+
 
 <img src="docs/screenshots/ai-laboratory.png" alt="AI Laboratory feature contract" width="72%" /> <img src="docs/screenshots/mobile-dashboard.png" alt="Mobile dashboard" width="24%" />
 
@@ -275,10 +280,10 @@ GET    /history  POST /feedback  GET /learning/progress  POST /learning/attempts
 | Backend on PostgreSQL | `TEST_DATABASE_URL=postgresql://… pytest backend/tests` | ✅ pass (CI) |
 | Docker image + health check | GitHub Actions `docker` job | ✅ pass (CI) |
 | Frontend types | `cd frontend && npm run typecheck` | ✅ pass |
-| Frontend unit + feature parity | `npm test` | ✅ 15 passed |
-| End-to-end (Chromium, fake camera) | `npm run build && npm run e2e` | ✅ 14 passed |
+| Frontend unit + feature parity | `npm test` | ✅ 16 passed |
+| End-to-end (Chromium, fake camera) | `npm run build && npm run e2e` | ✅ 15 passed |
 
-The E2E suite covers startup, registration and RBAC, search, sign CRUD, linguist verification, the full consent → record → four-eyes review flow, model-unavailable and camera-denied states, kiosk, every route for a single `h1` and unnamed buttons, and the 390 px layout. Evidence and the bugs the tests caught: [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md).
+The E2E suite covers startup, registration and RBAC, search, sign CRUD, linguist verification, the full consent → record → four-eyes review flow, model-unavailable and camera-denied states, kiosk, every route for a single `h1` and unnamed buttons, the light/dark theme toggle, and the 390 px layout. Evidence and the bugs the tests caught: [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md).
 
 ## ☁️ Deployment
 

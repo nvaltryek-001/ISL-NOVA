@@ -38,7 +38,7 @@ export function AcademyPage() {
                   <Meter label="Practised" value={practised} max={l.signs.length} tone="signal" />
                   <ul className="mt-4 flex flex-wrap gap-1.5">
                     {l.signs.map((s) => (
-                      <li key={s.sign_id}><Link to={`/signs/${s.sign_id}`} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs hover:text-white ${s.verification_status === 'verified' ? 'border-emerald-500/40 text-emerald-200' : 'border-ink-600 text-ink-300'}`}>
+                      <li key={s.sign_id}><Link to={`/signs/${s.sign_id}`} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs hover:text-fg ${s.verification_status === 'verified' ? 'border-emerald-500/40 text-emerald-200' : 'border-ink-600 text-ink-300'}`}>
                         {s.canonical_sign_name}{s.attempts > 0 && <span className="text-ink-500">{s.correct}/{s.attempts}</span>}
                       </Link></li>
                     ))}
@@ -64,7 +64,7 @@ function QuizView({ signedIn }: { signedIn: boolean }) {
   if (!quiz.data?.available) return <Card><Empty icon="cap" title="Quiz not available yet">{quiz.data?.reason}</Empty></Card>;
   const qs = quiz.data.questions;
   if (i >= qs.length) return (
-    <Card className="text-center"><p className="font-display text-4xl font-semibold text-white">{score} / {qs.length}</p><p className="muted mt-2">Answers recorded{signedIn ? ' to your progress' : ''}.</p>
+    <Card className="text-center"><p className="font-display text-4xl font-semibold text-fg">{score} / {qs.length}</p><p className="muted mt-2">Answers recorded{signedIn ? ' to your progress' : ''}.</p>
       <Button className="mt-5" variant="primary" onClick={() => { setI(0); setScore(0); setPicked(null); quiz.refetch(); }}>New quiz</Button></Card>
   );
   const q = qs[i];
@@ -77,7 +77,7 @@ function QuizView({ signedIn }: { signedIn: boolean }) {
   };
   return (
     <Card title={`Question ${i + 1} of ${qs.length}`} action={<Badge tone="nova">Score {score}</Badge>}>
-      <p className="text-lg text-white">{q.prompt}</p>
+      <p className="text-lg text-fg">{q.prompt}</p>
       {q.reference && <a className="mt-1 inline-block text-sm text-nova-300 hover:underline" href={q.reference.source_url} target="_blank" rel="noreferrer noopener">View reference ({q.reference.source_name})</a>}
       <div className="mt-5 grid gap-2 md:grid-cols-2">
         {q.options.map((o) => {
