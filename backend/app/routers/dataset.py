@@ -195,6 +195,12 @@ def delete_signer(ctx: Ctx):
             ctx.db.update("consent_records", {"revoked_at": utcnow(), "revocation_reason": "signer erased"},
                           "signer_id = ? AND revoked_at IS NULL", (sid,))
         else:
+            # explicit dependency order: recordings reference consent records, which
+            # PostgreSQL checks before cascading from the signer
+            ctx.db.execute("DELETE FROM recordings WHERE session_id IN "
+                           "(SELECT id FROM recording_sessions WHERE signer_id = ?)", (sid,))
+            ctx.db.execute("DELETE FROM recording_sessions WHERE signer_id = ?", (sid,))
+            ctx.db.execute("DELETE FROM consent_records WHERE signer_id = ?", (sid,))
             ctx.db.execute("DELETE FROM pseudonymous_signers WHERE id = ?", (sid,))
         for sign in {r["sign_id"] for r in recs}:
             recompute_readiness(ctx.db, sign)
