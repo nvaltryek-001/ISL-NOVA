@@ -27,8 +27,7 @@ import numpy as np
 
 from . import contract as C
 from .augment import augment_batch
-from .data import (assign_splits, build_tensors, leakage_report, load_manifest, sha256_file,
-                   training_eligible)
+from .data import assign_splits, build_tensors, leakage_report, load_manifest, sha256_file, training_eligible
 from .metrics import choose_threshold, classification_report, open_set_report
 from .models import REGISTRY, fit_temperature, save_model, softmax
 from .registry import Registry

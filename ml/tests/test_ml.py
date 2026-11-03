@@ -3,15 +3,20 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-
 from isl_nova_ml import contract as C
-from isl_nova_ml.data import (ManifestError, assign_splits, leakage_report, load_landmarks,
-                              load_manifest, save_landmarks, training_eligible)
+from isl_nova_ml.data import (
+    ManifestError,
+    assign_splits,
+    leakage_report,
+    load_landmarks,
+    load_manifest,
+    save_landmarks,
+    training_eligible,
+)
 from isl_nova_ml.features import extract_features
 from isl_nova_ml.inference import ModelUnavailable, Predictor, StreamSmoother
 from isl_nova_ml.metrics import auroc, classification_report, expected_calibration_error, topk_accuracy
-from isl_nova_ml.models import (DTW1NN, GRUClassifier, LSTMClassifier, PooledLogReg, load_model,
-                                save_model, softmax)
+from isl_nova_ml.models import DTW1NN, GRUClassifier, LSTMClassifier, PooledLogReg, load_model, save_model, softmax
 from isl_nova_ml.registry import Registry, RegistryError
 from isl_nova_ml.synthetic import make_sequence, write_synthetic_dataset
 from isl_nova_ml.train import TrainingError, run

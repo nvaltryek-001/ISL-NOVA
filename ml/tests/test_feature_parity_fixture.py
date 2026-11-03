@@ -12,7 +12,6 @@ import os
 from pathlib import Path
 
 import numpy as np
-
 from isl_nova_ml import contract as C
 from isl_nova_ml.features import extract_features
 from isl_nova_ml.synthetic import make_sequence

@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 import pytest
-
 from isl_nova_ml.data import leakage_report
 from isl_nova_ml.extract import ExtractorUnavailable, LandmarkExtractor
 from isl_nova_ml.include_import import plan

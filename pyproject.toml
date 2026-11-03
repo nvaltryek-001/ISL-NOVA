@@ -1,0 +1,23 @@
+[project]
+name = "isl-nova"
+version = "0.1.0"
+description = "ISL NOVA - Indian Sign Language recognition, learning and dataset platform"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["backend", "ml"]
+testpaths = ["backend/tests", "ml/tests"]
+addopts = "-p no:cacheprovider"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["frontend", "dataset/sources"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "BLE"]
+ignore = ["S101", "S608", "S311", "B008", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S", "B"]
