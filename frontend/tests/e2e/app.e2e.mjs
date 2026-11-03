@@ -177,7 +177,7 @@ describe('vocabulary', () => {
 });
 
 describe('dataset workflow', () => {
-  test('signer, consent, recording studio upload, four-eyes review', async () => {
+  test('signer, consent, recording studio upload, four-eyes review', { timeout: 180000 }, async () => {
     const { page, errors, ctx } = await newPage(browser, srv.base);
     await login(page);
     await page.goto('/dataset');
@@ -203,9 +203,9 @@ describe('dataset workflow', () => {
     await page.getByRole('button', { name: 'Start camera' }).click();
     await page.getByText('LIVE', { exact: true }).waitFor();
     await page.getByRole('button', { name: 'Record clip' }).click();
-    await page.getByLabel('Recorded clip preview').waitFor({ timeout: 15000 });
+    await page.getByLabel('Recorded clip preview').waitFor({ timeout: 60000 }); // MediaPipe on CPU can slow the page in CI
     await page.getByRole('button', { name: 'Upload for review' }).click();
-    await page.getByText(/Uploaded REC-/).waitFor({ timeout: 15000 });
+    await page.getByText(/Uploaded REC-/).waitFor({ timeout: 60000 });
 
     await page.getByRole('tab', { name: 'Review queue' }).click();
     await page.getByRole('row', { name: /ISL012/ }).getByRole('button', { name: 'Open' }).click();
