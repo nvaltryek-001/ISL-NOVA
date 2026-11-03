@@ -8,7 +8,7 @@ _Last updated: 2026-11-03, branch `feat/isl-nova-platform`._ Every result below 
 |---|---|---|
 | Python lint | `ruff check backend ml dataset/scripts scripts` | ✅ all checks passed |
 | Backend + ML tests (SQLite) | `pytest -q` | ✅ **56 passed, 1 skipped**. The skip is `test_extractor_runs_on_a_video`, which needs a MediaPipe `.task` model file that is not available offline. |
-| Backend tests (PostgreSQL) | `TEST_DATABASE_URL=… pytest backend/tests` | ⏳ **not run locally** (no psycopg). Configured in CI. |
+| Backend tests (PostgreSQL) | `TEST_DATABASE_URL=… pytest backend/tests` (GitHub Actions, PostgreSQL 16 service) | ✅ passed in CI run 41678896858 (the first CI run found a real FK-order bug, now fixed) |
 | PostgreSQL schema | rendered DDL applied to PostgreSQL 16.15 with `ON_ERROR_STOP=1` | ✅ 28 tables created |
 | PostgreSQL query compatibility | every distinct SQL statement executed by the test suite (163) run through `PREPARE` on PostgreSQL 16.15 | ✅ 0 errors |
 | Vocabulary reproducibility | `python dataset/scripts/build_vocabulary.py` then diff | ✅ identical output |
@@ -17,11 +17,13 @@ _Last updated: 2026-11-03, branch `feat/isl-nova-platform`._ Every result below 
 | Production build | `npm run build` | ✅ JS 405 kB, CSS 49 kB (minified, before gzip) |
 | End-to-end (Chromium, fake camera) | `npm run e2e` | ✅ **14 passed**; screenshot run (`E2E_SCREENSHOTS=1`) also passed |
 | Synthetic ML smoke test | `python -m isl_nova_ml.smoke` | ✅ all 4 model kinds train, calibrate, evaluate and register. **Metrics are synthetic and are not ISL results.** |
-| Docker image build | `docker build .` | ⛔ **not verified**: Docker Hub and GHCR blocked. Runs in CI. |
+| Docker image build + container health | `docker build .` and `/api/v1/health` (GitHub Actions) | ✅ passed in CI run 41678896858 (not buildable in the sandbox) |
 | Container layout + production start | files copied as in the Dockerfile; `ISL_NOVA_ENV=production` migrate + uvicorn | ✅ health ok, SPA served, 200 slots seeded; refuses to start without `JWT_SECRET` |
 | Deployment | - | ⛔ not deployed (no credentials) |
 
 ### Bugs found by the tests and fixed
+* **PostgreSQL only (found by CI):** erasing a signer violated the recordings → consent FK because PostgreSQL checks it before cascading. Fixed by deleting in explicit dependency order.
+* CI E2E flake: recording took longer than 15 s when MediaPipe really loaded on the runner; timeouts raised.
 * A synthetic class ID was written into the `recognition_history.chosen_sign` foreign key, causing an integrity error. Fixed by only storing vocabulary IDs.
 * PostgreSQL `SUM()` returns `Decimal`, which breaks JSON responses. Values are now normalised in `db.py`.
 * Dialog `aria-labelledby` used titles containing spaces, which broke the accessible name. Now uses `useId()`.
@@ -45,9 +47,9 @@ _Last updated: 2026-11-03, branch `feat/isl-nova-platform`._ Every result below 
 | | metrics from held-out evaluation; no fabricated accuracy | ✅ pipeline evaluates test once; no ISL metrics claimed |
 | Product | core routes work, no dead buttons, responsive, loading/error/empty states, server-side permissions | ✅ (E2E covers all routes, 390 px layout, unnamed-button check) |
 | Quality | tests run; production build; security addressed | ✅ |
-| | Docker path verified | ⚠️ layout verified; image build pending CI |
+| | Docker path verified | ✅ image built and health-checked in CI |
 | Delivery | README, docs, branch pushed | ✅ |
-| | PR / deployment | ⛔ PR must be opened from GitHub (sandbox `gh` token invalid); no deployment credentials |
+| | PR / deployment | ✅ PR #1 opened · ⛔ no deployment credentials |
 
 ## 200-class dataset numbers
 | Metric | Value |
@@ -60,7 +62,7 @@ _Last updated: 2026-11-03, branch `feat/isl-nova-platform`._ Every result below 
 | External videos listed (INCLUDE, not downloaded) | 3,392 |
 
 ## Continuation notes
-1. Open the PR `feat/isl-nova-platform → main` and let CI run the PostgreSQL tests and the Docker build. Fix anything environment-specific.
+1. Review and merge PR #1 (CI green).
 2. Download INCLUDE plus the MediaPipe task files, run `include_import`, train `ml/configs/lstm_baseline.json`, and fill [MODEL_CARD.md](MODEL_CARD.md) from `metrics.json`.
 3. Assign the `linguist` role only to qualified ISL reviewers and start verification of the 200 slots.
 4. Choose a licence for the project (none is committed; see README).

@@ -272,7 +272,8 @@ GET    /history  POST /feedback  GET /learning/progress  POST /learning/attempts
 |---|---|---|
 | Lint | `ruff check backend ml dataset/scripts scripts` | ✅ pass |
 | Backend + ML | `pytest -q` | ✅ 56 passed, 1 skipped (needs a MediaPipe model file) |
-| Backend on PostgreSQL | `TEST_DATABASE_URL=postgresql://… pytest backend/tests` | runs in CI |
+| Backend on PostgreSQL | `TEST_DATABASE_URL=postgresql://… pytest backend/tests` | ✅ pass (CI) |
+| Docker image + health check | GitHub Actions `docker` job | ✅ pass (CI) |
 | Frontend types | `cd frontend && npm run typecheck` | ✅ pass |
 | Frontend unit + feature parity | `npm test` | ✅ 15 passed |
 | End-to-end (Chromium, fake camera) | `npm run build && npm run e2e` | ✅ 14 passed |
@@ -281,7 +282,7 @@ The E2E suite covers startup, registration and RBAC, search, sign CRUD, linguist
 
 ## ☁️ Deployment
 
-**Not deployed; there is no live URL.** The repository ships a multi-stage [`Dockerfile`](Dockerfile), [`docker-compose.yml`](docker-compose.yml) with PostgreSQL 16, health checks and a CI image build. Platform steps (Render / Fly.io / Railway), HTTPS/CORS, storage, a post-deploy checklist and rollback are in [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md). Deploying needs a platform account and approval for any paid resources.
+**Not deployed; there is no live URL.** The repository ships a multi-stage [`Dockerfile`](Dockerfile), [`docker-compose.yml`](docker-compose.yml) with PostgreSQL 16 and health checks; CI builds the image and checks its health endpoint. Platform steps (Render / Fly.io / Railway), HTTPS/CORS, storage, a post-deploy checklist and rollback are in [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md). Deploying needs a platform account and approval for any paid resources.
 
 ## 🔬 Research
 
