@@ -16,6 +16,10 @@ on:
         description: "Publish the selected model as a GitHub pre-release asset"
         type: boolean
         default: true
+  # see include-data.yml: until on the default branch, runs start by pushing
+  # the run branch; settings come from ml/runs/include-train.json
+  push:
+    branches: ["run/include-train"]
 
 permissions:
   contents: write   # pre-release asset of the selected model
@@ -25,7 +29,27 @@ env:
   PYTHONPATH: ml
 
 jobs:
+  settings:
+    runs-on: ubuntu-24.04
+    outputs:
+      data_run_id: ${{ steps.cfg.outputs.data_run_id }}
+      epochs: ${{ steps.cfg.outputs.epochs }}
+      publish_release: ${{ steps.cfg.outputs.publish_release }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: cfg
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          d = "${{ github.event_name }}" == "workflow_dispatch"
+          cfg = {} if d else json.load(open("ml/runs/include-train.json"))
+          print("data_run_id=" + ("${{ needs.settings.outputs.data_run_id }}" if d else str(cfg["data_run_id"])))
+          print("epochs=" + ("${{ inputs.epochs }}" if d else str(cfg.get("epochs", 60))))
+          print("publish_release=" + ("${{ inputs.publish_release }}" if d else str(cfg.get("publish_release", True)).lower()))
+          PY
+
   train:
+    needs: settings
     runs-on: ubuntu-24.04
     timeout-minutes: 340
     strategy:
@@ -45,11 +69,11 @@ jobs:
         with:
           name: include-landmarks-v1
           path: data
-          run-id: ${{ inputs.data_run_id }}
+          run-id: ${{ needs.settings.outputs.data_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Train ${{ matrix.kind }} (official split; selection/calibration on validation; test evaluated once)
         run: |
-          python -c "import json,sys;c=json.load(open('${{ matrix.config }}'));c['epochs']=int('${{ inputs.epochs }}');json.dump(c,open('cfg.json','w'))"
+          python -c "import json,sys;c=json.load(open('${{ matrix.config }}'));c['epochs']=int('${{ needs.settings.outputs.epochs }}');json.dump(c,open('cfg.json','w'))"
           python -m isl_nova_ml.train --config cfg.json --manifest data/manifest.json --data-root data \
             --registry reg --vocab dataset/vocabulary/signs_master.csv --dataset-version include-official-v1 2>&1 | tee train.log
           cp train.log reg/*/
@@ -57,7 +81,7 @@ jobs:
         with: { name: "model-${{ matrix.kind }}", path: reg, retention-days: 90 }
 
   compare:
-    needs: train
+    needs: [settings, train]
     if: ${{ always() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -72,7 +96,7 @@ jobs:
         with:
           name: include-landmarks-v1
           path: data
-          run-id: ${{ inputs.data_run_id }}
+          run-id: ${{ needs.settings.outputs.data_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Assemble registry, select by validation macro-F1, compare
         run: |
@@ -86,7 +110,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with: { name: include-models, path: "registry\nreport", retention-days: 90 }
       - name: Publish selected model (pre-release)
-        if: ${{ inputs.publish_release }}
+        if: ${{ needs.settings.outputs.publish_release == 'true' }}
         env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
         run: |
           best=$(python -c "import json;print(json.load(open('report/comparison.json'))['best'])")
@@ -94,4 +118,4 @@ jobs:
           sha256sum "$best.tar.gz" > "$best.tar.gz.sha256"
           gh release create "model-$best" "$best.tar.gz" "$best.tar.gz.sha256" report/comparison.md report/comparison.json report/verify.json \
             --target "$GITHUB_SHA" --prerelease --title "ISL NOVA model $best (INCLUDE official split)" \
-            --notes "Trained by workflow run $GITHUB_RUN_ID on INCLUDE (Sridhar et al., ACM MM 2020, CC BY 4.0) landmarks from data run ${{ inputs.data_run_id }}. Evaluated on the INCLUDE official test split; INCLUDE has no signer IDs, so results are NOT signer-independent. See comparison.md."
+            --notes "Trained by workflow run $GITHUB_RUN_ID on INCLUDE (Sridhar et al., ACM MM 2020, CC BY 4.0) landmarks from data run ${{ needs.settings.outputs.data_run_id }}. Evaluated on the INCLUDE official test split; INCLUDE has no signer IDs, so results are NOT signer-independent. See comparison.md."

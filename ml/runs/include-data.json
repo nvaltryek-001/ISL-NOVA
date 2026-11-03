@@ -1,0 +1,5 @@
+{
+  "only": "Seasons",
+  "max_parallel": 2,
+  "purpose": "pilot: one category to validate download, zip layout and extraction speed"
+}
