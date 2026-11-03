@@ -1,0 +1,601 @@
+sign_id,language,text,status,translator,reviewer,source,notes
+ISL001,en,Alright,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL001,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL001,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL002,en,Bad,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL002,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL002,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL003,en,Blind,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL003,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL003,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL004,en,Deaf,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL004,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL004,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL005,en,Friend,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL005,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL005,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL006,en,Gift,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL006,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL006,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL007,en,Good,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL007,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL007,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL008,en,Good afternoon,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL008,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL008,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL009,en,Good evening,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL009,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL009,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL010,en,Good Morning,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL010,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL010,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL011,en,Good night,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL011,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL011,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL012,en,Hello,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL012,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL012,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL013,en,How are you,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL013,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL013,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL014,en,Marriage,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL014,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL014,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL015,en,Neighbour,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL015,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL015,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL016,en,Nice,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL016,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL016,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL017,en,Pleased,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL017,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL017,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL018,en,Sign,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL018,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL018,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL019,en,Thank you,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL019,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL019,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL020,en,Baby,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL020,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL020,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL021,en,Boy,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL021,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL021,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL022,en,Brother,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL022,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL022,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL023,en,Child,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL023,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL023,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL024,en,Daughter,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL024,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL024,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL025,en,Family,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL025,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL025,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL026,en,Father,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL026,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL026,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL027,en,Girl,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL027,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL027,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL028,en,Grandfather,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL028,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL028,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL029,en,Grandmother,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL029,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL029,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL030,en,Husband,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL030,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL030,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL031,en,Man,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL031,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL031,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL032,en,Mother,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL032,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL032,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL033,en,Old,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL033,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL033,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL034,en,Parent,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL034,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL034,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL035,en,Sister,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL035,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL035,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL036,en,Son,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL036,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL036,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL037,en,Wife,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL037,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL037,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL038,en,Woman,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL038,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL038,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL039,en,Young,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL039,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL039,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL040,en,Exercise,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL040,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL040,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL041,en,Sport,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL041,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL041,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL042,en,Bag,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL042,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL042,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL043,en,Ball,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL043,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL043,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL044,en,Bank,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL044,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL044,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL045,en,Bathroom,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL045,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL045,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL046,en,Bed,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL046,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL046,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL047,en,Bedroom,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL047,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL047,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL048,en,Camera,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL048,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL048,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL049,en,Chair,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL049,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL049,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL050,en,City,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL050,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL050,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL051,en,Clock,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL051,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL051,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL052,en,Computer,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL052,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL052,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL053,en,Door,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL053,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL053,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL054,en,Fan,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL054,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL054,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL055,en,House,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL055,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL055,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL056,en,India,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL056,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL056,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL057,en,Key,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL057,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL057,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL058,en,Kitchen,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL058,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL058,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL059,en,Laptop,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL059,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL059,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL060,en,Lock,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL060,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL060,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL061,en,Market,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL061,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL061,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL062,en,Office,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL062,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL062,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL063,en,Park,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL063,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL063,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL064,en,Photograph,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL064,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL064,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL065,en,Restaurant,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL065,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL065,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL066,en,Store or Shop,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL066,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL066,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL067,en,Table,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL067,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL067,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL068,en,Window,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL068,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL068,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL069,en,Bill,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL069,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL069,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL070,en,Cheap,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL070,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL070,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL071,en,Clothing,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL071,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL071,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL072,en,Dress,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL072,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL072,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL073,en,Expensive,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL073,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL073,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL074,en,Hat,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL074,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL074,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL075,en,Medicine,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL075,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL075,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL076,en,Money,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL076,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL076,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL077,en,Pant,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL077,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL077,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL078,en,Poor,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL078,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL078,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL079,en,Price,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL079,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL079,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL080,en,Rich,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL080,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL080,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL081,en,Shirt,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL081,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL081,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL082,en,Shoes,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL082,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL082,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL083,en,Soap,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL083,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL083,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL084,en,T-Shirt,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL084,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL084,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL085,en,Afternoon,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL085,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL085,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL086,en,Evening,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL086,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL086,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL087,en,Friday,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL087,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL087,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL088,en,Hour,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL088,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL088,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL089,en,Minute,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL089,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL089,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL090,en,Monday,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL090,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL090,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL091,en,Month,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL091,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL091,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL092,en,Morning,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL092,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL092,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL093,en,Night,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL093,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL093,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL094,en,Saturday,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL094,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL094,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL095,en,Season,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL095,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL095,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL096,en,Second,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL096,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL096,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL097,en,Spring,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL097,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL097,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL098,en,Summer,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL098,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL098,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL099,en,Sunday,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL099,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL099,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL100,en,Thursday,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL100,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL100,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL101,en,Time,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL101,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL101,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL102,en,Today,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL102,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL102,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL103,en,Tomorrow,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL103,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL103,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL104,en,Tuesday,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL104,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL104,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL105,en,Wednesday,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL105,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL105,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL106,en,Week,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL106,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL106,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL107,en,Winter,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL107,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL107,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL108,en,Year,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL108,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL108,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL109,en,Yesterday,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL109,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL109,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL110,en,Beautiful,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL110,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL110,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL111,en,Cold,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL111,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL111,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL112,en,Dead,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL112,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL112,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL113,en,Happy,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL113,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL113,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL114,en,Healthy,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL114,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL114,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL115,en,Hot,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL115,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL115,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL116,en,Loud,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL116,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL116,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL117,en,Quiet,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL117,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL117,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL118,en,Sad,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL118,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL118,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL119,en,Sick,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL119,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL119,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL120,en,Strong,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL120,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL120,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL121,en,Ugly,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL121,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL121,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL122,en,Warm,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL122,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL122,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL123,en,Weak,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL123,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL123,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL124,en,Cell phone,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL124,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL124,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL125,en,He,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL125,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL125,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL126,en,I,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL126,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL126,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL127,en,It,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL127,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL127,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL128,en,Letter,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL128,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL128,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL129,en,Newspaper,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL129,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL129,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL130,en,Radio,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL130,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL130,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL131,en,She,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL131,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL131,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL132,en,Telephone,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL132,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL132,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL133,en,Television,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL133,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL133,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL134,en,They,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL134,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL134,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL135,en,We,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL135,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL135,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL136,en,You,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL136,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL136,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL137,en,You (plural),source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL137,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL137,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL138,en,Book,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL138,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL138,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL139,en,Doctor,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL139,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL139,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL140,en,Job,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL140,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL140,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL141,en,Lawyer,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL141,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL141,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL142,en,Library,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL142,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL142,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL143,en,Manager,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL143,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL143,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL144,en,Paper,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL144,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL144,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL145,en,Patient,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL145,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL145,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL146,en,Pen,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL146,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL146,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL147,en,Pencil,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL147,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL147,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL148,en,School,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL148,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL148,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL149,en,Student,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL149,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL149,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL150,en,Teacher,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL150,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL150,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL151,en,University,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL151,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL151,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL152,en,Waiter,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL152,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL152,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL153,en,Bicycle,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL153,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL153,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL154,en,Boat,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL154,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL154,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL155,en,Bus,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL155,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL155,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL156,en,Car,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL156,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL156,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL157,en,Hospital,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL157,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL157,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL158,en,Location,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL158,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL158,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL159,en,Plane,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL159,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL159,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL160,en,Police,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL160,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL160,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL161,en,Street or Road,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL161,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL161,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL162,en,Train,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL162,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL162,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL163,en,Train Station,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL163,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL163,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL164,en,Train ticket,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL164,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL164,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL165,en,Transportation,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL165,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL165,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL166,en,Truck,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL166,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL166,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL167,en,Big large,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL167,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL167,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL168,en,Black,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL168,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL168,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL169,en,Blue,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL169,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL169,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL170,en,Brown,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL170,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL170,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL171,en,Clean,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL171,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL171,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL172,en,Dirty,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL172,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL172,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL173,en,Dry,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL173,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL173,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL174,en,Fast,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL174,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL174,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL175,en,Green,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL175,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL175,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL176,en,Grey,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL176,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL176,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL177,en,Hard,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL177,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL177,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL178,en,Heavy,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL178,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL178,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL179,en,High,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL179,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL179,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL180,en,Long,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL180,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL180,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL181,en,Low,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL181,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL181,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL182,en,New,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL182,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL182,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL183,en,Orange,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL183,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL183,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL184,en,Pink,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL184,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL184,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL185,en,Red,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL185,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL185,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL186,en,Short,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL186,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL186,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL187,en,Slow,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL187,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL187,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL188,en,Small little,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL188,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL188,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL189,en,Soft,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL189,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL189,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL190,en,Tall,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL190,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL190,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL191,en,Wet,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL191,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL191,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL192,en,White,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL192,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL192,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL193,en,Yellow,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL193,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL193,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL194,en,Animal,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL194,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL194,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL195,en,Bird,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL195,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL195,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL196,en,Cat,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL196,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL196,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL197,en,Cow,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL197,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL197,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL198,en,Dog,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL198,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL198,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL199,en,Fish,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL199,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL199,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL200,en,Horse,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL200,hi,,pending,,,,Requires bilingual reviewer familiar with ISL usage
+ISL200,kn,,pending,,,,Requires bilingual reviewer familiar with ISL usage

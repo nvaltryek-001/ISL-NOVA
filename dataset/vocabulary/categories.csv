@@ -1,0 +1,13 @@
+category,label,planning_target,assigned_slots
+greetings_social,Greetings / social expressions,20,19
+people_family,People / family / relationships,20,20
+everyday_actions,Everyday actions,25,2
+objects_places,Objects / places,20,27
+daily_needs,Food / daily needs,20,16
+numbers_time,Numbers / time / calendar,20,25
+emotions_states,Emotions / feelings / states,20,14
+communication,Questions / communication / pronouns,20,14
+education_work,Education / work / professions,20,15
+travel_emergency,Travel / directions / emergencies,15,14
+descriptions_colours,Descriptions / colours (added: source coverage),0,27
+animals_nature,Animals / nature (added: source coverage),0,7
