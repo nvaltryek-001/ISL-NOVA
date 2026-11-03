@@ -2,6 +2,7 @@ import json
 import time
 
 import numpy as np
+from app.db import Database
 from app.main import create_app
 from isl_nova_ml.synthetic import make_sequence, write_synthetic_dataset
 from isl_nova_ml.train import run
@@ -117,6 +118,22 @@ def test_version_requires_training_consent(app_env, tmp_path):
     c.patch(f"{A}/annotations/{ann['id']}", json={"decision": "approved"}, headers=ling)
     r = c.post(f"{A}/dataset/versions", json={"version": "1.0.0", "description": "first try"}, headers=admin)
     assert r.status_code == 409 and r.json()["error"]["code"] == "no_eligible_recordings"
+
+
+def test_validation_flags_expired_retention(app_env, tmp_path):
+    c, api, admin, settings = app_env
+    s = c.post(f"{A}/dataset/signers", json={}, headers=admin).json()
+    c.post(f"{A}/dataset/signers/{s['id']}/consents", json={"scopes": ["recording_storage"], "confirmed_by_signer": True,
+                                                             "retention_until": "2099-01-01"}, headers=admin)
+    sess = c.post(f"{A}/dataset/sessions", json={"signer_id": s["id"]}, headers=admin).json()
+    r = c.post(f"{A}/dataset/recordings", data={"sign_id": "ISL009", "session_id": str(sess["id"])},
+               files={"file": ("v.mp4", make_video(tmp_path / "r.mp4", seed=9), "video/mp4")}, headers=admin)
+    assert r.status_code == 201
+    assert not any(i["check"] == "retention_expired" for i in c.post(f"{A}/dataset/validate", headers=admin).json()["issues"])
+    with Database(settings.database_url).connect() as conn:
+        conn.execute("UPDATE consent_records SET retention_until = ?", ("2020-01-01T00:00:00Z",))
+    v = c.post(f"{A}/dataset/validate", headers=admin).json()
+    assert v["ok"] is False and any(i["check"] == "retention_expired" for i in v["issues"])
 
 
 def test_signer_erasure(app_env, tmp_path):

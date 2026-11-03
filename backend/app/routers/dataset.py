@@ -513,6 +513,12 @@ def validate(ctx: Ctx):
     for r in c.all("SELECT r.recording_code FROM recordings r JOIN consent_records cr ON cr.id = r.consent_id "
                    "WHERE cr.revoked_at IS NOT NULL AND r.status <> 'deleted'"):
         issues.append({"level": "error", "check": "revoked_consent", "message": r["recording_code"]})
+    today = utcnow()[:10]
+    for r in c.all("SELECT r.recording_code, cr.retention_until FROM recordings r JOIN consent_records cr "
+                   "ON cr.id = r.consent_id WHERE cr.retention_until IS NOT NULL AND r.status <> 'deleted'"):
+        if str(r["retention_until"])[:10] < today:
+            issues.append({"level": "error", "check": "retention_expired",
+                           "message": f"{r['recording_code']} retained past {str(r['retention_until'])[:10]}"})
     approved = c.all("SELECT r.sign_id, rs.signer_id FROM recordings r JOIN recording_sessions rs ON rs.id = r.session_id "
                      "WHERE r.status = 'approved'")
     signers = {a["signer_id"] for a in approved}
