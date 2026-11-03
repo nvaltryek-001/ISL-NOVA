@@ -73,6 +73,7 @@ def split_index() -> dict[tuple[str, str], tuple[str, str]]:
                 continue
             _cat, folder, fname = line.split("/", 2)
             idx[(norm(folder), fname.lower())] = (split, line)
+            idx.setdefault((norm(folder), "stem:" + Path(fname).stem.lower()), (split, line))
     return idx
 
 
@@ -195,7 +196,7 @@ def cmd_extract_part(a) -> int:
         for n in sorted(names):
             p = work / "x" / n
             gloss = norm(p.parent.name)
-            hit = idx.get((gloss, p.name.lower()))
+            hit = idx.get((gloss, p.name.lower())) or idx.get((gloss, "stem:" + p.stem.lower()))
             if hit is None:
                 unmatched.append(n)
                 continue
@@ -231,6 +232,10 @@ def cmd_extract_part(a) -> int:
     (out / "part_manifest.json").write_text(json.dumps({"report": report, "entries": entries, "failures": failures,
                                                         "unmatched": unmatched}, indent=1))
     print(json.dumps(report, indent=2))
+    if unmatched:
+        print("UNMATCHED (not in official split lists):", json.dumps(unmatched[:60]))
+        listed = sorted(v[1] for k, v in idx.items() if not k[1].startswith("stem:") and v[1].startswith(a.part.rsplit("_", 1)[0] + "/"))
+        print("LISTED FOR THIS CATEGORY (sample):", json.dumps(listed[:60]))
     return 0
 
 
