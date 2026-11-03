@@ -323,6 +323,26 @@ def dtw_distance(a: np.ndarray, b: np.ndarray, window: int | None = None) -> flo
     return float(D[Ta, Tb] / (Ta + Tb))
 
 
+def dtw_batch(q: np.ndarray, refs: np.ndarray, window: int | None = None) -> np.ndarray:
+    """DTW from one query [T, D] to many equal-length references [N, T, D].
+
+    Vectorised over references; identical to ``dtw_distance`` per pair.
+    """
+    N, Tb, _ = refs.shape
+    Ta = len(q)
+    # squared distances via |a|^2 + |b|^2 - 2ab: memory O(N*Ta*Tb), not O(N*Ta*Tb*D)
+    cross = np.einsum("ad,nbd->nab", q, refs)
+    sq = (q * q).sum(-1)[None, :, None] + (refs * refs).sum(-1)[:, None, :] - 2.0 * cross
+    cost = np.sqrt(np.maximum(sq, 0.0))  # [N, Ta, Tb]
+    D = np.full((N, Ta + 1, Tb + 1), np.inf)
+    D[:, 0, 0] = 0.0
+    w = max(window or max(Ta, Tb), abs(Ta - Tb))
+    for i in range(1, Ta + 1):
+        for j in range(max(1, i - w), min(Tb, i + w) + 1):
+            D[:, i, j] = cost[:, i - 1, j - 1] + np.minimum(np.minimum(D[:, i - 1, j], D[:, i, j - 1]), D[:, i - 1, j - 1])
+    return D[:, Ta, Tb] / (Ta + Tb)
+
+
 class DTW1NN:
     """Reference method; scores are -min-distance per class (not probabilities)."""
 
@@ -338,14 +358,15 @@ class DTW1NN:
 
     def fit(self, X, y, sample_weight=None):
         self.norm.fit(X)
-        self.X, self.y = self.norm(X), np.asarray(y)
+        self.X, self.y = self.norm(X).astype(np.float32), np.asarray(y)
         return self
 
     def logits(self, X):
         Xn = self.norm(X)
         out = np.full((len(Xn), self.C), -1e3)
+        refs = self.X.astype(np.float64)
         for n, q in enumerate(Xn):
-            d = np.array([dtw_distance(q, r, self.window) for r in self.X])
+            d = dtw_batch(q, refs, self.window)
             for c in np.unique(self.y):
                 out[n, c] = -d[self.y == c].min() / self.scale
         return out / self.temperature
@@ -358,7 +379,7 @@ class DTW1NN:
                 "seed": self.seed, "temperature": self.temperature, "scale": self.scale}
 
     def save(self, path):
-        np.savez(path, X=self.X, y=self.y, norm_mean=self.norm.mean, norm_std=self.norm.std)
+        np.savez(path, X=self.X.astype(np.float32), y=self.y, norm_mean=self.norm.mean, norm_std=self.norm.std)
 
     @classmethod
     def from_saved(cls, meta, path):

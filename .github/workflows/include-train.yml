@@ -1,0 +1,97 @@
+# Stage 2: train and compare models on the landmark dataset produced by
+# "INCLUDE data pipeline" (no re-download of videos). Manual trigger only.
+name: INCLUDE training
+
+on:
+  workflow_dispatch:
+    inputs:
+      data_run_id:
+        description: "Run ID of a successful 'INCLUDE data pipeline' run"
+        required: true
+      epochs:
+        description: "Max epochs for LSTM/GRU (early stopping on validation)"
+        required: false
+        default: "60"
+      publish_release:
+        description: "Publish the selected model as a GitHub pre-release asset"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write   # pre-release asset of the selected model
+  actions: read     # download artifacts from the data run
+
+env:
+  PYTHONPATH: ml
+
+jobs:
+  train:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { kind: lstm, config: ml/configs/lstm_baseline.json }
+          - { kind: gru, config: ml/configs/gru.json }
+          - { kind: pooled_logreg, config: ml/configs/pooled-logreg.json }
+          - { kind: dtw_1nn, config: ml/configs/dtw-1nn.json }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: pip install -r backend/requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: include-landmarks-v1
+          path: data
+          run-id: ${{ inputs.data_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Train ${{ matrix.kind }} (official split; selection/calibration on validation; test evaluated once)
+        run: |
+          python -c "import json,sys;c=json.load(open('${{ matrix.config }}'));c['epochs']=int('${{ inputs.epochs }}');json.dump(c,open('cfg.json','w'))"
+          python -m isl_nova_ml.train --config cfg.json --manifest data/manifest.json --data-root data \
+            --registry reg --vocab dataset/vocabulary/signs_master.csv --dataset-version include-official-v1 2>&1 | tee train.log
+          cp train.log reg/*/
+      - uses: actions/upload-artifact@v4
+        with: { name: "model-${{ matrix.kind }}", path: reg, retention-days: 90 }
+
+  compare:
+    needs: train
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: pip install -r backend/requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { pattern: "model-*", path: dl }
+      - uses: actions/download-artifact@v4
+        with:
+          name: include-landmarks-v1
+          path: data
+          run-id: ${{ inputs.data_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Assemble registry, select by validation macro-F1, compare
+        run: |
+          mkdir -p registry && for d in dl/*/*/; do [ -f "$d/model.json" ] && cp -r "$d" registry/; done
+          python -m isl_nova_ml.include_pipeline compare --registry registry --out report
+      - name: Load the selected model through the production predictor and re-run the test split
+        run: python -m isl_nova_ml.include_pipeline verify --registry registry --manifest data/manifest.json --data-root data --out report
+      - name: Summary
+        run: |
+          { echo "## Held-out test results (INCLUDE official split, NOT signer-independent)"; cat report/comparison.md; echo; echo '```json'; cat report/verify.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: { name: include-models, path: "registry\nreport", retention-days: 90 }
+      - name: Publish selected model (pre-release)
+        if: ${{ inputs.publish_release }}
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          best=$(python -c "import json;print(json.load(open('report/comparison.json'))['best'])")
+          tar -czf "$best.tar.gz" -C registry "$best"
+          sha256sum "$best.tar.gz" > "$best.tar.gz.sha256"
+          gh release create "model-$best" "$best.tar.gz" "$best.tar.gz.sha256" report/comparison.md report/comparison.json report/verify.json \
+            --target "$GITHUB_SHA" --prerelease --title "ISL NOVA model $best (INCLUDE official split)" \
+            --notes "Trained by workflow run $GITHUB_RUN_ID on INCLUDE (Sridhar et al., ACM MM 2020, CC BY 4.0) landmarks from data run ${{ inputs.data_run_id }}. Evaluated on the INCLUDE official test split; INCLUDE has no signer IDs, so results are NOT signer-independent. See comparison.md."

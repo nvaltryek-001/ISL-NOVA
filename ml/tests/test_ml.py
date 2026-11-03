@@ -16,7 +16,17 @@ from isl_nova_ml.data import (
 from isl_nova_ml.features import extract_features
 from isl_nova_ml.inference import ModelUnavailable, Predictor, StreamSmoother
 from isl_nova_ml.metrics import auroc, classification_report, expected_calibration_error, topk_accuracy
-from isl_nova_ml.models import DTW1NN, GRUClassifier, LSTMClassifier, PooledLogReg, load_model, save_model, softmax
+from isl_nova_ml.models import (
+    DTW1NN,
+    GRUClassifier,
+    LSTMClassifier,
+    PooledLogReg,
+    dtw_batch,
+    dtw_distance,
+    load_model,
+    save_model,
+    softmax,
+)
 from isl_nova_ml.registry import Registry, RegistryError
 from isl_nova_ml.synthetic import make_sequence, write_synthetic_dataset
 from isl_nova_ml.train import TrainingError, run
@@ -272,3 +282,12 @@ def test_stream_smoother():
     b = s.update(np.array([0.0, 1.0]))
     assert np.allclose(a, [1, 0]) and np.allclose(b, [0.5, 0.5])
     assert s.update(None) is None and s.state is None
+
+
+def test_batched_dtw_matches_reference():
+    q = RNG.normal(size=(12, 5))
+    refs = RNG.normal(size=(7, 12, 5))
+    for w in (None, 3):
+        got = dtw_batch(q, refs, w)
+        want = np.array([dtw_distance(q, r, w) for r in refs])
+        assert np.allclose(got, want)
