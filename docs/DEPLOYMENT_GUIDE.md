@@ -21,8 +21,9 @@ The container runs `python -m app.migrate`, then uvicorn. It seeds roles and the
 ### Live demo: Render free plan (deployed)
 
 A public demo runs at **https://isl-nova.onrender.com** (Render web service
-`isl-nova`, Docker runtime, free plan, Singapore, auto-deploys
-`feat/isl-nova-platform`). It was created with these environment variables and
+`isl-nova`, Docker runtime, free plan, Singapore, branch
+`feat/isl-nova-platform`; Render does not receive push webhooks for this repo, so
+new commits are deployed with a manual deploy from the dashboard or API). It was created with these environment variables and
 **no paid resources**:
 
 | Variable | Value | Why |
