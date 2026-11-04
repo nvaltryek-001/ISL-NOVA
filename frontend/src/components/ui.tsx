@@ -35,12 +35,12 @@ export function Card({ children, className, title, action, subtitle }: { childre
   return (
     <section className={clsx('card rise p-5', className)}>
       {(title || action) && (
-        <header className="mb-4 flex items-start justify-between gap-3">
-          <div>
+        <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
             {title && <h2 className="text-[15px] font-semibold text-fg">{title}</h2>}
             {subtitle && <p className="muted mt-0.5 text-sm">{subtitle}</p>}
           </div>
-          {action}
+          {action && <div className="min-w-0 max-w-full">{action}</div>}
         </header>
       )}
       {children}
@@ -196,10 +196,10 @@ export function Loading({ rows = 3 }: { rows?: number }) {
 export function Stat({ label, value, sub, tone = 'neutral', icon }: { label: string; value: ReactNode; sub?: ReactNode; tone?: 'neutral' | 'nova' | 'signal' | 'ok' | 'warn'; icon?: IconName }) {
   const accent = { neutral: 'text-ink-300', nova: 'text-nova-300', signal: 'text-cyan-300', ok: 'text-emerald-300', warn: 'text-amber-300' }[tone];
   return (
-    <div className="card rise flex flex-col gap-1 p-4">
-      <div className="flex items-center justify-between"><span className="label">{label}</span>{icon && <Icon name={icon} className={accent} />}</div>
-      <span className="font-display text-3xl font-semibold tabular-nums text-fg">{value}</span>
-      {sub && <span className="muted text-xs">{sub}</span>}
+    <div className="card rise flex min-w-0 flex-col gap-1 p-4">
+      <div className="flex items-start justify-between gap-2"><span className="label min-w-0 hyphens-auto [overflow-wrap:anywhere]">{label}</span>{icon && <Icon name={icon} className={`${accent} shrink-0`} />}</div>
+      <span className="font-display text-3xl font-semibold tabular-nums text-fg [overflow-wrap:anywhere]">{value}</span>
+      {sub && <span className="muted text-xs [overflow-wrap:anywhere]">{sub}</span>}
     </div>
   );
 }

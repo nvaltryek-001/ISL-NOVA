@@ -21,7 +21,8 @@ for (const v of videos) {
   });
   const r = { id: v.id, sign_id: v.sign_id, gloss: v.gloss, duration_s: v.duration_s, offline: v.offline };
   try {
-    const page = await (await browser.newContext({ viewport: { width: 1280, height: 860 } })).newPage();
+    // Playwright denies permissions that are not granted explicitly, so grant the camera
+    const page = await (await browser.newContext({ viewport: { width: 1280, height: 860 }, permissions: ['camera'] })).newPage();
     await page.goto(`${base}/live`);
     await page.getByRole('button', { name: 'Start camera' }).click();
     // in-browser MediaPipe is ready when the fps badge appears
@@ -41,7 +42,7 @@ for (const v of videos) {
     r.browser = { state: body.state, top1: body.top?.[0]?.sign_id ?? null, p: body.top?.[0]?.probability ?? null,
       top5: (body.top ?? []).map((t) => t.sign_id), quality: body.quality ?? null, model_id: body.model_id };
   } catch (e) {
-    r.error = String(e.message ?? e).slice(0, 300);
+    r.error = String(e.message ?? e).split('\n')[0].slice(0, 200);
   } finally {
     await browser.close();
   }

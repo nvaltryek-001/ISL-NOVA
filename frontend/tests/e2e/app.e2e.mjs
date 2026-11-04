@@ -349,8 +349,10 @@ describe('modules render with real data', () => {
 
   test('accessibility basics and responsive layout on phone, tablet and desktop', async () => {
     const routes = ['/', '/signs', '/live', '/communicate', '/academy', '/dataset', '/ai', '/research', '/admin', '/settings', '/analysis'];
-    for (const viewport of [{ width: 360, height: 740 }, { width: 768, height: 1024 }, { width: 1280, height: 800 }]) {
+    // the 360 px pass is repeated with a wide fallback font: CI runners' fonts are wider than local ones
+    for (const [viewport, font] of [[{ width: 360, height: 740 }], [{ width: 360, height: 740 }, 'DejaVu Sans'], [{ width: 768, height: 1024 }], [{ width: 1280, height: 800 }]]) {
       const { page, ctx, errors } = await newPage(browser, srv.base, { viewport });
+      if (font) await page.addInitScript((f) => document.addEventListener('DOMContentLoaded', () => { const st = document.createElement('style'); st.textContent = `*{font-family:'${f}' !important}`; document.head.append(st); }), font);
       await login(page);
       for (const route of routes) {
         await page.goto(route);
@@ -367,11 +369,13 @@ describe('modules render with real data', () => {
               .filter((el) => visible(el) && !named(el)).map((el) => el.outerHTML.slice(0, 80)),
             emptyLinks: [...document.querySelectorAll('a[href]')].filter((a) => visible(a) && !a.textContent.trim() && !a.getAttribute('aria-label')).length,
             main: !!document.querySelector('main#main'),
+            wide: [...document.querySelectorAll('main *')].filter((el) => el.getBoundingClientRect().right > document.documentElement.clientWidth + 1)
+              .slice(-3).map((el) => `${el.tagName.toLowerCase()}.${String(el.className).slice(0, 60)} "${el.textContent.trim().slice(0, 30)}" right=${Math.round(el.getBoundingClientRect().right)}`),
           };
         });
-        const where = `${route} @${viewport.width}px`;
+        const where = `${route} @${viewport.width}px${font ? ` (${font})` : ''}`;
         assert.ok(r.lang, `html lang missing ${where}`);
-        assert.ok(r.overflow <= 1, `${where} overflows by ${r.overflow}px`);
+        assert.ok(r.overflow <= 1, `${where} overflows by ${r.overflow}px: ${r.wide.join(' | ')}`);
         assert.equal(r.imgsNoAlt, 0, `images without alt ${where}`);
         assert.deepEqual(r.unlabeled, [], `unlabelled form controls ${where}`);
         assert.equal(r.emptyLinks, 0, `links without a name ${where}`);

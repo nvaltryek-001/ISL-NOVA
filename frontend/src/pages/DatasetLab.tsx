@@ -79,7 +79,7 @@ function Overview() {
       </div>
       {can(user, 'dataset:read') && (
         <Card title="Per-class readiness" action={
-          <Select aria-label="Filter readiness" value={filter} onChange={(e) => setFilter(e.target.value)} className="h-9 w-auto py-0">
+          <Select aria-label="Filter readiness" value={filter} onChange={(e) => setFilter(e.target.value)} className="h-9 w-auto max-w-full py-0">
             <option value="">All readiness states</option>
             {Object.keys(s.readiness).map((k) => <option key={k} value={k}>{k.replaceAll('_', ' ')} ({s.readiness[k]})</option>)}
           </Select>}>
