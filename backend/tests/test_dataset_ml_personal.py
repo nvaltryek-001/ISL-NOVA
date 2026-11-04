@@ -283,7 +283,7 @@ def test_new_signer_evaluation_run(tmp_path):
     write_synthetic_dataset(root, n_classes=3, n_signers=4, reps=2, unknown_classes=0)
     m = json.loads((root / "manifest.json").read_text())
     for e in m["entries"]:  # classes map onto vocabulary ids so local recordings can reference them
-        e["sign_id"] = "ISL%03d" % int(e["sign_id"][3:])
+        e["sign_id"] = f"ISL{int(e['sign_id'][3:]):03d}"
     (root / "manifest.json").write_text(json.dumps(m))
     res = run({"model": "pooled_logreg"}, root / "manifest.json", root, settings.model_registry_dir, None, "syn")
     with TestClient(create_app(settings)) as c:

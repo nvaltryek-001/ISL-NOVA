@@ -441,6 +441,73 @@ def cmd_verify(a) -> int:
     return 0
 
 
+def cmd_open_set(a) -> int:
+    """Unknown-sign detection: known held-out test signs vs INCLUDE reserve glosses never seen in training."""
+    import numpy as np
+
+    from .data import load_landmarks
+    from .features import extract_features
+    from .inference import Predictor
+    from .metrics import auroc
+
+    pred = Predictor.from_registry(Path(a.registry))
+    known_ids = {c["sign_id"] for c in pred.classes}
+    man = json.loads(Path(a.manifest).read_text())
+    groups = {"known": [e for e in man["entries"] if e["split"] == "test" and e["sign_id"] in known_ids],
+              "unknown": [e for e in man.get("open_set_entries", []) if e.get("open_set")]}
+    rows, scores = [], {"known": [], "unknown": []}
+    for g, ents in groups.items():
+        for e in ents:
+            frames, aspect = load_landmarks(Path(a.data_root) / e["landmarks_path"])
+            fr = extract_features(frames, aspect)
+            out = pred.predict(frames, aspect, 5)
+            p1 = float(pred.predict_features(fr.features).max()) if fr.status == "ok" else None
+            if p1 is not None:
+                scores[g].append(p1)
+            top = out["top"][0]["sign_id"] if out["top"] else None
+            rows.append({"group": g, "gloss": e.get("gloss"), "sign_id": e["sign_id"], "state": out["state"],
+                         "top1": top, "max_prob": p1, "correct": g == "known" and top == e["sign_id"]})
+    k, u = np.array(scores["known"]), np.array(scores["unknown"])
+
+    def states(g):
+        return dict(Counter(r["state"] for r in rows if r["group"] == g))
+
+    sweep = []
+    for t in np.round(np.arange(0.1, 0.96, 0.05), 2):
+        sweep.append({"threshold": float(t), "known_accept_rate": float((k >= t).mean()) if k.size else None,
+                      "unknown_reject_rate": float((u < t).mean()) if u.size else None})
+    fpr95 = None
+    if k.size and u.size:
+        t95 = float(np.percentile(k, 5))  # threshold keeping 95% of known sequences
+        fpr95 = {"threshold": t95, "unknown_accept_rate": float((u >= t95).mean())}
+    kn = [r for r in rows if r["group"] == "known"]
+    un = [r for r in rows if r["group"] == "unknown"]
+    rep = {
+        "model_id": pred.info["model_id"], "tau": pred.tau, "margin": pred.margin,
+        "known_test_sequences": len(kn), "unknown_sequences": len(un),
+        "unknown_glosses": len({r["gloss"] for r in un}),
+        "scored_known": int(k.size), "scored_unknown": int(u.size),
+        "auroc_maxprob_known_vs_unknown": auroc(k, u) if k.size and u.size else None,
+        "known_states": states("known"), "unknown_states": states("unknown"),
+        "unknown_false_recognition_rate": (sum(r["state"] == "recognized" for r in un) / len(un)) if un else None,
+        "unknown_rejected_rate_unknown_or_uncertain": (sum(r["state"] in ("unknown", "uncertain") for r in un) / len(un)) if un else None,
+        "known_recognized_and_correct_rate": (sum(r["state"] == "recognized" and r["correct"] for r in kn) / len(kn)) if kn else None,
+        "known_recognized_but_wrong_rate": (sum(r["state"] == "recognized" and not r["correct"] for r in kn) / len(kn)) if kn else None,
+        "unknown_accept_at_95pct_known_accept": fpr95, "threshold_sweep": sweep,
+        "protocol": "Known = INCLUDE official test split of the 200 trained classes. Unknown = INCLUDE glosses outside "
+                    "the vocabulary (reserve), never used in training, calibration or threshold selection. Same signers "
+                    "and recording conditions as training; this is not an evaluation on unseen signers.",
+    }
+    Path(a.out).mkdir(parents=True, exist_ok=True)
+    (Path(a.out) / "open_set.json").write_text(json.dumps(rep, indent=2))
+    with (Path(a.out) / "open_set_rows.csv").open("w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(rows[0]) if rows else ["group"])
+        w.writeheader()
+        w.writerows(rows)
+    print(json.dumps({x: v for x, v in rep.items() if x != "threshold_sweep"}, indent=2))
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -476,10 +543,15 @@ def main(argv=None) -> int:
     p.add_argument("--manifest", required=True)
     p.add_argument("--data-root", required=True)
     p.add_argument("--out", required=True)
+    p = sub.add_parser("open-set")
+    p.add_argument("--registry", required=True)
+    p.add_argument("--manifest", required=True)
+    p.add_argument("--data-root", required=True)
+    p.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     return {"preflight": cmd_preflight, "parts": cmd_parts, "extract-part": cmd_extract_part,
             "merge": cmd_merge, "compare": cmd_compare, "verify": cmd_verify,
-            "fetch-test-videos": cmd_fetch_test_videos}[a.cmd](a)
+            "fetch-test-videos": cmd_fetch_test_videos, "open-set": cmd_open_set}[a.cmd](a)
 
 
 if __name__ == "__main__":

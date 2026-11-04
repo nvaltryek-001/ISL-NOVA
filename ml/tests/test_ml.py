@@ -291,3 +291,25 @@ def test_batched_dtw_matches_reference():
         got = dtw_batch(q, refs, w)
         want = np.array([dtw_distance(q, r, w) for r in refs])
         assert np.allclose(got, want)
+
+
+def test_open_set_evaluation_reports_genuine_counts(trained, tmp_path):
+    from isl_nova_ml.include_pipeline import main
+
+    root, res = trained
+    reg = Registry(root / "reg")
+    reg.promote(res["model_id"], allow_synthetic=True)
+    m = json.loads((root / "data" / "manifest.json").read_text())
+    entries = [dict(e, split="test") for e in m["entries"]]
+    unknown = [dict(e, open_set=True, gloss=e["sign_id"]) for e in m["open_set_entries"]]
+    assert unknown, "synthetic fixture must contain open-set sequences"
+    man = tmp_path / "manifest.json"
+    man.write_text(json.dumps({"entries": entries, "open_set_entries": unknown}))
+    assert main(["open-set", "--registry", str(root / "reg"), "--manifest", str(man),
+                 "--data-root", str(root / "data"), "--out", str(tmp_path / "out")]) == 0
+    rep = json.loads((tmp_path / "out" / "open_set.json").read_text())
+    assert rep["known_test_sequences"] == len(entries) and rep["unknown_sequences"] == len(unknown)
+    assert 0.0 <= rep["auroc_maxprob_known_vs_unknown"] <= 1.0
+    assert sum(rep["unknown_states"].values()) == len(unknown)
+    assert (tmp_path / "out" / "open_set_rows.csv").exists()
+    reg.rollback()

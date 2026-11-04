@@ -3,6 +3,7 @@ from app.config import Settings
 from app.db import Database
 from app.migrate import MigrationError, migrate, status
 from app.services import LocalStorage
+
 from tests.conftest import CHECKLIST, DESCRIBED
 
 A = "/api/v1"

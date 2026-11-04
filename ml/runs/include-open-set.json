@@ -1,0 +1,7 @@
+{
+  "data_run_id": 41773683352,
+  "artifact": "landmarks-include-official-v2",
+  "model_tag": "model-lstm-20261104T041414Z-s13",
+  "attach_to_release": true,
+  "purpose": "unknown-sign detection: 200-class test split vs INCLUDE reserve glosses outside the vocabulary"
+}
