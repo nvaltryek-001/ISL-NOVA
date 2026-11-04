@@ -327,7 +327,7 @@ Measured engineering latency (2 vCPU sandbox, synthetic input, untrained 200-cla
 | Capability | Implemented | How it was tested | Evidence |
 |---|:---:|---|---|
 | 200-class recognition (INCLUDE official split) | ✅ | Genuine held-out test split, evaluated once | 91.7 % top-1 · [run 41771084083](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41771084083) |
-| Production inference path (`Predictor`, API) | ✅ | All 635 test sequences re-run; 24 samples through `POST /predict/sequence` in CI and on the live demo | 91.65 % · 24/24 |
+| Production inference path (`Predictor`, API) | ✅ | All 635 test sequences re-run; 24 held-out samples through `POST /predict/sequence` in CI **and against the live demo** | 91.65 % · 24/24 · [smoke run](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41817628215) |
 | Unknown-sign rejection | ✅ | 887 held-out out-of-vocabulary recordings (62 glosses) | AUROC 0.900, **29.3 % false recognition** |
 | Raw video → MediaPipe → model | ✅ | 73 held-out test videos, server-side extraction | 67/73 (91.8 %) |
 | In-browser MediaPipe (GPU/CPU) | ✅ | CI Chromium: bundle, WASM, hand model on GPU and CPU, UI fps badge | [run 41815175935](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815175935) |
@@ -337,7 +337,7 @@ Measured engineering latency (2 vCPU sandbox, synthetic input, untrained 200-cla
 | Linguistic verification of 200 signs | ✅ workflow | Workflow tested (API + E2E); **0 signs verified**, no approvals made | [protocol](docs/VERIFICATION_PROTOCOL.md) |
 | RBAC, consent, four-eyes review, erasure | ✅ | pytest on SQLite + PostgreSQL 16, E2E | CI |
 | Responsive + accessibility basics | ✅ | E2E: 11 routes × 360/768/1280 px + wide font; labels, alt, names, landmarks | CI |
-| Free-tier deployment with model | ✅ | Public `/health`, `/model/info`; start-up log shows the SHA-256-verified install | [isl-nova.onrender.com](https://isl-nova.onrender.com) |
+| Free-tier deployment with model | ✅ | Read-only smoke test from GitHub Actions: health, headers, model, 24/24 held-out samples, UI camera pipeline at 1280/390 px | [isl-nova.onrender.com](https://isl-nova.onrender.com) |
 
 ## 🌐 Live demo
 
@@ -380,7 +380,7 @@ GET    /history  POST /feedback  GET /learning/progress  POST /learning/attempts
 | Frontend unit + Python↔TS feature parity | `npm test` | ✅ **16 passed** |
 | End-to-end (Chromium) | `npm run build && npm run e2e` | ✅ **19 passed** in CI: 16 app + 3 with the real model (24/24 held-out samples) |
 | Docker image + container health | GitHub Actions `docker` job | ✅ pass |
-| Deployed instance (read-only) | `.github/workflows/deploy-smoke.yml` | SMOKE_RESULT |
+| Deployed instance (read-only) | `.github/workflows/deploy-smoke.yml` | ✅ all checks passed ([run 41817628215](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41817628215)): health, CSP/HSTS, model, **24/24 held-out samples recognized correctly** via the live API, UI + in-browser MediaPipe (GPU) at 1280 and 390 px |
 
 Latest CI on this branch: [run 41815644645](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815644645): all jobs green.
 

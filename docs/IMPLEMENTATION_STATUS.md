@@ -1,75 +1,66 @@
 # Implementation status
 
-_Last updated: 2026-11-03, branch `feat/isl-nova-platform`._ Every result below was produced by a command that actually ran in the build sandbox (2 vCPU, Python 3.13.18, Node 22.23.4, Chromium via Playwright 1.63).
+_Last updated: 2026-11-04, branch `feat/isl-nova-platform`._ Every result below
+was produced by a command that actually ran: in the build sandbox (2 vCPU,
+Python 3.13, Node 22, Chromium via Playwright), in GitHub Actions, or against
+the live deployment. **Implemented** and **tested** are reported separately.
 
-## Verification evidence
+## Implemented vs tested
+
+| Capability | Implemented | Tested | Evidence / result |
+|---|:---:|:---:|---|
+| 200 vocabulary slots ISL001–ISL200, sources, states | ✅ | ✅ | vocabulary build reproducible; tests |
+| INCLUDE download + landmark extraction | ✅ | ✅ | run [41764539272](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41764539272): 44/44 parts, 56.75 GB MD5-verified, 3,370 usable sequences, 0 failed |
+| Out-of-vocabulary extraction (open set) | ✅ | ✅ | run [41773683352](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41773683352): 887 sequences, 62 reserve glosses |
+| Training (LSTM, GRU, LogReg, DTW) on 200 classes | ✅ | ✅ | run [41771084083](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41771084083): LSTM 91.7 % top-1 / 98.3 % top-5 / 91.7 % macro-F1 (official split, not signer-independent) |
+| Production `Predictor` on the test split | ✅ | ✅ | 635 sequences, 91.65 % top-1 reproduced |
+| Unknown-sign detection | ✅ | ✅ | run [41815223675](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815223675): AUROC 0.900; **29.3 % of unknown sequences recognized** at τ; 84.4 % of known recognized and correct |
+| Raw video → Python MediaPipe → model | ✅ | ✅ | 67 / 73 held-out test videos top-1 correct |
+| In-browser MediaPipe in CI Chromium | ✅ | ✅ | run [41815175935](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815175935): bundle 52–85 ms, hand model GPU 0.2–0.7 s / CPU 0.4 s, UI ready in 10 s |
+| Browser capture on held-out video (virtual camera) | ✅ | LIVEEVAL_STATUS | LIVEEVAL_EVIDENCE |
+| Live webcam with a real person | ✅ | ⛔ | not tested: no camera or person in any build environment |
+| New-signer evaluation (`/evaluation/runs`, AI Lab tab) | ✅ | ✅ code path | synthetic recordings only; **no new-signer data, no accuracy figure** |
+| Vocabulary verification (checklist, documented entry, review sheet) | ✅ | ✅ | API tests + E2E; **0 / 200 verified**, no approvals made ([protocol](VERIFICATION_PROTOCOL.md)) |
+| RBAC, consent, four-eyes review, erasure, audit | ✅ | ✅ | pytest on SQLite and PostgreSQL 16; E2E |
+| Responsive layout + accessibility basics | ✅ | ✅ | E2E: 11 routes at 360 / 768 / 1280 px and with a wide fallback font; labels, alt, link names, landmarks |
+| Security headers, CSP, HSTS (production) | ✅ | ✅ | `test_security_headers_and_cors`; deployed headers checked by smoke test |
+| Free-tier deployment with the model installed | ✅ | ✅ | [isl-nova.onrender.com](https://isl-nova.onrender.com): `/health` ok, `/model/info` = `lstm-20261104T041414Z-s13`, 200 classes, `synthetic: false`; deploy smoke [run 41817628215](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41817628215): 24/24 held-out samples correct and *recognized* through the public API (median round trip 497 ms, US runner → Singapore), MediaPipe loads on GPU in the deployed UI at 1280 and 390 px |
+
+## Test suites (latest)
 
 | Check | Command | Result |
 |---|---|---|
-| Python lint | `ruff check backend ml dataset/scripts scripts` | ✅ all checks passed |
-| Backend + ML tests (SQLite) | `pytest -q` | ✅ **56 passed, 1 skipped**. The skip is `test_extractor_runs_on_a_video`, which needs a MediaPipe `.task` model file that is not available offline. |
-| Backend tests (PostgreSQL) | `TEST_DATABASE_URL=… pytest backend/tests` (GitHub Actions, PostgreSQL 16 service) | ✅ passed in CI run 41678896858 (the first CI run found a real FK-order bug, now fixed) |
-| PostgreSQL schema | rendered DDL applied to PostgreSQL 16.15 with `ON_ERROR_STOP=1` | ✅ 28 tables created |
-| PostgreSQL query compatibility | every distinct SQL statement executed by the test suite (163) run through `PREPARE` on PostgreSQL 16.15 | ✅ 0 errors |
-| Vocabulary reproducibility | `python dataset/scripts/build_vocabulary.py` then diff | ✅ identical output |
-| Frontend type check | `tsc --noEmit` (strict) | ✅ exit 0 |
-| Frontend unit tests | `npm test` | ✅ **16 passed** (includes 4 Python↔TypeScript feature-parity cases, max diff < 2×10⁻⁵) |
-| Production build | `npm run build` | ✅ JS 405 kB, CSS 49 kB (minified, before gzip) |
-| End-to-end (Chromium, fake camera) | `npm run e2e` | ✅ **15 passed** (4 consecutive clean runs after the light-theme redesign); screenshot run (`E2E_SCREENSHOTS=1`) also passed |
-| Synthetic ML smoke test | `python -m isl_nova_ml.smoke` | ✅ all 4 model kinds train, calibrate, evaluate and register. **Metrics are synthetic and are not ISL results.** |
-| INCLUDE preflight + download + landmark extraction | `INCLUDE data pipeline`, run [41764539272](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41764539272) | ✅ 44/44 parts, 56.75 GB, MD5-verified; 4,284 videos; **3,370 usable sequences for 200 classes**; 0 failed; 15 insufficient-input |
-| **Real training (4 models, 200 classes)** | `INCLUDE training`, run [41771084083](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41771084083) | ✅ LSTM test **91.7 % top-1 / 98.3 % top-5 / 91.7 % macro-F1** (INCLUDE official split, not signer-independent); GRU 86.5 %, LogReg 89.1 %, DTW 84.4 % top-1 |
-| Real model through production `Predictor` | `include_pipeline verify` (CI) | ✅ 635 test sequences, 91.65 % top-1 reproduced |
-| Real model through the API (this sandbox) | `fetch_model.py` + `POST /predict/sequence` | ✅ 24/24 held-out samples recognized correctly; `/model/info`, `/model/metrics`, 200×200 confusion matrix served |
-| Model-backed E2E | `E2E_MODEL_TAG=… npm run e2e` | ✅ 3 passed locally (UI shows live model and metrics; API sample 24/24; live studio with model) |
-| Docker image build + container health | `docker build .` and `/api/v1/health` (GitHub Actions) | ✅ passed in CI run 41678896858 (not buildable in the sandbox) |
-| Container layout + production start | files copied as in the Dockerfile; `ISL_NOVA_ENV=production` migrate + uvicorn | ✅ health ok, SPA served, 200 slots seeded; refuses to start without `JWT_SECRET` |
-| Deployment | - | ⛔ not deployed (no credentials) |
+| Python lint | `ruff check backend ml dataset/scripts scripts` | ✅ pass |
+| Backend + ML (SQLite) | `pytest -q` | ✅ **60 passed, 1 skipped** (needs a MediaPipe `.task` file offline) |
+| Backend (PostgreSQL 16) | CI service container | ✅ pass |
+| Frontend type check | `tsc --noEmit` (strict) | ✅ pass |
+| Frontend unit + feature parity | `npm test` | ✅ 16 passed |
+| End-to-end | `npm run e2e` with `E2E_MODEL_TAG` | ✅ **19 passed** (CI [41815644645](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815644645)) |
+| Docker build + container health | CI `docker` job | ✅ pass |
 
-### Bugs found by the tests and fixed
-* Flaky review-workflow E2E check read stats before the verification dialog closed; now waits for the post-verification state.
-* **PostgreSQL only (found by CI):** erasing a signer violated the recordings → consent FK because PostgreSQL checks it before cascading. Fixed by deleting in explicit dependency order.
-* CI E2E flake: recording took longer than 15 s when MediaPipe really loaded on the runner; timeouts raised.
-* A synthetic class ID was written into the `recognition_history.chosen_sign` foreign key, causing an integrity error. Fixed by only storing vocabulary IDs.
-* PostgreSQL `SUM()` returns `Decimal`, which breaks JSON responses. Values are now normalised in `db.py`.
-* Dialog `aria-labelledby` used titles containing spaces, which broke the accessible name. Now uses `useId()`.
-* Mobile header overflowed by 38 px. The search button lacked `min-w-0`.
-* The Tailwind candidate tokenizer split arbitrary values such as `grid-cols-[minmax(0,1fr)_…]`.
-* Expired consent retention was documented but not checked; `dataset/validate` now flags it (with a test).
+## Bugs found by tests and evaluation runs, and fixed
 
-## Specification acceptance criteria
+* **Virtual-camera evaluation never reached MediaPipe.** The script did not grant camera permission and Playwright denies ungranted permissions, so all 73 clips timed out. A diagnostic workflow showed that MediaPipe itself loads in under a second. Fixed by granting the permission.
+* **/dataset overflowed by 7 px at 360 px on CI only.** The runner's fallback font is wider. The cause was a `Card` header that could not wrap its filter control. Card and page headers now wrap, and the E2E pass repeats with a wide font.
+* **API docs page was blank under its own CSP.** It used an inline script and an unpinned CDN version. The init script is now served same-origin and Swagger UI is pinned.
+* Earlier: PostgreSQL FK order on signer erasure; `Decimal` from PostgreSQL `SUM()`; a synthetic class id written into a vocabulary FK; dialog accessible names; 38 px mobile header overflow; Tailwind tokenizer on arbitrary values; unchecked consent retention; DTW memory blow-up; non-monotonic MediaPipe timestamps across videos; INCLUDE file-name matching.
 
-| Area | Criterion | Status |
-|---|---|---|
-| Dataset | exactly 200 stable IDs | ✅ ISL001–ISL200 |
-| | every entry has verification and readiness state | ✅ |
-| | no invented signs or translations | ✅ Hindi/Kannada left pending; glosses from source |
-| | sources and licences traceable | ✅ `references.csv`, `sign_references` |
-| | consent/review workflow works | ✅ E2E: signer → consent → record → annotate → second-reviewer approval |
-| | manifests validate; actual counts shown | ✅ |
-| AI | versioned feature contract; train/infer parity | ✅ |
-| | genuine model artefacts load; inference tested | ✅ INCLUDE-trained LSTM loaded via release, `Predictor` and API; tested on held-out data |
-| | live webcam recognition with a real person | ⛔ not tested: no real camera or person in the build environment |
-| | unknown/uncertain handling | ✅ |
-| | metrics from held-out evaluation; no fabricated accuracy | ✅ pipeline evaluates test once; no ISL metrics claimed |
-| Product | core routes work, no dead buttons, responsive, loading/error/empty states, server-side permissions | ✅ (E2E covers all routes, 390 px layout, unnamed-button check) |
-| Quality | tests run; production build; security addressed | ✅ |
-| | Docker path verified | ✅ image built and health-checked in CI |
-| Delivery | README, docs, branch pushed | ✅ |
-| | PR / deployment | ✅ PR #1 opened · ⛔ no deployment credentials |
+## Numbers that matter
 
-## 200-class dataset numbers
 | Metric | Value |
 |---|---:|
 | Class slots | 200 |
-| Linguistically verified | 0 |
-| Classes with authentic local (app) recordings | 0 |
-| Classes approved via in-app review workflow | 0 |
-| INCLUDE videos listed / usable sequences | 3,392 / 3,370 |
-| **Classes trained / evaluated (INCLUDE)** | **200 / 200** (189 with samples in all splits) |
+| Linguistically verified | **0** |
+| Classes trained / evaluated on INCLUDE | 200 / 200 (189 with samples in all splits) |
+| Test top-1 / top-5 / macro-F1 (LSTM) | 91.7 % / 98.3 % / 91.7 % |
+| Unknown-sign AUROC / false recognition at τ | 0.900 / 29.3 % |
+| New-signer accuracy | not measured (no data) |
+| Live-person webcam accuracy | not measured |
 
-## Continuation notes
-1. Review and merge PR #1 (CI green).
-2. Download INCLUDE plus the MediaPipe task files, run `include_import`, train `ml/configs/lstm_baseline.json`, and fill [MODEL_CARD.md](MODEL_CARD.md) from `metrics.json`.
-3. Assign the `linguist` role only to qualified ISL reviewers and start verification of the 200 slots.
-4. Choose a licence for the project (none is committed; see README).
+## What remains (needs people or data, not code)
+
+1. Qualified ISL reviewers (Deaf signers or accredited interpreters) to verify the 200 signs with the checklist.
+2. Consented recordings from signers outside INCLUDE, to run the new-signer evaluation.
+3. A real-person webcam study, with consent and a written protocol.
+4. A stronger unknown-sign detector (energy score, background class, or embedding distance).
+5. Owner approval for a persistent deployment (disk or managed PostgreSQL) if the demo should keep data.
