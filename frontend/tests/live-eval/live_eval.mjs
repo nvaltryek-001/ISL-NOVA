@@ -19,14 +19,20 @@ for (const v of videos) {
   const browser = await chromium.launch({
     args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', `--use-file-for-fake-video-capture=${path.join(dir, v.y4m)}`],
   });
+  const diag = [];
+  let pageRef = null;
   const r = { id: v.id, sign_id: v.sign_id, gloss: v.gloss, duration_s: v.duration_s, offline: v.offline };
   try {
     // Playwright denies permissions that are not granted explicitly, so grant the camera
     const page = await (await browser.newContext({ viewport: { width: 1280, height: 860 }, permissions: ['camera'] })).newPage();
+    page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') diag.push(`${m.type()}: ${m.text()}`.slice(0, 200)); });
+    page.on('pageerror', (e) => diag.push(`pageerror: ${e}`.slice(0, 200)));
+    page.on('requestfailed', (q) => diag.push(`requestfailed: ${q.url()} ${q.failure()?.errorText}`.slice(0, 200)));
+    pageRef = page;
     await page.goto(`${base}/live`);
     await page.getByRole('button', { name: 'Start camera' }).click();
     // in-browser MediaPipe is ready when the fps badge appears
-    await page.getByText(/fps · (GPU|CPU)/).waitFor({ timeout: 120000 });
+    await page.getByText(/fps · (GPU|CPU)/).waitFor({ timeout: Number(process.env.LIVE_EVAL_READY_MS || 120000) });
     r.delegate = (await page.getByText(/fps · (GPU|CPU)/).innerText()).split('· ')[1];
     await page.waitForTimeout(3000); // let the fps badge measure real throughput before the timed run
     r.fps = await page.getByText(/fps · (GPU|CPU)/).first().innerText();
@@ -48,6 +54,13 @@ for (const v of videos) {
       top5: (body.top ?? []).map((t) => t.sign_id), quality: body.quality ?? null, model_id: body.model_id };
   } catch (e) {
     r.error = String(e.message ?? e).split('\n')[0].slice(0, 200);
+    // record what the page showed so failures can be diagnosed from the job log
+    try {
+      r.page_state = (await pageRef?.locator('main').innerText({ timeout: 5000 }))?.replace(/\s+/g, ' ').slice(0, 1500);
+      r.video = await pageRef?.evaluate(() => { const x = document.querySelector('video'); return x && { readyState: x.readyState, t: x.currentTime, w: x.videoWidth, h: x.videoHeight }; });
+    } catch { /* page gone */ }
+    r.diag = diag.slice(0, 10);
+    if (results.length < 3) console.log(JSON.stringify({ page_state: r.page_state, video: r.video, diag: r.diag }));
   } finally {
     await browser.close();
   }
