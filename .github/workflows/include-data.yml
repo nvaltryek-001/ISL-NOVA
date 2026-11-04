@@ -39,6 +39,8 @@ jobs:
     outputs:
       parts: ${{ steps.parts.outputs.parts }}
       max_parallel: ${{ steps.cfg.outputs.max_parallel }}
+      reserve: ${{ steps.cfg.outputs.reserve }}
+      version: ${{ steps.cfg.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -53,6 +55,7 @@ jobs:
           only = "${{ inputs.only }}" if "${{ github.event_name }}" == "workflow_dispatch" else cfg.get("only", "")
           par = "${{ inputs.max_parallel }}" if "${{ github.event_name }}" == "workflow_dispatch" else str(cfg.get("max_parallel", 8))
           print(f"only={only}"); print(f"max_parallel={par}")
+          print("reserve=" + str(cfg.get("include_reserve", False)).lower()); print("version=" + cfg.get("version", "include-official-v1"))
           PY
       - name: Runner resources
         run: |
@@ -93,7 +96,7 @@ jobs:
       - name: Download, verify, extract landmarks (raw video deleted afterwards)
         run: |
           python -m isl_nova_ml.include_pipeline extract-part --part "${{ matrix.part }}" \
-            --out out --work "$RUNNER_TEMP/work" --hand-model hand.task --pose-model pose.task
+            --out out --work "$RUNNER_TEMP/work" --hand-model hand.task --pose-model pose.task ${{ needs.preflight.outputs.reserve == 'true' && '--include-reserve' || '' }}
       - uses: actions/upload-artifact@v4
         with: { name: "landmarks-${{ steps.name.outputs.safe }}", path: out, retention-days: 14 }
 
@@ -110,10 +113,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { pattern: "landmarks-*", path: parts }
       - name: Merge into versioned landmark dataset
-        run: python -m isl_nova_ml.include_pipeline merge --inputs parts --out include-landmarks --version include-official-v1
+        run: python -m isl_nova_ml.include_pipeline merge --inputs parts --out include-landmarks --version ${{ needs.preflight.outputs.version }}
       - name: Summary
         if: always()
         run: |
           { echo "## Merged dataset"; echo '```json'; python -c "import json;print(json.dumps(json.load(open('include-landmarks/manifest.json'))['summary'],indent=2))"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
-        with: { name: include-landmarks-v1, path: include-landmarks, retention-days: 90 }
+        with: { name: "${{ needs.preflight.outputs.version == 'include-official-v1' && 'include-landmarks-v1' || format('landmarks-{0}', needs.preflight.outputs.version) }}", path: include-landmarks, retention-days: 90 }

@@ -191,7 +191,7 @@ def cmd_extract_part(a) -> int:
     zpath.unlink()
     idx, voc = split_index(), vocab()
     ex = LandmarkExtractor(Path(a.hand_model), Path(a.pose_model), max_side=a.max_side)
-    entries, failures, unmatched, outside_vocab = [], [], [], 0
+    entries, reserve, failures, unmatched, outside_vocab = [], [], [], [], 0
     duplicates: list[dict] = []
     seen_listed: dict[str, str] = {}
     try:
@@ -202,7 +202,8 @@ def cmd_extract_part(a) -> int:
             if hit is None:
                 unmatched.append(n)
                 continue
-            if gloss not in voc:
+            open_set = gloss not in voc
+            if open_set and not a.include_reserve:
                 outside_vocab += 1
                 continue
             split, listed = hit
@@ -219,7 +220,8 @@ def cmd_extract_part(a) -> int:
             rel = f"landmarks/{gloss}__{p.stem}.npz"
             sha = save_landmarks(out / rel, frames, aspect)
             q = extract_features(frames, aspect)
-            entries.append({"recording_id": rid, "sign_id": voc[gloss], "gloss": gloss, "split": split,
+            (reserve if open_set else entries).append({"recording_id": rid, "sign_id": f"RESERVE:{gloss}" if open_set else voc[gloss], "gloss": gloss, "split": split,
+                            "open_set": open_set,
                             "signer_id": "unknown:include", "session_id": "unknown:include",
                             "landmarks_path": rel, "sha256": sha, "video_sha256": sha256_file(p),
                             "source": "include", "license": "CC BY 4.0", "approved": True,
@@ -227,16 +229,16 @@ def cmd_extract_part(a) -> int:
                                                                "hand_frame_ratio": round(q.hand_frame_ratio, 3),
                                                                "pose_frame_ratio": round(q.pose_frame_ratio, 3),
                                                                **vmeta}})
-            if len(entries) % 25 == 0:
+            if (len(entries) + len(reserve)) % 25 == 0:
                 print(f"{a.part}: {len(entries)} videos processed", flush=True)
     finally:
         ex.close()
         shutil.rmtree(work / "x", ignore_errors=True)
-    report.update({"processed": len(entries), "failed": len(failures), "unmatched_to_split_lists": len(unmatched),
+    report.update({"processed": len(entries), "reserve_processed": len(reserve), "failed": len(failures), "unmatched_to_split_lists": len(unmatched),
                    "outside_isl_nova_vocabulary": outside_vocab,
                    "duplicate_files_for_one_split_entry": duplicates, "extract_seconds": round(time.time() - t0, 1),
                    "insufficient_input": sum(e["quality"]["status"] != "ok" for e in entries)})
-    (out / "part_manifest.json").write_text(json.dumps({"report": report, "entries": entries, "failures": failures,
+    (out / "part_manifest.json").write_text(json.dumps({"report": report, "entries": entries, "open_set_entries": reserve, "failures": failures,
                                                         "unmatched": unmatched}, indent=1))
     print(json.dumps(report, indent=2))
     if unmatched:
@@ -249,16 +251,16 @@ def cmd_extract_part(a) -> int:
 def cmd_merge(a) -> int:
     inp, out = Path(a.inputs), Path(a.out)
     (out / "landmarks").mkdir(parents=True, exist_ok=True)
-    entries, failures, reports = [], [], []
+    entries, open_set, failures, reports = [], [], [], []
     for m in sorted(inp.glob("**/part_manifest.json")):
         d = json.loads(m.read_text())
         reports.append(d["report"])
         failures += d["failures"]
-        for e in d["entries"]:
-            src = m.parent / e["landmarks_path"]
-            shutil.copy2(src, out / e["landmarks_path"])
-            entries.append(e)
-    ids = Counter(e["recording_id"] for e in entries)
+        for key, bucket in (("entries", entries), ("open_set_entries", open_set)):
+            for e in d.get(key, []):
+                shutil.copy2(m.parent / e["landmarks_path"], out / e["landmarks_path"])
+                bucket.append(e)
+    ids = Counter(e["recording_id"] for e in entries + open_set)
     dups = [k for k, c in ids.items() if c > 1]
     per_class = defaultdict(Counter)
     for e in entries:
@@ -275,11 +277,13 @@ def cmd_merge(a) -> int:
         "duplicate_recording_ids": dups, "by_split": dict(Counter(e["split"] for e in entries)),
         "classes_with_data": len(per_class), "slots_without_data": sorted(set(all_slots) - set(per_class)),
         "classes_with_train_val_test": sum(1 for c in per_class.values() if c["train"] and c["val"] and c["test"]),
+        "open_set_sequences": len(open_set), "open_set_classes": len({e["gloss"] for e in open_set}),
         "signer_ids": "not provided by INCLUDE; signer independence cannot be verified",
     }
     manifest = {"dataset_version": a.version, "source": "INCLUDE (doi:10.1145/3394171.3413528), CC BY 4.0",
                 "feature_contract": "isl-nova-fc-1.0.0", "split_policy": "INCLUDE official train/val/test lists",
-                "summary": summary, "entries": entries}
+                "summary": summary, "entries": entries,
+                "open_set_entries": open_set, "open_set_note": "INCLUDE reserve glosses outside the 200-class vocabulary; never used for training"}
     (out / "manifest.json").write_text(json.dumps(manifest, indent=1))
     (out / "failures.json").write_text(json.dumps(failures, indent=1))
     (out / "part_reports.json").write_text(json.dumps(reports, indent=1))
@@ -384,6 +388,7 @@ def main(argv=None) -> int:
     p.add_argument("--hand-model", required=True)
     p.add_argument("--pose-model", required=True)
     p.add_argument("--max-side", type=int, default=960)
+    p.add_argument("--include-reserve", action="store_true", help="also extract the 63 reserve glosses as open-set unknowns")
     p = sub.add_parser("merge")
     p.add_argument("--inputs", required=True)
     p.add_argument("--out", required=True)
