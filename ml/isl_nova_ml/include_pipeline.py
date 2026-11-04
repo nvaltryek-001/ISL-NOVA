@@ -342,6 +342,73 @@ def cmd_compare(a) -> int:
     return 0
 
 
+def _ffmpeg() -> str:
+    exe = shutil.which("ffmpeg")
+    if exe:
+        return exe
+    import imageio_ffmpeg  # bundled with imageio-ffmpeg
+
+    return imageio_ffmpeg.get_ffmpeg_exe()
+
+
+def cmd_fetch_test_videos(a) -> int:
+    """Prepare held-out test-split videos as Y4M files for a browser virtual camera,
+    plus the offline (Python MediaPipe) prediction for the same videos."""
+    import subprocess
+
+    from .extract import LandmarkExtractor
+    from .inference import Predictor
+
+    out = Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
+    work = Path(a.work)
+    work.mkdir(parents=True, exist_ok=True)
+    _, files = zenodo_files()
+    meta = {f["key"]: f for f in files}
+    idx, voc = split_index(), vocab()
+    pred = Predictor.from_registry(Path(a.registry))
+    ex = LandmarkExtractor(Path(a.hand_model), Path(a.pose_model))
+    items = []
+    try:
+        for part in [x for x in a.parts.split(",") if x]:
+            z = work / part
+            download(meta[part]["url"], z, meta[part]["checksum"])
+            with zipfile.ZipFile(z) as zf:
+                names = [n for n in zf.namelist() if Path(n).suffix.lower() in VIDEO_EXT]
+                for n in names:
+                    p = Path(n)
+                    gloss = norm(p.parent.name)
+                    hit = idx.get((gloss, p.name.lower())) or idx.get((gloss, "stem:" + p.stem.lower()))
+                    if not hit or hit[0] != "test" or gloss not in voc:
+                        continue
+                    src = work / "v" / p.name
+                    src.parent.mkdir(exist_ok=True)
+                    src.write_bytes(zf.read(n))
+                    vid = f"{gloss}__{p.stem}"
+                    y4m = out / f"{vid}.y4m"
+                    cmd = [_ffmpeg(), "-loglevel", "error", "-y", "-i", str(src), "-vf", "scale=640:-2,fps=25",
+                           "-pix_fmt", "yuv420p", str(y4m)]
+                    subprocess.run(cmd, check=True)  # noqa: S603 - fixed binary, paths we created
+                    frames, aspect, vmeta = ex.video(src)
+                    off = pred.predict(frames, aspect, 5)
+                    items.append({"id": vid, "sign_id": voc[gloss], "gloss": gloss, "y4m": y4m.name,
+                                  "duration_s": round(vmeta["frames"] / vmeta["fps"], 2),
+                                  "offline": {"state": off["state"], "top1": off["top"][0]["sign_id"] if off["top"] else None,
+                                              "p": off["top"][0]["probability"] if off["top"] else None}})
+                    src.unlink()
+                    if a.limit and len(items) >= a.limit:
+                        break
+            z.unlink()
+            if a.limit and len(items) >= a.limit:
+                break
+    finally:
+        ex.close()
+    (out / "videos.json").write_text(json.dumps({"model_id": pred.info["model_id"], "videos": items}, indent=2))
+    ok = sum(i["offline"]["top1"] == i["sign_id"] for i in items)
+    print(json.dumps({"videos": len(items), "offline_top1_correct": ok}, indent=2))
+    return 0
+
+
 def cmd_verify(a) -> int:
     """Load the promoted model exactly as the API does and re-run the test split."""
     import numpy as np
@@ -396,6 +463,14 @@ def main(argv=None) -> int:
     p = sub.add_parser("compare")
     p.add_argument("--registry", required=True)
     p.add_argument("--out", required=True)
+    p = sub.add_parser("fetch-test-videos")
+    p.add_argument("--parts", required=True)
+    p.add_argument("--out", required=True)
+    p.add_argument("--work", default="/tmp/include-live")  # noqa: S108 - runner scratch
+    p.add_argument("--registry", required=True)
+    p.add_argument("--hand-model", required=True)
+    p.add_argument("--pose-model", required=True)
+    p.add_argument("--limit", type=int, default=0)
     p = sub.add_parser("verify")
     p.add_argument("--registry", required=True)
     p.add_argument("--manifest", required=True)
@@ -403,7 +478,8 @@ def main(argv=None) -> int:
     p.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     return {"preflight": cmd_preflight, "parts": cmd_parts, "extract-part": cmd_extract_part,
-            "merge": cmd_merge, "compare": cmd_compare, "verify": cmd_verify}[a.cmd](a)
+            "merge": cmd_merge, "compare": cmd_compare, "verify": cmd_verify,
+            "fetch-test-videos": cmd_fetch_test_videos}[a.cmd](a)
 
 
 if __name__ == "__main__":

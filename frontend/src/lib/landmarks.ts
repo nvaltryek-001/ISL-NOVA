@@ -9,7 +9,7 @@ const CDN = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VE
 export const HAND_MODEL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
 export const POSE_MODEL = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task';
 
-export type Extractor = { detect: (v: HTMLVideoElement, ts: number) => Frame; close: () => void; withPose: boolean };
+export type Extractor = { detect: (v: HTMLVideoElement, ts: number) => Frame; close: () => void; withPose: boolean; delegate: string };
 
 let loading: Promise<Extractor> | null = null;
 
@@ -23,20 +23,22 @@ async function create(withPose: boolean): Promise<Extractor> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const vision: any = await import(/* @vite-ignore */ url);
   const files = await vision.FilesetResolver.forVisionTasks(`${CDN}/wasm`);
-  const hands = await vision.HandLandmarker.createFromOptions(files, {
-    baseOptions: { modelAssetPath: HAND_MODEL, delegate: 'GPU' }, runningMode: 'VIDEO', numHands: 2,
-    minHandDetectionConfidence: 0.5, minTrackingConfidence: 0.5,
-  });
+  // GPU (WebGL) is fastest; fall back to CPU (WASM) where WebGL is unavailable.
+  const make = async (Task: any, opts: Record<string, unknown>, asset: string) => {
+    try { return { task: await Task.createFromOptions(files, { ...opts, baseOptions: { modelAssetPath: asset, delegate: 'GPU' } }), delegate: 'GPU' }; }
+    catch { return { task: await Task.createFromOptions(files, { ...opts, baseOptions: { modelAssetPath: asset, delegate: 'CPU' } }), delegate: 'CPU' }; }
+  };
+  const h = await make(vision.HandLandmarker, { runningMode: 'VIDEO', numHands: 2, minHandDetectionConfidence: 0.5, minTrackingConfidence: 0.5 }, HAND_MODEL);
+  const hands = h.task;
   let pose: any = null;
   if (withPose) {
     try {
-      pose = await vision.PoseLandmarker.createFromOptions(files, {
-        baseOptions: { modelAssetPath: POSE_MODEL, delegate: 'GPU' }, runningMode: 'VIDEO', numPoses: 1,
-      });
+      pose = (await make(vision.PoseLandmarker, { runningMode: 'VIDEO', numPoses: 1 }, POSE_MODEL)).task;
     } catch { pose = null; }
   }
   return {
     withPose: !!pose,
+    delegate: h.delegate,
     detect(v, ts) {
       const r = hands.detectForVideo(v, ts);
       const f: Frame = { left: null, right: null, pose: null };

@@ -41,7 +41,7 @@ export function KioskPage() {
         setPred(await api<Prediction>('/predict/sequence', { body: { frames: w.map((x) => x.f), aspect: w[w.length - 1]?.a ?? 4 / 3, top_k: 3 } }));
       } catch (e) { setPred({ state: 'model_unavailable', top: [], reasons: [(e as Error).message] }); }
       setBusy(false);
-    }, 2200);
+    }, 2500);
   };
   const reset = () => { setPred(null); frames.current = []; setKey((k) => k + 1); speechSynthesis?.cancel?.(); };
   const top = pred?.top[0];

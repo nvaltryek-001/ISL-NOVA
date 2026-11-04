@@ -8,7 +8,7 @@ import { Badge, Button, Select } from './ui';
 export type StageApi = { frames: React.MutableRefObject<Frame[]>; aspect: number; extractor: 'loading' | 'ready' | 'unavailable' };
 
 export function CameraStage({ onFrame, showPose = true, keep = 90, large, onState, recordStream }:
-  { onFrame?: (f: Frame, aspect: number) => void; showPose?: boolean; keep?: number; large?: boolean; onState?: (s: CameraState, ex: StageApi['extractor']) => void; recordStream?: (s: MediaStream | null) => void }) {
+  { onFrame?: (f: Frame, aspect: number, t: number) => void; showPose?: boolean; keep?: number; large?: boolean; onState?: (s: CameraState, ex: StageApi['extractor']) => void; recordStream?: (s: MediaStream | null) => void }) {
   const video = useRef<HTMLVideoElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const stream = useRef<MediaStream | null>(null);
@@ -61,11 +61,16 @@ export function CameraStage({ onFrame, showPose = true, keep = 90, large, onStat
   const loop = () => {
     let last = performance.now();
     let count = 0;
+    let lastVideoTime = -1;
+    let lastDetect = 0;
     const tick = () => {
       const v = video.current;
       if (!v || !stream.current) return;
-      if (ex.current && v.readyState >= 2) {
-        const now = performance.now();
+      const now = performance.now();
+      // process each camera frame once (screens refresh faster than cameras) and cap at ~30 fps
+      if (ex.current && v.readyState >= 2 && v.currentTime !== lastVideoTime && now - lastDetect >= 30) {
+        lastVideoTime = v.currentTime;
+        lastDetect = now;
         try {
           const f = ex.current.detect(v, now);
           frames.current.push(f);
@@ -76,7 +81,7 @@ export function CameraStage({ onFrame, showPose = true, keep = 90, large, onStat
             drawOverlay(c.getContext('2d')!, f, c.width, c.height, showPose);
           }
           setTracking({ l: !!f.left, r: !!f.right, p: !!f.pose });
-          onFrame?.(f, v.videoWidth / (v.videoHeight || 1));
+          onFrame?.(f, v.videoWidth / (v.videoHeight || 1), now);
         } catch { /* skip frame */ }
         count++;
         if (now - last > 1000) { setFps(Math.round((count * 1000) / (now - last))); count = 0; last = now; }
@@ -110,7 +115,7 @@ export function CameraStage({ onFrame, showPose = true, keep = 90, large, onStat
             <Badge tone={tracking.l ? 'nova' : 'neutral'}>L hand</Badge>
             <Badge tone={tracking.r ? 'signal' : 'neutral'}>R hand</Badge>
             {showPose && <Badge tone={tracking.p ? 'ok' : 'neutral'}>Pose</Badge>}
-            {exState === 'ready' && <Badge>{fps} fps</Badge>}
+            {exState === 'ready' && <Badge>{fps} fps · {ex.current?.delegate}</Badge>}
           </div>
         )}
         {state === 'live' && exState !== 'ready' && (

@@ -13,8 +13,9 @@ import { speak } from '../lib/speech';
 import { toast, useAuth, usePrefs } from '../lib/store';
 import type { ModelInfo, Prediction, SignSummary } from '../lib/types';
 
-const WINDOW = 45; // ~1.5 s at 30 fps
+const WINDOW_MS = 2000; // continuous mode: classify the last 2 s, independent of camera frame rate
 const INTERVAL_MS = 750;
+const CAPTURE_OPTIONS = [1.5, 2.5, 3.5];
 const LANGS = { en: 'English', hi: 'हिन्दी', kn: 'ಕನ್ನಡ' } as const;
 
 type Mode = 'capture' | 'continuous';
@@ -23,7 +24,9 @@ export function LivePage() {
   const { user } = useAuth();
   const prefs = usePrefs();
   const model = useQuery<ModelInfo>('/model/info');
-  const buffer = useRef<{ f: Frame; a: number }[]>([]);
+  const buffer = useRef<{ f: Frame; a: number; t: number }[]>([]);
+  const [captureSec, setCaptureSec] = useState(2.5);
+  const [useCountdown, setUseCountdown] = useState(true);
   const capture = useRef<{ f: Frame; a: number }[] | null>(null);
   const [mode, setMode] = useState<Mode>('capture');
   const [cam, setCam] = useState<{ s: CameraState; ex: string }>({ s: 'idle', ex: 'loading' });
@@ -37,9 +40,9 @@ export function LivePage() {
   const [correcting, setCorrecting] = useState(false);
   const inflight = useRef(false);
 
-  const onFrame = useCallback((f: Frame, a: number) => {
-    buffer.current.push({ f, a });
-    if (buffer.current.length > 120) buffer.current.shift();
+  const onFrame = useCallback((f: Frame, a: number, t: number) => {
+    buffer.current.push({ f, a, t });
+    while (buffer.current.length && t - buffer.current[0].t > 6000) buffer.current.shift();
     capture.current?.push({ f, a });
   }, []);
   const onState = useCallback((s: CameraState, ex: string) => setCam({ s, ex }), []);
@@ -67,8 +70,9 @@ export function LivePage() {
   useEffect(() => {
     if (!running || mode !== 'continuous') return;
     const t = setInterval(() => {
-      const w = buffer.current.slice(-WINDOW);
-      if (w.length < WINDOW / 2) return;
+      const end = performance.now();
+      const w = buffer.current.filter((x) => end - x.t <= WINDOW_MS);
+      if (w.length < 8) return;
       if (windowQuality(w.map((x) => x.f)).hands < 0.25) { setPred({ state: 'insufficient_input', top: [], reasons: ['Hands not visible in enough frames'] }); return; }
       send(w);
     }, INTERVAL_MS);
@@ -76,16 +80,24 @@ export function LivePage() {
   }, [running, mode, send]);
 
   const startCapture = () => {
-    setCountdown(3);
+    const record = () => {
+      capture.current = [];
+      setCountdown(-1); // capturing
+      setTimeout(() => {
+        const frames = capture.current ?? [];
+        capture.current = null;
+        setCountdown(-2); // classifying
+        send(frames).finally(() => setCountdown(0));
+      }, captureSec * 1000);
+    };
+    if (!useCountdown) { record(); return; }
     let n = 3;
+    setCountdown(n);
     const t = setInterval(() => {
       n -= 1;
-      setCountdown(n);
-      if (n === 0) {
-        clearInterval(t);
-        capture.current = [];
-        setTimeout(() => { const frames = capture.current ?? []; capture.current = null; setCountdown(-1); send(frames).finally(() => setCountdown(0)); }, 2000);
-      }
+      if (n > 0) { setCountdown(n); return; }
+      clearInterval(t);
+      record();
     }, 700);
   };
 
@@ -121,12 +133,21 @@ export function LivePage() {
             <CameraStage onFrame={onFrame} onState={onState} large />
             {countdown > 0 && <div className="pointer-events-none absolute inset-0 grid place-items-center"><span className="font-display text-8xl font-semibold text-white drop-shadow-[0_4px_24px_rgba(0,0,0,.8)]" aria-live="assertive">{countdown}</span></div>}
             {countdown === -1 && <div className="pointer-events-none absolute right-3 top-3"><Badge tone="bad"><span className="live-dot size-2 rounded-full bg-rose-400" />Capturing…</Badge></div>}
+            {countdown === -2 && <div className="pointer-events-none absolute right-3 top-3" role="status"><Badge tone="nova">Classifying…</Badge></div>}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {mode === 'capture'
-              ? <Button variant="primary" size="lg" icon="record" disabled={!ready || countdown !== 0} onClick={startCapture}>Capture sign (3-2-1)</Button>
+              ? <Button variant="primary" size="lg" icon="record" disabled={!ready || countdown !== 0} onClick={startCapture}>{useCountdown ? 'Capture sign (3-2-1)' : 'Capture sign now'}</Button>
               : <Button variant={running ? 'danger' : 'primary'} size="lg" icon={running ? 'pause' : 'play'} disabled={!ready} onClick={() => setRunning(!running)}>{running ? 'Pause' : 'Start continuous'}</Button>}
-            <p className="muted text-sm">{!ready ? (cam.s !== 'live' ? 'Start the camera first.' : 'Waiting for hand tracking…') : mode === 'capture' ? 'Sign once after the countdown (2 s window).' : `Classifying a ${WINDOW}-frame sliding window every ${INTERVAL_MS} ms.`}</p>
+            <p className="muted text-sm">{!ready ? (cam.s !== 'live' ? 'Start the camera first.' : 'Waiting for hand tracking…') : mode === 'capture' ? `Sign once after the countdown (${captureSec} s window).` : `Classifying the last ${WINDOW_MS / 1000} s every ${INTERVAL_MS} ms.`}</p>
+            {mode === 'capture' && (
+              <Select aria-label="Capture length" value={captureSec} onChange={(e) => setCaptureSec(Number(e.target.value))} className="h-9 w-auto py-0 text-sm">
+                {CAPTURE_OPTIONS.map((s) => <option key={s} value={s}>{s} s window</option>)}
+              </Select>
+            )}
+            {mode === 'capture' && (
+              <label className="flex items-center gap-2 text-sm text-ink-300"><input type="checkbox" className="accent-nova-500" checked={useCountdown} onChange={(e) => setUseCountdown(e.target.checked)} />3-second countdown</label>
+            )}
           </div>
         </div>
 
