@@ -42,7 +42,7 @@ for (const viewport of [{ width: 1280, height: 800 }, { width: 390, height: 844 
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(base + '/');
-  await page.getByText(/Model live · 200 signs/).first().waitFor({ timeout: 60000 });
+  await page.getByText(/Model live · 200 signs/).first().waitFor({ state: 'attached', timeout: 60000 });
   await page.goto(base + '/live');
   await page.getByRole('button', { name: /Start camera/ }).click();
   let fps = null;

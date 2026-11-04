@@ -18,14 +18,45 @@ The container runs `python -m app.migrate`, then uvicorn. It seeds roles and the
 
 ## 2. Managed platforms
 
-Any container host works. Example, Render (no `render.yaml` is committed, to avoid accidental provisioning):
+### Live demo: Render free plan (deployed)
+
+A public demo runs at **https://isl-nova.onrender.com** (Render web service
+`isl-nova`, Docker runtime, free plan, Singapore, auto-deploys
+`feat/isl-nova-platform`). It was created with these environment variables and
+**no paid resources**:
+
+| Variable | Value | Why |
+|---|---|---|
+| `ISL_NOVA_ENV` | `production` | strict config checks, HSTS |
+| `ISL_NOVA_MODEL_TAG` | `model-lstm-20261104T041414Z-s13` | entrypoint installs the verified release (SHA-256 checked) at start |
+| `ISL_NOVA_GENERATE_JWT_SECRET` | `1` | container generates its own signing key; no secret passes through config or logs |
+| `DATABASE_URL` | `sqlite:////data/isl_nova.sqlite` | free plan has no disk and free Postgres expires after 30 days |
+| `CORS_ORIGINS` | `https://isl-nova.onrender.com` | same-origin SPA |
+| `PBKDF2_ITERATIONS` | `310000` | OWASP minimum; keeps login responsive on 0.1 CPU |
+
+**Free-plan consequences (by design of the plan, not bugs):** the service sleeps
+after ~15 min idle and the first request takes ~1 min; the SQLite database and
+any accounts or recordings are **wiped on every restart or redeploy**; sessions
+end on restart. No bootstrap admin is configured, so the demo has no admin
+account; visitors can register as *learners* and use live recognition,
+explorer, communication and academy. **Do not upload real signer recordings to
+the demo.** For a persistent deployment use a paid disk or managed Postgres
+(owner approval required) and set `JWT_SECRET`, `BOOTSTRAP_ADMIN_*`.
+
+Verified after deployment: `GET /api/v1/health` → `status: ok`, model available;
+`GET /api/v1/model/info` → `lstm-20261104T041414Z-s13`, 200 classes,
+`synthetic: false`; start-up log shows the release installed and promoted with
+SHA-256 `e0979cd5…c543c0`. The read-only smoke workflow
+(`.github/workflows/deploy-smoke.yml`, push `run/deploy-smoke`) re-checks
+health, security headers, the model, 24 held-out landmark sequences through the
+production API, and the UI camera pipeline at desktop and phone widths.
+
+### Persistent deployment (Render / Fly.io / Railway)
 
 1. Create a **PostgreSQL 16** instance and copy its internal URL.
 2. Create a **Web Service** from this repository using the `Dockerfile`, with a persistent disk mounted at `/data`.
-3. Set environment variables: `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGINS=https://<your-domain>`, `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD`, `ISL_NOVA_ENV=production`.
+3. Set environment variables: `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGINS=https://<your-domain>`, `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD`, `ISL_NOVA_ENV=production`, optionally `ISL_NOVA_MODEL_TAG`.
 4. Health check path: `/api/v1/health`.
-
-Fly.io / Railway: the same image, a Postgres add-on, a volume at `/data`, and the same variables.
 
 ## 3. HTTPS, domain, CORS
 Terminate TLS at the platform or a reverse proxy; uvicorn runs with `--proxy-headers`. Set `CORS_ORIGINS` to the exact HTTPS origin. The camera requires a secure context (HTTPS or localhost).
@@ -34,6 +65,9 @@ Terminate TLS at the platform or a reverse proxy; uvicorn runs with `--proxy-hea
 The local storage adapter writes to `STORAGE_DIR` (a mounted volume). For S3-compatible storage, implement the four methods of `LocalStorage` (`put/get/exists/delete`). Model artefacts live in `MODEL_REGISTRY_DIR`; copy trained model directories there and promote one in the AI Laboratory.
 
 ## 4b. Install the trained model
+Set `ISL_NOVA_MODEL_TAG=<release tag>`: `scripts/docker-entrypoint.sh` installs and
+promotes that release on start when no model is active (a failed download is
+logged and the API reports `model_unavailable`). Or install manually:
 ```bash
 docker compose exec app python /app/scripts/fetch_model.py \
   --tag model-lstm-20261104T041414Z-s13 --registry /data/models --promote
