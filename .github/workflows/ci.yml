@@ -73,6 +73,23 @@ jobs:
           E2E_MODEL_TAG: model-lstm-20261104T041414Z-s13
         run: npm run e2e
 
+  audit:
+    name: Dependency audit (report only)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: pip-audit (backend/requirements.txt)
+        continue-on-error: true
+        run: pip install pip-audit==2.9.0 && pip-audit -r backend/requirements.txt --progress-spinner off
+      - name: npm audit (production dependencies)
+        continue-on-error: true
+        working-directory: frontend
+        run: npm install --no-fund --package-lock-only && npm audit --omit=dev
+
   docker:
     name: Docker image
     runs-on: ubuntu-24.04
