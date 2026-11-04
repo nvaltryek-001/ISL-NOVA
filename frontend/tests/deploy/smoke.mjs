@@ -24,7 +24,7 @@ const man = JSON.parse(fs.readFileSync(path.join(sampleDir, 'manifest.json'), 'u
 const py = 'import json,sys; sys.path.insert(0, "../ml"); from isl_nova_ml.data import load_landmarks\nf,a = load_landmarks(sys.argv[1]); print(json.dumps({"frames": f, "aspect": a}))';
 let correct = 0; const lat = []; const states = {};
 for (const e of man.entries) {
-  const body = execFileSync('python3', ['-c', py, path.join(sampleDir, e.landmarks_path)], { maxBuffer: 1 << 26 }).toString();
+  const body = execFileSync(process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3'), ['-c', py, path.join(sampleDir, e.landmarks_path)], { maxBuffer: 1 << 26 }).toString();
   const t0 = performance.now();
   const res = await (await fetch(`${base}/api/v1/predict/sequence`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })).json();
   lat.push(performance.now() - t0);

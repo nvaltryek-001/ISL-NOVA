@@ -1,0 +1,41 @@
+# Runs the Windows local-setup scripts exactly as a developer would, on a
+# Windows runner with Windows PowerShell 5.1. Manual: push run/windows-check.
+name: Windows local setup
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["run/windows-check"]
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: PowerShell version
+        run: $PSVersionTable.PSVersion.ToString()
+      - name: setup_windows.ps1 (venv, packages, frontend build, .env, database, model)
+        run: .\scripts\setup_windows.ps1 -Python python -WithMediaPipeTasks
+      - name: start_windows.ps1 -Background, then use the running app
+        run: |
+          .\scripts\start_windows.ps1 -Background -Port 8000
+          $m = Invoke-RestMethod http://127.0.0.1:8000/api/v1/model/info
+          if (-not $m.available -or $m.n_classes -ne 200) { throw "model not available" }
+          Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8000/live | Select-Object -ExpandProperty StatusCode
+          # held-out INCLUDE test landmarks (from the model release) through the recognition API
+          .\.venv\Scripts\python.exe scripts\check_predictions.py --base http://127.0.0.1:8000
+          if ($LASTEXITCODE -ne 0) { throw "prediction check failed" }
+          Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force
+      - name: test_windows.ps1 -E2E -WithModel
+        run: .\scripts\test_windows.ps1 -E2E -WithModel

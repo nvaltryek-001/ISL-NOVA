@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { after, before, describe, test } from 'node:test';
-import { launch, newPage, repo, startServer } from './harness.mjs';
+import { launch, newPage, PYTHON, repo, startServer } from './harness.mjs';
 
 const TAG = process.env.E2E_MODEL_TAG;
 let srv, browser, sample;
@@ -39,7 +39,7 @@ describe('trained INCLUDE model', { skip: !TAG && 'E2E_MODEL_TAG not set' }, () 
 f,a = load_landmarks(sys.argv[1]); print(json.dumps({"frames": f, "aspect": a}))`;
     let correct = 0;
     for (const e of man.entries) {
-      const body = execFileSync(process.env.PYTHON || 'python3', ['-c', py, path.join(sample, e.landmarks_path)], { cwd: repo, maxBuffer: 1 << 26 }).toString();
+      const body = execFileSync(PYTHON, ['-c', py, path.join(sample, e.landmarks_path)], { cwd: repo, maxBuffer: 1 << 26 }).toString();
       const r = await (await fetch(`${srv.base}/api/v1/predict/sequence`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })).json();
       assert.ok(['recognized', 'uncertain', 'unknown'].includes(r.state), r.state);
       assert.equal(r.synthetic, false);

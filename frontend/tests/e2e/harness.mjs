@@ -11,6 +11,8 @@ import { chromium } from 'playwright';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const repo = path.resolve(here, '..', '..', '..');
+// python executable: $PYTHON, else `python` on Windows and `python3` elsewhere
+export const PYTHON = process.env.PYTHON || (process.platform === 'win32' ? 'python' : 'python3');
 export const ADMIN = { email: 'admin@example.org', password: 'admin-password-1' };
 
 const freePort = () => new Promise((res) => { const s = net.createServer(); s.listen(0, () => { const p = s.address().port; s.close(() => res(p)); }); });
@@ -20,18 +22,18 @@ export async function startServer({ withModel = false } = {}) {
   const port = await freePort();
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'isl-nova-e2e-'));
   const env = {
-    ...process.env, PYTHONPATH: `${repo}/backend:${repo}/ml`, DATABASE_URL: `sqlite:///${dir}/db.sqlite`,
+    ...process.env, PYTHONPATH: [path.join(repo, 'backend'), path.join(repo, 'ml')].join(path.delimiter), DATABASE_URL: `sqlite:///${dir}/db.sqlite`,
     STORAGE_DIR: `${dir}/objects`, MODEL_REGISTRY_DIR: `${dir}/models`, JWT_SECRET: 'e2e-secret-'.padEnd(48, 'x'),
     BOOTSTRAP_ADMIN_EMAIL: ADMIN.email, BOOTSTRAP_ADMIN_PASSWORD: ADMIN.password, PBKDF2_ITERATIONS: '1000',
     CORS_ORIGINS: `http://127.0.0.1:${port}`, AUTH_RATE_LIMIT_PER_MINUTE: '1000', RATE_LIMIT_PER_MINUTE: '10000',
   };
   if (withModel && process.env.E2E_MODEL_TAG) {
     // install the published, trained model exactly as an operator would
-    const r = spawnSync(process.env.PYTHON || 'python3', ['scripts/fetch_model.py', '--tag', process.env.E2E_MODEL_TAG, '--registry', `${dir}/models`, '--promote'],
+    const r = spawnSync(PYTHON, ['scripts/fetch_model.py', '--tag', process.env.E2E_MODEL_TAG, '--registry', `${dir}/models`, '--promote'],
       { cwd: repo, env, encoding: 'utf8' });
     if (r.status !== 0) throw new Error(`fetch_model failed: ${r.stderr}`);
   }
-  const proc = spawn(process.env.PYTHON || 'python3', ['-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', String(port), '--log-level', 'warning'],
+  const proc = spawn(PYTHON, ['-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', String(port), '--log-level', 'warning'],
     { cwd: path.join(repo, 'backend'), env, stdio: ['ignore', 'ignore', 'pipe'] });
   let stderr = '';
   proc.stderr.on('data', (d) => { stderr += d; });
@@ -41,7 +43,7 @@ export async function startServer({ withModel = false } = {}) {
     if (proc.exitCode !== null) throw new Error(`server exited: ${stderr}`);
     await new Promise((r) => setTimeout(r, 150));
   }
-  return { base, dir, stop: () => { proc.kill('SIGTERM'); fs.rmSync(dir, { recursive: true, force: true }); } };
+  return { base, dir, stop: () => { proc.kill(); try { fs.rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch { /* Windows may hold the file briefly */ } } };
 }
 
 export async function launch({ camera = 'allow' } = {}) {
