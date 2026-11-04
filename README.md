@@ -37,7 +37,7 @@
 >
 > | | |
 > |---|---|
-> | ✅ **Platform** | 12 application modules, consent-first data pipeline, training and evaluation, webcam recognition. CI green: **60** Python tests, **16** unit tests, **19** end-to-end tests. Setup scripts verified on a Windows runner. |
+> | ✅ **Platform** | 12 application modules, consent-first data pipeline, training and evaluation, webcam recognition. CI green: **60** Python tests, **17** unit tests, **19** end-to-end tests. Setup scripts verified on a Windows runner. |
 > | ✅ **Real model** | LSTM trained on genuine INCLUDE recordings, all **200 classes**: **91.7 % top-1 · 98.3 % top-5 · 91.7 % macro-F1** on the 635-video official test split. |
 > | ✅ **Deployed** | Free-tier demo with that model at **[isl-nova.onrender.com](https://isl-nova.onrender.com)**, checked from outside: 24/24 held-out samples correct through the public API. |
 > | ⚠️ **Unknown signs** | Tested on 62 held-out INCLUDE glosses: AUROC 0.900, but **29 % of unseen signs are still "recognized"**. |
@@ -346,7 +346,7 @@ Artifacts: model release [`model-lstm-20261104T041414Z-s13`](https://github.com/
 | Capability | Implemented | How it was tested | Evidence |
 |---|:---:|---|---|
 | 200-class recognition (INCLUDE official split) | ✅ | Genuine held-out test split, evaluated once | 91.7 % top-1 · [run 41771084083](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41771084083) |
-| Production inference path (`Predictor`, API) | ✅ | 635 test sequences re-run; 24 held-out samples through `POST /predict/sequence` in CI, on Windows **and against the live demo** | 91.65 % · 24/24 · [smoke run](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41817628215) |
+| Production inference path (`Predictor`, API) | ✅ | 635 test sequences re-run; 24 held-out samples through `POST /predict/sequence` in CI, on Windows **and against the live demo** | 91.65 % · 24/24 · [smoke run](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41861458853) |
 | Unknown-sign rejection | ✅ | 887 out-of-vocabulary recordings (62 glosses) | AUROC 0.900, **29.3 % false acceptance** |
 | Raw video → MediaPipe → model | ✅ | 73 held-out test videos, server-side extraction | 67/73 (91.8 %) |
 | In-browser MediaPipe (GPU/CPU) | ✅ | CI Chromium: bundle, WASM, hand model on GPU and CPU, fps badge | [run 41815175935](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815175935) |
@@ -481,7 +481,7 @@ Recordings collected in the app train through *AI Laboratory → Experiments* on
 | Backend + ML | `pytest -q` | ✅ **60 passed**, 1 skipped (needs a MediaPipe model file); Linux **and Windows** |
 | Backend on PostgreSQL 16 | `TEST_DATABASE_URL=postgresql://… pytest backend/tests` | ✅ pass (CI) |
 | Frontend types | `cd frontend && npm run typecheck` | ✅ pass |
-| Frontend unit + Python↔TS feature parity | `npm test` | ✅ **16 passed** |
+| Frontend unit + Python↔TS feature parity | `npm test` | ✅ **17 passed** |
 | End-to-end (Chromium) | `npm run build && npm run e2e` | ✅ **19 passed**: 16 app + 3 with the real model (24/24 held-out samples) |
 | Docker image + container health | CI `docker` job | ✅ pass |
 | Deployed instance (read-only) | `deploy-smoke.yml` | ✅ health, CSP/HSTS, model, **24/24** via the live API, in-browser MediaPipe (GPU) at 1280 and 390 px |

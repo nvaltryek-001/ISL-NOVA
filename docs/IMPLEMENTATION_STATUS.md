@@ -26,7 +26,7 @@ the live deployment. **Implemented** and **tested** are reported separately.
 | Security headers, CSP, HSTS (production) | ✅ | ✅ | `test_security_headers_and_cors`; deployed headers checked by smoke test |
 | Dependency audit | ✅ | ✅ | CI `audit` job: pip-audit **no known vulnerabilities**; npm audit found GHSA-mrhx-c7xc-m3w5 (zod, high), fixed by removing zod |
 | Windows local setup | ✅ | ✅ | [run 41842534266](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41842534266) on `windows-latest`, Windows PowerShell 5.1: `setup_windows.ps1` → `start_windows.ps1` → 24/24 held-out samples through the local API → `test_windows.ps1 -E2E -WithModel`: ruff, 60 pytest, 16 unit, **19/19 E2E** |
-| Free-tier deployment with the model installed | ✅ | ✅ | [isl-nova.onrender.com](https://isl-nova.onrender.com): `/health` ok, `/model/info` = `lstm-20261104T041414Z-s13`, 200 classes, `synthetic: false`; deploy smoke [run 41817628215](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41817628215): 24/24 held-out samples correct and *recognized* through the public API (median round trip 497 ms, US runner → Singapore), MediaPipe loads on GPU in the deployed UI at 1280 and 390 px |
+| Free-tier deployment with the model installed | ✅ | ✅ | [isl-nova.onrender.com](https://isl-nova.onrender.com): `/health` ok, `/model/info` = `lstm-20261104T041414Z-s13`, 200 classes, `synthetic: false`; deploy smoke [run 41861458853](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41861458853) on commit `d83175a`: 24/24 held-out samples correct and *recognized* through the public API (median round trip 1.0 s, US runner → Singapore, after the free instance woke), MediaPipe loads on GPU in the deployed UI at 1280 and 390 px |
 
 ## Test suites (latest)
 
