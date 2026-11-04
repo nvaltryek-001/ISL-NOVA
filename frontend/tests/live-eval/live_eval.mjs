@@ -17,7 +17,7 @@ const results = [];
 
 for (const v of videos) {
   const browser = await chromium.launch({
-    args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', `--use-file-for-fake-video-capture=${path.join(dir, v.y4m)}`],
+    args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', `--use-file-for-fake-video-capture=${path.resolve(dir, v.y4m)}`  /* Chromium needs an absolute path */],
   });
   const diag = [];
   let pageRef = null;
