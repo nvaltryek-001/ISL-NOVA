@@ -192,6 +192,8 @@ def cmd_extract_part(a) -> int:
     idx, voc = split_index(), vocab()
     ex = LandmarkExtractor(Path(a.hand_model), Path(a.pose_model), max_side=a.max_side)
     entries, failures, unmatched, outside_vocab = [], [], [], 0
+    duplicates: list[dict] = []
+    seen_listed: dict[str, str] = {}
     try:
         for n in sorted(names):
             p = work / "x" / n
@@ -205,6 +207,10 @@ def cmd_extract_part(a) -> int:
                 continue
             split, listed = hit
             rid = f"include:{gloss}:{p.stem}"
+            if listed in seen_listed:  # two files resolve to one official split entry
+                duplicates.append({"path": n, "split_entry": listed, "kept": seen_listed[listed]})
+                continue
+            seen_listed[listed] = n
             try:
                 frames, aspect, vmeta = ex.video(p)
             except Exception as exc:  # noqa: BLE001 - recorded per video
@@ -227,7 +233,8 @@ def cmd_extract_part(a) -> int:
         ex.close()
         shutil.rmtree(work / "x", ignore_errors=True)
     report.update({"processed": len(entries), "failed": len(failures), "unmatched_to_split_lists": len(unmatched),
-                   "outside_isl_nova_vocabulary": outside_vocab, "extract_seconds": round(time.time() - t0, 1),
+                   "outside_isl_nova_vocabulary": outside_vocab,
+                   "duplicate_files_for_one_split_entry": duplicates, "extract_seconds": round(time.time() - t0, 1),
                    "insufficient_input": sum(e["quality"]["status"] != "ok" for e in entries)})
     (out / "part_manifest.json").write_text(json.dumps({"report": report, "entries": entries, "failures": failures,
                                                         "unmatched": unmatched}, indent=1))
