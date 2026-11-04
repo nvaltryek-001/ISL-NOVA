@@ -1,7 +1,9 @@
 // Camera + landmark pipeline shared by Live Recognition, Recording Studio and Kiosk.
 import { useEffect, useRef, useState } from 'react';
 import type { Frame } from '../lib/features';
-import { type CameraState, drawOverlay, type Extractor, listCameras, loadExtractor, openCamera } from '../lib/landmarks';
+import { type CameraState, drawOverlay, type Extractor, listCameras, loadExtractor, openCamera, rememberDelegate } from '../lib/landmarks';
+
+const SLOW_FPS = 5;
 import { Icon } from './icons';
 import { Badge, Button, Select } from './ui';
 
@@ -20,6 +22,7 @@ export function CameraStage({ onFrame, showPose = true, keep = 90, large, onStat
   const [cams, setCams] = useState<MediaDeviceInfo[]>([]);
   const [camId, setCamId] = useState<string>('');
   const [fps, setFps] = useState(0);
+  const [switched, setSwitched] = useState(false);
   const [err, setErr] = useState('');
   const frames = useRef<Frame[]>([]);
   const [tracking, setTracking] = useState({ l: false, r: false, p: false });
@@ -63,6 +66,8 @@ export function CameraStage({ onFrame, showPose = true, keep = 90, large, onStat
     let count = 0;
     let lastVideoTime = -1;
     let lastDetect = 0;
+    let slowSeconds = 0;
+    let switching = false;
     const tick = () => {
       const v = video.current;
       if (!v || !stream.current) return;
@@ -84,7 +89,19 @@ export function CameraStage({ onFrame, showPose = true, keep = 90, large, onStat
           onFrame?.(f, v.videoWidth / (v.videoHeight || 1), now);
         } catch { /* skip frame */ }
         count++;
-        if (now - last > 1000) { setFps(Math.round((count * 1000) / (now - last))); count = 0; last = now; }
+        if (now - last > 1000) {
+          const measured = Math.round((count * 1000) / (now - last));
+          setFps(measured);
+          count = 0; last = now;
+          // GPU delegate much slower than real time (software WebGL, weak GPU): switch to CPU once
+          slowSeconds = ex.current?.delegate === 'GPU' && measured < SLOW_FPS ? slowSeconds + 1 : 0;
+          if (slowSeconds >= 3 && !switching) {
+            switching = true;
+            loadExtractor(showPose, 'CPU').then((cpu) => {
+              ex.current = cpu; rememberDelegate('CPU'); setSwitched(true);
+            }).catch(() => { /* keep GPU */ });
+          }
+        }
       }
       raf.current = requestAnimationFrame(tick);
     };
@@ -116,6 +133,7 @@ export function CameraStage({ onFrame, showPose = true, keep = 90, large, onStat
             <Badge tone={tracking.r ? 'signal' : 'neutral'}>R hand</Badge>
             {showPose && <Badge tone={tracking.p ? 'ok' : 'neutral'}>Pose</Badge>}
             {exState === 'ready' && <Badge>{fps} fps · {ex.current?.delegate}</Badge>}
+            {switched && <Badge tone="warn">GPU slow · switched to CPU</Badge>}
           </div>
         )}
         {state === 'live' && exState !== 'ready' && (

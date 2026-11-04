@@ -34,12 +34,14 @@ for (const v of videos) {
     // in-browser MediaPipe is ready when the fps badge appears
     await page.getByText(/fps · (GPU|CPU)/).waitFor({ timeout: Number(process.env.LIVE_EVAL_READY_MS || 120000) });
     r.delegate = (await page.getByText(/fps · (GPU|CPU)/).innerText()).split('· ')[1];
-    await page.waitForTimeout(3000); // let the fps badge measure real throughput before the timed run
+    await page.waitForTimeout(7000); // let the fps badge measure throughput (and the app switch GPU→CPU if GPU is slow)
     r.fps = await page.getByText(/fps · (GPU|CPU)/).first().innerText();
     // restart the camera so the clip plays from its first frame, then capture immediately
     await page.getByRole('button', { name: 'Stop camera' }).click();
     await page.getByRole('button', { name: 'Start camera' }).click();
     await page.getByText(/fps · (GPU|CPU)/).waitFor({ timeout: 30000 });
+    await page.waitForTimeout(1500);
+    r.fps_capture = await page.getByText(/fps · (GPU|CPU)/).first().innerText();
     await page.getByLabel('3-second countdown').uncheck();
     const secs = [1.5, 2.5, 3.5].find((s) => s >= v.duration_s) ?? 3.5;
     await page.getByLabel('Capture length').selectOption(String(secs));
@@ -65,11 +67,12 @@ for (const v of videos) {
     await browser.close();
   }
   results.push(r);
-  console.log(`${r.gloss} [${r.fps ?? '-'}]: browser=${r.browser?.top1 ?? r.error} (${r.browser?.state ?? '-'}) offline=${v.offline.top1} truth=${v.sign_id}`);
+  console.log(`${r.gloss} [${r.fps ?? '-'} → ${r.fps_capture ?? '-'}]: browser=${r.browser?.top1 ?? r.error} (${r.browser?.state ?? '-'}) offline=${v.offline.top1} truth=${v.sign_id}`);
 }
 
 const ok = results.filter((r) => r.browser);
 const acc = (f) => (ok.length ? ok.filter(f).length / ok.length : null);
+const fpsOf = (t) => Number(String(t ?? '').split(' ')[0]) || 0;
 const summary = {
   model_id, method: 'virtual camera replay of held-out INCLUDE test videos through the Live Recognition page (not a live person)',
   videos: results.length, completed: ok.length, errors: results.length - ok.length,
@@ -79,6 +82,8 @@ const summary = {
   browser_insufficient_input_rate: acc((r) => r.browser.state === 'insufficient_input'),
   offline_python_top1_same_videos: acc((r) => r.offline.top1 === r.sign_id),
   agreement_browser_vs_offline: acc((r) => r.browser.top1 === r.offline.top1),
+  median_fps_at_capture: ok.length ? ok.map((r) => fpsOf(r.fps_capture)).sort((a, b) => a - b)[ok.length >> 1] : null,
+  delegates_at_capture: ok.reduce((m, r) => { const d = String(r.fps_capture ?? '').split('· ')[1] ?? '?'; return { ...m, [d]: (m[d] ?? 0) + 1 }; }, {}),
   states: ok.reduce((m, r) => ({ ...m, [r.browser.state]: (m[r.browser.state] ?? 0) + 1 }), {}),
 };
 fs.writeFileSync(outFile, JSON.stringify({ summary, results }, null, 2));

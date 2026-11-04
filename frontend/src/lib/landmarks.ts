@@ -11,22 +11,42 @@ export const POSE_MODEL = 'https://storage.googleapis.com/mediapipe-models/pose_
 
 export type Extractor = { detect: (v: HTMLVideoElement, ts: number) => Frame; close: () => void; withPose: boolean; delegate: string };
 
-let loading: Promise<Extractor> | null = null;
+export type Delegate = 'GPU' | 'CPU';
+const loading = new Map<string, Promise<Extractor>>();
 
-export function loadExtractor(withPose = true): Promise<Extractor> {
-  if (!loading) loading = create(withPose).catch((e) => { loading = null; throw e; });
-  return loading;
+/** Load (once per delegate) the MediaPipe hand + pose landmarkers. 'GPU' falls back to 'CPU' if WebGL fails. */
+export function loadExtractor(withPose = true, delegate: Delegate = preferredDelegate()): Promise<Extractor> {
+  const key = `${withPose}:${delegate}`;
+  let p = loading.get(key);
+  if (!p) {
+    p = create(withPose, delegate).catch((e) => { loading.delete(key); throw e; });
+    loading.set(key, p);
+  }
+  return p;
 }
 
-async function create(withPose: boolean): Promise<Extractor> {
+// Some machines (software WebGL, weak integrated GPUs, CI) run the GPU delegate far slower than WASM.
+// When the camera stage measures that, it switches to CPU and remembers the choice for this browser.
+const PREF_KEY = 'isl-nova.mediapipe-delegate';
+export function preferredDelegate(): Delegate {
+  try { return localStorage.getItem(PREF_KEY) === 'CPU' ? 'CPU' : 'GPU'; } catch { return 'GPU'; }
+}
+export function rememberDelegate(d: Delegate) {
+  try { localStorage.setItem(PREF_KEY, d); } catch { /* storage unavailable */ }
+}
+
+async function create(withPose: boolean, preferred: Delegate): Promise<Extractor> {
   const url = `${CDN}/vision_bundle.mjs`;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const vision: any = await import(/* @vite-ignore */ url);
   const files = await vision.FilesetResolver.forVisionTasks(`${CDN}/wasm`);
-  // GPU (WebGL) is fastest; fall back to CPU (WASM) where WebGL is unavailable.
+  // GPU (WebGL) is usually fastest; fall back to CPU (WASM) where WebGL is unavailable.
   const make = async (Task: any, opts: Record<string, unknown>, asset: string) => {
-    try { return { task: await Task.createFromOptions(files, { ...opts, baseOptions: { modelAssetPath: asset, delegate: 'GPU' } }), delegate: 'GPU' }; }
-    catch { return { task: await Task.createFromOptions(files, { ...opts, baseOptions: { modelAssetPath: asset, delegate: 'CPU' } }), delegate: 'CPU' }; }
+    if (preferred === 'GPU') {
+      try { return { task: await Task.createFromOptions(files, { ...opts, baseOptions: { modelAssetPath: asset, delegate: 'GPU' } }), delegate: 'GPU' }; }
+      catch { /* fall through to CPU */ }
+    }
+    return { task: await Task.createFromOptions(files, { ...opts, baseOptions: { modelAssetPath: asset, delegate: 'CPU' } }), delegate: 'CPU' };
   };
   const h = await make(vision.HandLandmarker, { runningMode: 'VIDEO', numHands: 2, minHandDetectionConfidence: 0.5, minTrackingConfidence: 0.5 }, HAND_MODEL);
   const hands = h.task;
