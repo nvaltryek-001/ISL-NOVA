@@ -29,6 +29,7 @@ Generated from the application's OpenAPI document by `scripts/gen_api_contract.p
 |---|---|---|---|---|
 | `GET` | `/api/v1/signs` | Search and filter the vocabulary | optional | - |
 | `POST` | `/api/v1/signs` | Create a vocabulary entry | required | `signs:write` |
+| `GET` | `/api/v1/signs/review-sheet.csv` | CSV review sheet of all signs for offline linguistic review | required | `signs:review` |
 | `GET` | `/api/v1/signs/categories` | Categories with slot counts | public | - |
 | `GET` | `/api/v1/signs/{sign_id}` | Sign detail with references, translations and history | optional | - |
 | `PATCH` | `/api/v1/signs/{sign_id}` | Update descriptive fields of a sign | required | `signs:write` |
@@ -86,6 +87,9 @@ Generated from the application's OpenAPI document by `scripts/gen_api_contract.p
 | `POST` | `/api/v1/experiments` | Register an experiment configuration | required | `experiments:write` |
 | `GET` | `/api/v1/experiments/{eid}` | Experiment detail | required | `experiments:read` |
 | `POST` | `/api/v1/experiments/{eid}/run` | Queue a training run (background job) | required | `experiments:write` |
+| `POST` | `/api/v1/evaluation/runs` | Evaluate the active model on a dataset version (e.g. new signers) | required | `experiments:write` |
+| `GET` | `/api/v1/evaluation/runs` | Evaluation runs on dataset versions | required | `experiments:read` |
+| `GET` | `/api/v1/evaluation/runs/{rid}` | Evaluation run detail with per-recording rows | required | `experiments:read` |
 
 ## personal
 

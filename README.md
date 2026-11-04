@@ -349,7 +349,7 @@ Measured engineering latency (2 vCPU sandbox, synthetic input, untrained 200-cla
 
 ## 🔌 API
 
-80 operations under `/api/v1`, documented in [docs/API_CONTRACT.md](docs/API_CONTRACT.md) (generated from the code) and served live at `/api/v1/openapi.json` and `/api/docs`.
+84 operations under `/api/v1`, documented in [docs/API_CONTRACT.md](docs/API_CONTRACT.md) (generated from the code) and served live at `/api/v1/openapi.json` and `/api/docs`.
 
 <details><summary>Highlights</summary>
 
@@ -363,7 +363,8 @@ POST   /dataset/signers · /dataset/signers/{id}/consents · /dataset/consents/{
 GET    /annotations  POST /annotations  PATCH /annotations/{id}
 GET/POST /dataset/versions             GET /dataset/versions/{id}/manifest
 GET/POST /experiments  POST /experiments/{id}/run   GET /models  POST /models/{id}/promote · /models/rollback
-GET    /evaluation/metrics · /evaluation/confusion-matrix
+GET    /evaluation/metrics · /evaluation/confusion-matrix   POST/GET /evaluation/runs (new signers)
+GET    /signs/review-sheet.csv (linguists)
 GET    /history  POST /feedback  GET /learning/progress  POST /learning/attempts  GET /learning/quiz
 ```
 </details>
@@ -373,18 +374,54 @@ GET    /history  POST /feedback  GET /learning/progress  POST /learning/attempts
 | Suite | Command | Last result |
 |---|---|---|
 | Lint | `ruff check backend ml dataset/scripts scripts` | ✅ pass |
-| Backend + ML | `pytest -q` | ✅ 56 passed, 1 skipped (needs a MediaPipe model file) |
-| Backend on PostgreSQL | `TEST_DATABASE_URL=postgresql://… pytest backend/tests` | ✅ pass (CI) |
-| Docker image + health check | GitHub Actions `docker` job | ✅ pass (CI) |
+| Backend + ML | `pytest -q` | ✅ **60 passed**, 1 skipped (needs a MediaPipe model file) |
+| Backend on PostgreSQL 16 | `TEST_DATABASE_URL=postgresql://… pytest backend/tests` | ✅ pass (CI) |
 | Frontend types | `cd frontend && npm run typecheck` | ✅ pass |
-| Frontend unit + feature parity | `npm test` | ✅ 16 passed |
-| End-to-end (Chromium, fake camera) | `npm run build && npm run e2e` | ✅ 15 passed |
+| Frontend unit + Python↔TS feature parity | `npm test` | ✅ **16 passed** |
+| End-to-end (Chromium) | `npm run build && npm run e2e` | ✅ **19 passed** in CI: 16 app + 3 with the real model (24/24 held-out samples) |
+| Docker image + container health | GitHub Actions `docker` job | ✅ pass |
+| Deployed instance (read-only) | `.github/workflows/deploy-smoke.yml` | SMOKE_RESULT |
 
-The E2E suite covers startup, registration and RBAC, search, sign CRUD, linguist verification, the full consent → record → four-eyes review flow, model-unavailable and camera-denied states, kiosk, every route for a single `h1` and unnamed buttons, the light/dark theme toggle, and the 390 px layout. Evidence and the bugs the tests caught: [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md).
+Latest CI on this branch: [run 41815644645](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815644645): all jobs green.
+
+The E2E suite covers:
+* startup, registration and RBAC;
+* search and sign CRUD, plus the linguist flow (document the sign, then complete the checklist, then verify);
+* the full consent → record → four-eyes review flow;
+* model-unavailable and camera-denied states, and kiosk mode;
+* every route for one `h1` and no unnamed buttons;
+* the light/dark theme toggle;
+* layout and accessibility at 360, 768 and 1280 px.
+
+Bugs the tests caught and how they were fixed: [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md).
+
+**Staged evaluation workflows.** These are manual, triggered by pushing a `run/*` branch, with settings in `ml/runs/*.json`:
+
+| Workflow | What it does |
+|---|---|
+| `include-data.yml` | Preflight, Zenodo download (MD5), MediaPipe extraction in parallel, merge. Raw video never leaves the runner. |
+| `include-train.yml` | Trains LSTM, GRU, LogReg and DTW; compares on validation; verifies; publishes a pre-release |
+| `include-open-set.yml` | Known test split vs out-of-vocabulary glosses |
+| `include-live-eval.yml` | Held-out clips as Chromium's virtual webcam, through the Live page |
+| `mediapipe-check.yml` | Diagnoses in-browser MediaPipe loading |
+| `deploy-smoke.yml` | Read-only checks of a running deployment |
 
 ## ☁️ Deployment
 
-**Not deployed; there is no live URL.** The repository ships a multi-stage [`Dockerfile`](Dockerfile), [`docker-compose.yml`](docker-compose.yml) with PostgreSQL 16 and health checks; CI builds the image and checks its health endpoint. Platform steps (Render / Fly.io / Railway), HTTPS/CORS, storage, a post-deploy checklist and rollback are in [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md). Deploying needs a platform account and approval for any paid resources.
+**Live:** [isl-nova.onrender.com](https://isl-nova.onrender.com) (Render free plan, no paid resources). See [Live demo](#-live-demo).
+
+The multi-stage [`Dockerfile`](Dockerfile) builds the SPA and the Python API into one image. [`scripts/docker-entrypoint.sh`](scripts/docker-entrypoint.sh) then:
+1. applies migrations;
+2. installs the released model when `ISL_NOVA_MODEL_TAG` is set (verified by SHA-256; a failure is logged and the API reports `model_unavailable` instead of crashing);
+3. serves on `$PORT`.
+
+[`docker-compose.yml`](docker-compose.yml) adds PostgreSQL 16 for a persistent setup. Environment variables, the free-plan trade-offs, a persistent setup, HTTPS/CORS, a post-deploy checklist and rollback are covered in [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md).
+
+```bash
+docker build -t isl-nova .
+docker run -p 8000:8000 -e ISL_NOVA_ENV=production -e JWT_SECRET=$(openssl rand -hex 32) \
+  -e CORS_ORIGINS=http://localhost:8000 -e ISL_NOVA_MODEL_TAG=model-lstm-20261104T041414Z-s13 isl-nova
+```
 
 ## 🔬 Research
 
@@ -396,7 +433,7 @@ Pseudonymous signers, explicit consent scopes, withdrawal as erasure, four-eyes 
 
 ## ⚠️ Limitations
 
-Results are on INCLUDE's official split, not signer-independent; unknown-sign rejection not evaluated · vocabulary unverified · category gaps · INCLUDE has no signer IDs, so its split cannot be proven signer-independent · isolated signs only, no grammatical translation · no non-manual features · CPU NumPy models · not yet tested with Deaf users. Full list: [research/LIMITATIONS.md](research/LIMITATIONS.md).
+Results are on INCLUDE's official split, not signer-independent · unknown-sign rejection is weak (29 % of unseen signs recognized) · no live-person webcam test · vocabulary unverified · category gaps · INCLUDE has no signer IDs, so its split cannot be proven signer-independent · isolated signs only, no grammatical translation · no non-manual features · CPU NumPy models · not yet tested with Deaf users. Full list: [research/LIMITATIONS.md](research/LIMITATIONS.md).
 
 ## 📁 Repository structure
 
