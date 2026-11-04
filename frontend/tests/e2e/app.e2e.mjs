@@ -265,8 +265,12 @@ describe('recognition', () => {
     await page.getByRole('button', { name: 'Start camera' }).click();
     await page.getByText('LIVE', { exact: true }).waitFor();
     await page.waitForTimeout(500);
-    const extractor = page.getByText(/Loading hand-tracking models|Landmark extractor unavailable/);
-    if (await extractor.count()) assert.equal(await page.getByRole('button', { name: 'Capture sign (3-2-1)' }).isDisabled(), true);
+    // read extractor state and button state in one snapshot (MediaPipe may finish loading between two reads)
+    const snap = await page.evaluate(() => ({
+      notReady: /Loading hand-tracking models|Landmark extractor unavailable/.test(document.body.innerText),
+      disabled: [...document.querySelectorAll('button')].find((b) => b.textContent.includes('Capture sign'))?.disabled,
+    }));
+    if (snap.notReady) assert.equal(snap.disabled, true, 'capture must be disabled while hand tracking is not ready');
     const r = await (await fetch(`${srv.base}/api/v1/predict/sequence`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ frames: [] }) })).json();
     assert.equal(r.state, 'model_unavailable');
     assert.deepEqual(errors, []);
