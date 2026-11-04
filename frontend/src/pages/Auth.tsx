@@ -1,5 +1,4 @@
 import { type FormEvent, useState } from 'react';
-import { z } from 'zod';
 import { Icon } from '../components/icons';
 import { Button, ErrorNote, Field, Input } from '../components/ui';
 import { api, type ApiError } from '../lib/api';
@@ -7,11 +6,17 @@ import { clearCache } from '../lib/query';
 import { Link, navigate, useLocation } from '../lib/router';
 import { auth, type User } from '../lib/store';
 
-const registerSchema = z.object({
-  display_name: z.string().trim().min(1, 'Enter your name').max(120),
-  email: z.string().trim().email('Enter a valid email address'),
-  password: z.string().min(10, 'Use at least 10 characters'),
-});
+// client-side checks for fast feedback; the API validates the same rules (Pydantic)
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export function validateRegistration(f: { display_name: string; email: string; password: string }): Record<string, string> {
+  const e: Record<string, string> = {};
+  const name = f.display_name.trim();
+  if (!name) e.display_name = 'Enter your name';
+  else if (name.length > 120) e.display_name = 'Use at most 120 characters';
+  if (!EMAIL.test(f.email.trim())) e.email = 'Enter a valid email address';
+  if (f.password.length < 10) e.password = 'Use at least 10 characters';
+  return e;
+}
 
 export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   const { search } = useLocation();
@@ -25,8 +30,8 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
     e.preventDefault();
     setError(null);
     if (mode === 'register') {
-      const r = registerSchema.safeParse(form);
-      if (!r.success) { setErrors(Object.fromEntries(r.error.issues.map((i) => [i.path[0], i.message]))); return; }
+      const v = validateRegistration(form);
+      if (Object.keys(v).length) { setErrors(v); return; }
     }
     setErrors({});
     setBusy(true);

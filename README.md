@@ -237,7 +237,7 @@ The 204 features per frame are hand landmarks normalised to the wrist and hand s
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19.2, TypeScript 6 (strict), Tailwind CSS 4.3, esbuild 0.28, Zod, in-house router / query cache / store, SVG charts |
+| Frontend | React 19.2, TypeScript 6 (strict), Tailwind CSS 4.3, esbuild 0.28, in-house router / query cache / store, SVG charts |
 | Backend | Python 3.13, Starlette 1.7, Pydantic 2.13, Uvicorn, PyJWT, PBKDF2, versioned SQL migrations, structured JSON logs |
 | Data | PostgreSQL 16 (production), SQLite (development and the free demo), path-safe local object storage |
 | CV / ML | MediaPipe Tasks (browser 0.10.14, Python 0.10.32), OpenCV 5, NumPy LSTM/GRU with gradient-checked backprop, scikit-learn |

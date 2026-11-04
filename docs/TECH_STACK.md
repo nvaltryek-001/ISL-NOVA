@@ -9,7 +9,7 @@
 | Frontend | React, Vite, TS, Tailwind | **React 19.2, TypeScript 6 (strict), Tailwind CSS 4.3**, bundled by **esbuild 0.28** (`scripts/build.mjs`) | Vite not installable; esbuild is Vite's own bundler |
 | Router / server state / store | React Router, TanStack Query, Zustand | In-house `lib/router.tsx`, `lib/query.ts`, `lib/store.ts` (~250 lines total) | Not installable; same concepts (route params, cache + invalidation + polling, external stores) |
 | Charts / motion | Recharts, Framer Motion | Accessible SVG charts (`components/charts.tsx`); CSS animations honouring reduced-motion | Not installable |
-| Validation | Zod | **Zod 3.25** (forms) + Pydantic (server) | |
+| Validation | Zod | Small typed validator for the sign-up form (`validateRegistration`) + **Pydantic** on the server | Zod was removed after `npm audit` reported GHSA-mrhx-c7xc-m3w5 (memory exhaustion, high) for zod < 4.6.6; one form did not justify the dependency |
 | Frontend tests | Vitest, RTL, Playwright | **node:test** + `react-dom/server` for components; **Playwright 1.63** for E2E | |
 | Computer vision | OpenCV, MediaPipe | **MediaPipe Tasks** (browser via jsDelivr, pinned 0.10.14; Python 0.10.32) + **OpenCV 5** for decoding/probing | |
 | ML | TensorFlow/Keras, PyTorch | **NumPy** LSTM and GRU with hand-written backprop (gradient-checked), scikit-learn logistic-regression baseline, DTW 1-NN | No DL framework installable; TCN/Transformer documented as next candidates |

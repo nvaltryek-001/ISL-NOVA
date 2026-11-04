@@ -14,7 +14,6 @@
   "dependencies": {
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "zod": "3.25.76",
     "clsx": "2.1.1"
   },
   "devDependencies": {
