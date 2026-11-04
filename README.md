@@ -13,13 +13,26 @@ An open, consent-first platform for **Indian Sign Language** recognition, learni
 ![python](https://img.shields.io/badge/python-3.13-3776ab)
 ![react](https://img.shields.io/badge/react-19.2-22d3ee)
 ![model](https://img.shields.io/badge/LSTM%20(INCLUDE%20test)-91.7%25%20top--1%20·%20200%20classes-10b981)
+![open-set](https://img.shields.io/badge/unknown--sign%20AUROC-0.900-f59e0b)
+[![demo](https://img.shields.io/badge/live%20demo-isl--nova.onrender.com-8b5cf6)](https://isl-nova.onrender.com)
+
+<p>
+  <a href="https://isl-nova.onrender.com"><b>Live demo</b></a> ·
+  <a href="#-results">Results</a> ·
+  <a href="#-implemented-vs-tested">What is tested</a> ·
+  <a href="docs/MODEL_CARD.md">Model card</a> ·
+  <a href="#-quick-start">Quick start</a>
+</p>
 
 </div>
 
 > [!IMPORTANT]
-> **Project status, stated plainly.** The full software platform is built and tested: 200 vocabulary slots, the consent-first data pipeline, the training and evaluation pipeline, webcam recognition, and every application module.
-> A **real model has now been trained on genuine INCLUDE recordings**: an LSTM covering all **200 classes**, at **91.7 % top-1 / 98.3 % top-5 / 91.7 % macro-F1** on the 635-video INCLUDE official test split. See [Results](#-results).
-> These results are **not signer-independent**: INCLUDE publishes no signer IDs, so signers in the test split may also appear in training. **None of the 200 signs has been linguistically verified yet.** The INCLUDE gloss is a label, not a reviewed ISL description.
+> **Project status, stated plainly.**
+> * ✅ **Platform built and tested:** 200 vocabulary slots, the consent-first data pipeline, training and evaluation, webcam recognition, and every application module. CI is green: 60 Python tests, 16 unit tests, 19 end-to-end tests.
+> * ✅ **Real model:** an LSTM trained on genuine INCLUDE recordings covers all **200 classes**. On the 635-video official test split it scores **91.7 % top-1, 98.3 % top-5 and 91.7 % macro-F1**.
+> * ✅ **Deployed:** a free-tier demo with that model installed runs at **[isl-nova.onrender.com](https://isl-nova.onrender.com)**.
+> * ⚠️ **Unknown signs:** tested on 62 held-out INCLUDE glosses, rejection is **weak**. AUROC is 0.900, but **29 % of unseen signs are still "recognized"** as a vocabulary sign.
+> * ⛔ **Not yet shown:** accuracy on new signers (INCLUDE has no signer IDs, so these results are **not signer-independent**); recognition with a real person in front of a webcam; and linguistic verification. **0 of 200 signs are verified.**
 
 <p align="center">
   <img src="docs/screenshots/dashboard.png" alt="ISL NOVA dashboard showing 200 class slots, 0 verified, no trained model" width="100%" />
@@ -34,6 +47,8 @@ An open, consent-first platform for **Indian Sign Language** recognition, learni
 - [The 200-class dataset](#-the-200-class-dataset)
 - [Train a model](#-train-a-model)
 - [Results](#-results)
+- [Implemented vs tested](#-implemented-vs-tested)
+- [Live demo](#-live-demo)
 - [API](#-api)
 - [Testing](#-testing)
 - [Deployment](#-deployment)
@@ -57,20 +72,20 @@ Indian Sign Language has few openly licensed, consented datasets. Many recogniti
 |---|---|
 | **NOVA Core** | Accounts, PBKDF2 + JWT auth, five roles with server-side RBAC, profile, notifications, audit log, health endpoint |
 | **Dashboard** | Live counts from the database and registry: slots, verified signs, recordings, training-ready classes, model status, system health |
-| **Live Recognition Studio** | Webcam with camera selection, in-browser MediaPipe hand + pose landmarks and overlay, *capture one sign* or continuous sliding window, top-5 with smoothing, states `recognized · uncertain · unknown · insufficient_input · model_unavailable · camera_unavailable`, meanings in en/hi/kn, speech, copy, save, correction reports. **Video never leaves the device.** |
+| **Live Recognition Studio** | Webcam with camera selection, in-browser MediaPipe hand + pose landmarks and overlay, *capture one sign* or continuous sliding window, top-5 with smoothing, adjustable capture length (1.5 / 2.5 / 3.5 s) with optional countdown, GPU→CPU fallback with a live fps badge, states `recognized · uncertain · unknown · insufficient_input · model_unavailable · camera_unavailable`, meanings in en/hi/kn, speech, copy, save, correction reports. **Video never leaves the device.** |
 | **Video Analysis** | Validated upload (magic bytes, decode, size), background job, hand-tracking timeline, windowed inference when a model exists, JSON export, 24-hour auto-deletion |
-| **Sign Explorer** | Multilingual search, category/status filters, sign detail with licensed references, review log, related signs, bookmarks, correction reports; reviewers get **full CRUD** (create, edit, retire/restore, references, translations) |
+| **Sign Explorer** | Multilingual search, category/status filters, sign detail with licensed references, review log, related signs, bookmarks, correction reports; reviewers get **full CRUD** (create, edit, retire/restore, references, translations); linguists verify with a **required three-item checklist** and can export a CSV **review sheet** for all 200 signs |
 | **Communication Workspace** | Word-by-word composer from sign meanings, editable text, speech, copy/share, saved phrases. It is clearly labelled as *not* an ISL translator. |
 | **Learning Academy** | Lessons by category, quizzes built **only from verified signs and verified meanings**, progress and "review these signs" |
 | **Dataset Intelligence Lab** | Readiness funnel and per-class table, pseudonymous signers, consent scopes and withdrawal, sessions, **Recording Studio** (countdown, MediaRecorder + landmarks, quality badges), four-eyes review queue, validation, immutable versioned manifests |
-| **AI Laboratory** | Active model, held-out metrics, per-class report and confusion matrix, model registry with promote/rollback, experiments run as background jobs, feature-contract viewer |
+| **AI Laboratory** | Active model, held-out metrics, per-class report and confusion matrix, model registry with promote/rollback, experiments run as background jobs, **new-signer evaluation runs** (overall + per signer), feature-contract viewer |
 | **Research Centre** | Research questions, evidence status, protocol documents, verified references, intentionally empty results table |
 | **3D Visualisation** *(experimental)* | Record or load real landmark sequences; orbit, frame stepping, speed, wrist trajectories |
 | **Admin & Kiosk** | User roles, feedback inbox, audit log; full-screen high-contrast kiosk with large targets, verified quick phrases and one-tap session reset |
 
 **Design:** a clean **light theme by default** (white cards on a soft violet-tinted canvas, deep-violet accents, AA-contrast status colours) with a one-click **dark theme** toggle in the header, or *match my device* in Settings. Both themes share one token system (`frontend/src/styles.css`).
 
-Accessibility throughout: keyboard navigation and visible focus, skip link, labelled controls, high-contrast, reduced-motion and large-text modes, and a responsive layout tested at 390 px.
+Accessibility throughout: keyboard navigation and visible focus, skip link, labelled controls, high-contrast, reduced-motion and large-text modes, and a responsive layout checked by E2E on 11 routes at 360, 768 and 1280 px (including a wide fallback font), with automated checks for labelled controls, image alt text, link names and landmarks.
 
 ## 🏗 Architecture
 
@@ -107,21 +122,26 @@ Why Starlette rather than FastAPI, and esbuild rather than Vite? The build envir
 
 ## 📸 Screenshots
 
-All screenshots were captured by the Playwright suite from the running application, on freshly seeded data. They show the real state: 200 unverified slots and no model.
+All screenshots were captured by Playwright from the running application, on a local test database.
+
+<p align="center"><img src="docs/screenshots/dashboard-model.png" alt="Dashboard with the trained 200-class model live" width="100%" /></p>
 
 | | |
 |---|---|
-| ![Live recognition: camera on, model unavailable notice](docs/screenshots/live-recognition.png) **Live Recognition** before a model is installed. Fake test camera; in the offline sandbox MediaPipe could not load, and the UI says so. | ![Sign detail with licensed reference and review workflow](docs/screenshots/sign-detail.png) **Sign detail.** Licensed source, pending meanings, review workflow. |
-| ![Dataset Lab readiness funnel](docs/screenshots/dataset-lab.png) **Dataset Lab.** Readiness funnel and per-class table. | ![Sign explorer grid](docs/screenshots/sign-explorer.png) **Sign Explorer.** 200 slots, searchable. |
-| ![Communication composer](docs/screenshots/communication.png) **Communication.** Composer with unverified-meaning warnings. | ![Kiosk mode](docs/screenshots/kiosk.png) **Kiosk.** High-contrast, large targets. |
+| ![AI Laboratory with the trained LSTM's held-out metrics](docs/screenshots/ai-laboratory-model.png) **AI Laboratory.** Held-out metrics, read from the model's own `metrics.json`. | ![Per-class F1 and 200-class confusion matrix](docs/screenshots/evaluation.png) **Evaluation.** Per-class F1 and the 200 × 200 confusion matrix. |
+| ![Verification dialog with the three-item checklist](docs/screenshots/verification-checklist.png) **Verification.** The reviewer must document the sign and tick all three checks; Confirm stays disabled until they do. | ![New-signer evaluation tab](docs/screenshots/ai-laboratory-new-signers.png) **New signers.** Evaluate the live model on consented recordings from people outside INCLUDE (no such data yet). |
+| ![Sign detail with licensed reference and review workflow](docs/screenshots/sign-detail.png) **Sign detail.** Licensed source, pending meanings, review log. | ![Dataset Lab readiness funnel](docs/screenshots/dataset-lab.png) **Dataset Lab.** Readiness funnel and per-class table. |
+| ![Communication composer](docs/screenshots/communication.png) **Communication.** Composer with unverified-meaning warnings. | ![Kiosk mode](docs/screenshots/kiosk.png) **Kiosk.** High contrast, large targets. |
 
-<details><summary>More: dark theme · AI Laboratory · mobile</summary>
+<details><summary>More: dark theme · Live Recognition · Sign Explorer · mobile</summary>
 
 <img src="docs/screenshots/dashboard-dark.png" alt="Dashboard in dark theme" width="100%" />
 
+<img src="docs/screenshots/live-recognition.png" alt="Live recognition before a model is installed" width="49%" /> <img src="docs/screenshots/sign-explorer.png" alt="Sign explorer grid" width="49%" />
 
-<img src="docs/screenshots/ai-laboratory.png" alt="AI Laboratory feature contract" width="72%" /> <img src="docs/screenshots/mobile-dashboard.png" alt="Mobile dashboard" width="24%" />
+<img src="docs/screenshots/mobile-dashboard.png" alt="Mobile dashboard" width="30%" /> <img src="docs/screenshots/mobile-dataset.png" alt="Mobile Dataset Lab at 360 px" width="30%" />
 
+The Live Recognition capture shows the state before a model was installed. In the offline build sandbox MediaPipe could not load from its CDN, and the page says so.
 </details>
 
 ## 🚀 Quick start
@@ -274,8 +294,22 @@ Sample counts used: 2,448 train / 272 val / 635 test. The 15 insufficient-input 
 
 <p align="center"><img src="docs/screenshots/ai-laboratory-model.png" alt="AI Laboratory showing the trained LSTM's held-out metrics" width="49%" /> <img src="docs/screenshots/evaluation.png" alt="Per-class F1 and 200-class confusion matrix" width="49%" /></p>
 
+### Unknown signs (open set)
+
+The same model, unchanged, was scored on 887 recordings of **62 INCLUDE glosses outside the vocabulary**. These glosses were never used for training, calibration or choosing the threshold (run [41815223675](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815223675)).
+
+| AUROC (known vs unknown) | Unknown signs wrongly *recognized* | Unknown answered *uncertain* / *unknown* | Known signs recognized **and** correct |
+|:---:|:---:|:---:|:---:|
+| **0.900** | **29.3 %** | 36.0 % / 34.3 % | 84.4 % |
+
+Roughly 3 in 10 signs outside the vocabulary get mapped confidently to a known sign. The UI therefore always shows the top-5 alternatives and the decision state, and never speaks a result on its own. Raising the threshold to 0.80 would let through 17 % of unknown signs instead, at the cost of rejecting 18 % of known signs. Full sweep: [research/OPEN_SET_EVALUATION.md](research/OPEN_SET_EVALUATION.md).
+
+### From raw video
+
+LIVEEVAL_BLOCK
+
 > [!WARNING]
-> **What these numbers do not show.** INCLUDE has no signer IDs, so this is **not** signer-independent evaluation and says nothing about unseen signers. All signers come from one school in Chennai. Many classes have only 1–4 test videos, so per-class scores are noisy. Unknown-sign rejection was **not** evaluated, because no held-out unknown classes were used. Live webcam accuracy on new people has **not** been measured.
+> **What these numbers do not show.** INCLUDE has no signer IDs, so this is **not** signer-independent evaluation and says nothing about unseen signers. All signers come from one school in Chennai. Many classes have only 1–4 test videos, so per-class scores are noisy. **Live webcam accuracy with a real person has not been measured.** The new-signer workflow exists, but no new-signer recordings exist yet.
 
 Artifacts: model release [`model-lstm-20261104T041414Z-s13`](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/model-lstm-20261104T041414Z-s13) (weights, SHA-256, comparison, verification, test-landmark sample). The workflow artifacts `include-landmarks-v1` and `include-models` are kept for 90 days. Full model card: [docs/MODEL_CARD.md](docs/MODEL_CARD.md) · [research/RESULTS.md](research/RESULTS.md).
 
@@ -287,6 +321,31 @@ Measured engineering latency (2 vCPU sandbox, synthetic input, untrained 200-cla
 | LSTM inference (h = 128, 222k params) | 2.7 ms |
 | GRU inference (h = 128, 179k params) | 1.8 ms |
 | `GET /api/v1/signs?q=…` | 3.5 ms |
+
+## 🧪 Implemented vs tested
+
+| Capability | Implemented | How it was tested | Evidence |
+|---|:---:|---|---|
+| 200-class recognition (INCLUDE official split) | ✅ | Genuine held-out test split, evaluated once | 91.7 % top-1 · [run 41771084083](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41771084083) |
+| Production inference path (`Predictor`, API) | ✅ | All 635 test sequences re-run; 24 samples through `POST /predict/sequence` in CI and on the live demo | 91.65 % · 24/24 |
+| Unknown-sign rejection | ✅ | 887 held-out out-of-vocabulary recordings (62 glosses) | AUROC 0.900, **29.3 % false recognition** |
+| Raw video → MediaPipe → model | ✅ | 73 held-out test videos, server-side extraction | 67/73 (91.8 %) |
+| In-browser MediaPipe (GPU/CPU) | ✅ | CI Chromium: bundle, WASM, hand model on GPU and CPU, UI fps badge | [run 41815175935](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815175935) |
+| Browser capture flow on held-out video (virtual camera) | ✅ | INCLUDE test clips played as Chromium's webcam through the Live page | LIVEEVAL_CELL |
+| Live webcam with a real person | ✅ | ⛔ **Not tested.** There is no camera or person in the build environment | — |
+| Accuracy on new signers | ✅ workflow | ⛔ **No data.** Code path tested with synthetic recordings only | `test_new_signer_evaluation_run` |
+| Linguistic verification of 200 signs | ✅ workflow | Workflow tested (API + E2E); **0 signs verified**, no approvals made | [protocol](docs/VERIFICATION_PROTOCOL.md) |
+| RBAC, consent, four-eyes review, erasure | ✅ | pytest on SQLite + PostgreSQL 16, E2E | CI |
+| Responsive + accessibility basics | ✅ | E2E: 11 routes × 360/768/1280 px + wide font; labels, alt, names, landmarks | CI |
+| Free-tier deployment with model | ✅ | Public `/health`, `/model/info`; start-up log shows the SHA-256-verified install | [isl-nova.onrender.com](https://isl-nova.onrender.com) |
+
+## 🌐 Live demo
+
+**[https://isl-nova.onrender.com](https://isl-nova.onrender.com)**: Render free plan, Docker image from this branch, with the released LSTM installed at start-up and verified by SHA-256.
+
+* The first request after ~15 minutes idle takes about a minute while the free instance wakes.
+* The demo database is **temporary**: it is reset on every restart or redeploy. Register as a learner to try Live Recognition, Sign Explorer, Communication and the Academy. There is no admin account on the demo.
+* Recognition runs MediaPipe **in your browser**; only landmarks are sent to the server. Please **do not upload recordings of real signers** to the demo.
 
 ## 🔌 API
 

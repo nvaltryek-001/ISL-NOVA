@@ -28,6 +28,28 @@
 
 Weakest classes on test (F1, test support in brackets): Today 0.00 (1), Dress 0.29 (4), Bad 0.40 (4), Wife 0.40 (4), Friend 0.44 (4), Chair 0.50 (3), Clothing 0.50 (4). With 1–4 test videos per class, per-class figures carry wide uncertainty.
 
+## Unknown-sign (open-set) evaluation
+
+Scored on 635 known test sequences and 887 sequences of **62 INCLUDE glosses
+outside the vocabulary**, never used in training or threshold selection
+(run [41815223675](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815223675)).
+
+| Metric | Value |
+|---|---:|
+| AUROC (max calibrated probability) | **0.900** |
+| Unknown signs wrongly *recognized* at τ = 0.673 | **29.3 %** |
+| Unknown signs answered *uncertain* / *unknown* | 36.0 % / 34.3 % |
+| Known signs recognized and correct at τ | 84.4 % |
+
+Full threshold sweep: [research/OPEN_SET_EVALUATION.md](../research/OPEN_SET_EVALUATION.md).
+
+## Raw-video check (offline)
+
+73 held-out INCLUDE test videos from Greetings, Seasons and Colours were run
+from the raw video through the Python MediaPipe extractor, the feature contract
+and this model (live-eval run [41774486592](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41774486592)):
+**67 / 73 top-1 correct (91.8 %)**. Same signers as training.
+
 ## Comparison (same data, split, features and seed)
 
 | Model | Val macro-F1 | Test top-1 | Test macro-F1 |
@@ -45,7 +67,7 @@ Isolated-sign recognition for practice, look-up and research in ISL NOVA. **Not*
 ## Limitations
 * **Not signer-independent.** INCLUDE publishes no signer IDs, so test signers may appear in training. These numbers do **not** estimate accuracy on new people.
 * **Narrow population.** INCLUDE was recorded with deaf students at one school in Chennai, under similar studio conditions. Accuracy on other signers, regions, lighting and webcams is unknown.
-* **Unknown-sign rejection not evaluated.** No held-out out-of-vocabulary classes were used; τ was set from known-class validation data only.
+* **Weak unknown-sign rejection.** About 3 in 10 out-of-vocabulary signs are recognized as some vocabulary sign at the shipped threshold (see above). Always show alternatives; never act on a single prediction.
 * **Vocabulary unverified.** Class labels are INCLUDE glosses, not reviewed ISL descriptions.
 * **Isolated signs only**; no non-manual (facial) features.
 

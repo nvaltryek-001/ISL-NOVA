@@ -219,7 +219,7 @@ export function Meter({ value, max, label, tone = 'nova' }: { value: number; max
 
 export function PageHeader({ title, kicker, children, actions }: { title: string; kicker?: string; children?: ReactNode; actions?: ReactNode }) {
   return (
-    <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="mb-6 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end md:justify-between">
       <div className="min-w-0">
         {kicker && <p className="label mb-1.5 text-nova-300">{kicker}</p>}
         <h1 className="text-2xl font-semibold text-fg md:text-[28px]">{title}</h1>

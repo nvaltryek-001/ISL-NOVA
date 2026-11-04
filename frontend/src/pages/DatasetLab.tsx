@@ -53,7 +53,7 @@ function Overview() {
         <Stat label="Classes w/ recordings" value={s.classes_with_recordings} icon="record" tone="signal" />
         <Stat label="Approved for training" value={s.classes_approved_for_training} icon="rocket" tone="warn" />
         <Stat label="Approved samples" value={s.approved_samples} icon="database" sub={`${s.recordings.pending_review ?? 0} awaiting review`} />
-        <Stat label="Pseudonymous signers" value={s.signers} icon="user" sub={`${s.sessions} sessions`} />
+        <Stat label="Signers" value={s.signers} icon="user" sub={`pseudonymous · ${s.sessions} sessions`} />
       </div>
       <div className="grid gap-4 xl:grid-cols-3">
         <Card title="Readiness funnel" subtitle="How many of the 200 classes reach each stage">
