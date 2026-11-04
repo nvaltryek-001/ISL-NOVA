@@ -17,7 +17,7 @@ the live deployment. **Implemented** and **tested** are reported separately.
 | Unknown-sign detection | ✅ | ✅ | run [41815223675](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815223675): AUROC 0.900; **29.3 % of unknown sequences recognized** at τ; 84.4 % of known recognized and correct |
 | Raw video → Python MediaPipe → model | ✅ | ✅ | 67 / 73 held-out test videos top-1 correct |
 | In-browser MediaPipe in CI Chromium | ✅ | ✅ | run [41815175935](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815175935): bundle 52–85 ms, hand model GPU 0.2–0.7 s / CPU 0.4 s, UI ready in 10 s |
-| Browser capture on held-out video (virtual camera) | ✅ | LIVEEVAL_STATUS | LIVEEVAL_EVIDENCE |
+| Browser capture on held-out video (virtual camera) | ✅ | ✅ | [run 41860050670](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41860050670): 73/73 clips completed through the Live page; **74.0 % top-1**, 89.0 % top-5; 45/48 *recognized* correct; 48 recognized · 17 uncertain · 8 unknown; offline Python on the same clips 91.8 %; ~10 fps on the CPU delegate after the automatic GPU→CPU switch. Replay of recordings, **not a live person** |
 | Live webcam with a real person | ✅ | ⛔ | not tested: no camera or person in any build environment |
 | New-signer evaluation (`/evaluation/runs`, AI Lab tab) | ✅ | ✅ code path | synthetic recordings only; **no new-signer data, no accuracy figure** |
 | Vocabulary verification (checklist, documented entry, review sheet) | ✅ | ✅ | API tests + E2E; **0 / 200 verified**, no approvals made ([protocol](VERIFICATION_PROTOCOL.md)) |
@@ -42,6 +42,8 @@ the live deployment. **Implemented** and **tested** are reported separately.
 
 ## Bugs found by tests and evaluation runs, and fixed
 
+* **GPU delegate at ~1 fps on software WebGL.** The first virtual-camera run that reached the model (41841624766) returned *insufficient input* for every clip, because MediaPipe's GPU delegate processed about one frame per second on the CI runner. The camera stage now switches to the CPU (WASM) delegate after three seconds below 5 fps and remembers the choice; the next run got ~10 fps and 73/73 clips classified.
+
 * **Video upload failed on Windows.** `probe_video` kept a `NamedTemporaryFile` open while OpenCV opened it by name, which Windows does not allow, so every upload was rejected as undecodable. Found by the Windows E2E run; now uses a closed temp file.
 * **Virtual-camera evaluation: relative video path.** Chromium's `--use-file-for-fake-video-capture` needs an absolute path; with a relative one the page showed *Camera unavailable: Requested device not found* for every clip. Found with page-state diagnostics added to the harness.
 * **Silent empty capture.** If no frames were processed during a capture, the Live page returned to idle without any message. It now answers *insufficient input* with a reason.
@@ -62,6 +64,7 @@ the live deployment. **Implemented** and **tested** are reported separately.
 | Test top-1 / top-5 / macro-F1 (LSTM) | 91.7 % / 98.3 % / 91.7 % |
 | Unknown-sign AUROC / false recognition at τ | 0.900 / 29.3 % |
 | New-signer accuracy | not measured (no data) |
+| Browser pipeline on held-out clips (virtual camera) | 74.0 % top-1 |
 | Live-person webcam accuracy | not measured |
 
 ## What remains (needs people or data, not code)

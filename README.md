@@ -38,7 +38,7 @@
 > | | |
 > |---|---|
 > | ✅ **Platform** | 12 application modules, consent-first data pipeline, training and evaluation, webcam recognition. CI green: **60** Python tests, **17** unit tests, **19** end-to-end tests. Setup scripts verified on a Windows runner. |
-> | ✅ **Real model** | LSTM trained on genuine INCLUDE recordings, all **200 classes**: **91.7 % top-1 · 98.3 % top-5 · 91.7 % macro-F1** on the 635-video official test split. |
+> | ✅ **Real model** | LSTM trained on genuine INCLUDE recordings, all **200 classes**: **91.7 % top-1 · 98.3 % top-5 · 91.7 % macro-F1** on the 635-video official test split. Through the full browser pipeline (held-out clips as a virtual webcam): **74.0 % top-1**. |
 > | ✅ **Deployed** | Free-tier demo with that model at **[isl-nova.onrender.com](https://isl-nova.onrender.com)**, checked from outside: 24/24 held-out samples correct through the public API. |
 > | ⚠️ **Unknown signs** | Tested on 62 held-out INCLUDE glosses: AUROC 0.900, but **29 % of unseen signs are still "recognized"**. |
 > | ⛔ **Not yet shown** | Accuracy on **new signers** (INCLUDE has no signer IDs, so results are **not signer-independent**) · recognition with **a real person at a webcam** · **linguistic verification** (0 / 200 signs verified). |
@@ -334,7 +334,13 @@ About 3 in 10 signs outside the vocabulary are mapped confidently to a known sig
 
 * **Raw video → server-side MediaPipe → model:** 67 of 73 held-out INCLUDE test videos (91.8 %) top-1 correct.
 * **In-browser MediaPipe in CI Chromium:** bundle loads in 52–85 ms, hand model on GPU in 0.2–0.7 s and CPU in 0.4 s; the Live page is ready in about 10 s ([run 41815175935](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815175935)).
-* **Virtual-camera replay** (held-out clips played into Chromium as its webcam, through the real Live page): see [Implemented vs tested](#-implemented-vs-tested) for the current status of this run.
+* **Virtual-camera replay through the real Live page** ([run 41860050670](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41860050670)): 73 held-out INCLUDE test clips were played into headless Chromium as its webcam. Each went through in-browser MediaPipe, the capture button, `POST /predict/sequence` and the released model.
+
+  | Clips | Top-1 | Top-5 | *recognized* answers that were correct | States | Same clips, offline Python | Hand tracking |
+  |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+  | 73 / 73 completed | **74.0 %** (54) | 89.0 % | **45 / 48** (93.8 %) | 48 recognized · 17 uncertain · 8 unknown | 91.8 % | ~10 fps, CPU delegate |
+
+  The gap to the offline figure is mostly frame rate: the 2-vCPU runner has only software WebGL, so MediaPipe ran at ~1 fps on the GPU delegate. The app now switches to the CPU delegate on its own (shown as a badge), which gave ~10 fps instead of the clips' 25 fps. This is a **replay of recorded videos, not a person in front of a webcam**, and uses the same signers as training.
 
 > [!WARNING]
 > **What these numbers do not show.** INCLUDE has no signer IDs, so this is **not** signer-independent and says nothing about unseen signers. All signers come from one school in Chennai. Many classes have 1–4 test videos, so per-class scores are noisy. **Live webcam accuracy with a real person has not been measured.** The new-signer workflow exists, but no new-signer recordings exist yet.
@@ -350,7 +356,7 @@ Artifacts: model release [`model-lstm-20261104T041414Z-s13`](https://github.com/
 | Unknown-sign rejection | ✅ | 887 out-of-vocabulary recordings (62 glosses) | AUROC 0.900, **29.3 % false acceptance** |
 | Raw video → MediaPipe → model | ✅ | 73 held-out test videos, server-side extraction | 67/73 (91.8 %) |
 | In-browser MediaPipe (GPU/CPU) | ✅ | CI Chromium: bundle, WASM, hand model on GPU and CPU, fps badge | [run 41815175935](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815175935) |
-| Browser capture flow on held-out video (virtual camera) | ✅ | Held-out clips played as Chromium's webcam through the Live page | First two runs did not reach the model because of harness bugs (camera permission, then a relative video path), both fixed; result of the corrected run is reported in [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) |
+| Browser capture flow on held-out video (virtual camera) | ✅ | 73 held-out clips played as Chromium's webcam through the Live page, in-browser MediaPipe, API and model | **74.0 % top-1**, 89.0 % top-5; 45/48 *recognized* answers correct · [run 41860050670](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41860050670) |
 | Live webcam with a real person | ✅ | ⛔ **Not tested.** No camera or person in any build environment | — |
 | Accuracy on new signers | ✅ workflow | ⛔ **No data.** Code path tested with synthetic recordings only | `test_new_signer_evaluation_run` |
 | Linguistic verification of 200 signs | ✅ workflow | API + E2E; **0 signs verified**, no approvals made | [protocol](docs/VERIFICATION_PROTOCOL.md) |

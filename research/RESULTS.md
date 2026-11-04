@@ -25,4 +25,6 @@ All values come from `metrics.json` files written by training run [41771084083](
 |---|---|---|
 | Unknown-sign detection, 635 known vs 887 unknown (62 glosses) | [41815223675](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41815223675) | AUROC 0.900; unknown false-recognition 29.3 %; known recognized-and-correct 84.4 % |
 | Raw held-out video → Python MediaPipe → model (offline) | [41774486592](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41774486592) | 67 / 73 top-1 correct (91.8 %) |
+| Same 73 clips as a virtual webcam through the Live page (browser MediaPipe, CPU delegate ~10 fps) | [41860050670](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41860050670) | 74.0 % top-1, 89.0 % top-5; 45/48 *recognized* correct; 17 uncertain, 8 unknown |
+| Unknown-sign false acceptance / false rejection at τ | 41815223675 | 29.3 % / 12.1 %; unknown-detection precision 89.1 %, recall 70.7 % |
 | New-signer evaluation | — | workflow implemented; **no new-signer data exists, no result** |

@@ -52,6 +52,14 @@ from the raw video through the Python MediaPipe extractor, the feature contract
 and this model (live-eval run [41774486592](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41774486592)):
 **67 / 73 top-1 correct (91.8 %)**. Same signers as training.
 
+## Browser pipeline check (virtual camera)
+
+The same 73 clips played into headless Chromium as its webcam and recognised
+through the Live Recognition page (in-browser MediaPipe on the CPU delegate,
+~10 fps; [run 41860050670](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41860050670)): **74.0 % top-1**, 89.0 % top-5; 48 recognized (45 correct),
+17 uncertain, 8 unknown. Lower than offline mainly because of the frame rate on
+a 2-vCPU runner without a GPU. Not a live-person test.
+
 ## Comparison (same data, split, features and seed)
 
 | Model | Val macro-F1 | Test top-1 | Test macro-F1 |

@@ -1,6 +1,6 @@
 # Limitations
 
-* **Evaluation is not signer-independent.** The 200-class LSTM (91.7 % top-1) was tested on INCLUDE's official split, and test signers may appear in training. Accuracy on new people is unknown. Live webcam recognition with real users has not been measured.
+* **Evaluation is not signer-independent.** The 200-class LSTM (91.7 % top-1) was tested on INCLUDE's official split, and test signers may appear in training. Accuracy on new people is unknown. Live webcam recognition with real users has not been measured; replaying held-out clips through the browser as a virtual webcam gave 74.0 % top-1 at ~10 fps on a CPU-only runner, below the 91.8 % offline figure for the same clips.
 * **Unknown-sign rejection is weak.** On 62 held-out INCLUDE glosses outside the vocabulary, AUROC is 0.900 but 29.3 % of unknown sequences are *recognized* as a vocabulary sign at the shipped threshold ([details](OPEN_SET_EVALUATION.md)).
 * **Vocabulary unverified.** All 200 entries come from INCLUDE folder names. A gloss is not an ISL sign: forms, regional variants and non-manual features need qualified review.
 * **Category gaps.** INCLUDE lacks most everyday actions, food words and question words; the planning targets are not met.
