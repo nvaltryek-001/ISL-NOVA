@@ -59,7 +59,7 @@ export async function newPage(browser, base, { viewport = { width: 1440, height:
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => {
     // network failures to the MediaPipe CDN are expected in offline sandboxes
-    if (m.type() === 'error' && !/cdn\.jsdelivr|storage\.googleapis|Failed to load resource/.test(m.text())) errors.push(m.text());
+    if (m.type() === 'error' && !/cdn\.jsdelivr|storage\.googleapis|Failed to load resource|^INFO: Created TensorFlow Lite XNNPACK delegate/.test(m.text())) errors.push(m.text());
   });
   return { page, ctx, errors };
 }
