@@ -1,0 +1,36 @@
+# Post-deployment smoke test of a running ISL NOVA instance (read-only).
+# Manual: push run/deploy-smoke (settings in ml/runs/deploy-smoke.json).
+name: Deployment smoke test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["run/deploy-smoke"]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: pip install numpy==2.5.3
+      - id: cfg
+        run: python3 -c "import json; c=json.load(open('ml/runs/deploy-smoke.json')); print('url='+c['url']); print('tag='+c['model_tag'])" >> "$GITHUB_OUTPUT"
+      - name: Held-out landmark sample from the model release
+        run: |
+          mkdir sample && curl -fsSL -o s.tgz "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ steps.cfg.outputs.tag }}/include_test_landmark_sample.tar.gz"
+          tar -xzf s.tgz -C sample
+      - working-directory: frontend
+        run: npm install --no-audit --no-fund && npx playwright install --with-deps chromium
+      - name: Smoke test
+        working-directory: frontend
+        run: node tests/deploy/smoke.mjs "${{ steps.cfg.outputs.url }}" ../sample ../smoke.json
+      - if: always()
+        run: cat smoke.json || true

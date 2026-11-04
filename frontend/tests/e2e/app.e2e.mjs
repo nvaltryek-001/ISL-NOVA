@@ -347,6 +347,41 @@ describe('modules render with real data', () => {
     await ctx.close();
   });
 
+  test('accessibility basics and responsive layout on phone, tablet and desktop', async () => {
+    const routes = ['/', '/signs', '/live', '/communicate', '/academy', '/dataset', '/ai', '/research', '/admin', '/settings', '/analysis'];
+    for (const viewport of [{ width: 360, height: 740 }, { width: 768, height: 1024 }, { width: 1280, height: 800 }]) {
+      const { page, ctx, errors } = await newPage(browser, srv.base, { viewport });
+      await login(page);
+      for (const route of routes) {
+        await page.goto(route);
+        await page.getByRole('heading', { level: 1 }).waitFor();
+        const r = await page.evaluate(() => {
+          const visible = (el) => el.offsetParent !== null || getComputedStyle(el).position === 'fixed';
+          const named = (el) => (el.getAttribute('aria-label') || el.getAttribute('aria-labelledby') || el.getAttribute('title') || '').trim()
+            || (el.id && document.querySelector(`label[for="${CSS.escape(el.id)}"]`)) || el.closest('label');
+          return {
+            lang: document.documentElement.lang,
+            overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            imgsNoAlt: [...document.images].filter((i) => !i.hasAttribute('alt')).length,
+            unlabeled: [...document.querySelectorAll('input:not([type=hidden]), select, textarea')]
+              .filter((el) => visible(el) && !named(el)).map((el) => el.outerHTML.slice(0, 80)),
+            emptyLinks: [...document.querySelectorAll('a[href]')].filter((a) => visible(a) && !a.textContent.trim() && !a.getAttribute('aria-label')).length,
+            main: !!document.querySelector('main#main'),
+          };
+        });
+        const where = `${route} @${viewport.width}px`;
+        assert.ok(r.lang, `html lang missing ${where}`);
+        assert.ok(r.overflow <= 1, `${where} overflows by ${r.overflow}px`);
+        assert.equal(r.imgsNoAlt, 0, `images without alt ${where}`);
+        assert.deepEqual(r.unlabeled, [], `unlabelled form controls ${where}`);
+        assert.equal(r.emptyLinks, 0, `links without a name ${where}`);
+        assert.ok(r.main, `main landmark ${where}`);
+      }
+      assert.deepEqual(errors, []);
+      await ctx.close();
+    }
+  });
+
   test('mobile layout has no horizontal scroll and a working nav drawer', async () => {
     const { page, ctx } = await newPage(browser, srv.base, { viewport: { width: 390, height: 844 } });
     for (const route of ['/', '/signs', '/live', '/dataset']) {

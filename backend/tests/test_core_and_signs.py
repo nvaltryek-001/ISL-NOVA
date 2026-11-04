@@ -27,6 +27,11 @@ def test_security_headers_and_cors(app_env):
     assert "access-control-allow-origin" not in r.headers
     ok = c.get(f"{A}/health", headers={"Origin": "http://localhost:5173"})
     assert ok.headers["access-control-allow-origin"] == "http://localhost:5173"
+    d = c.get("/api/docs")
+    assert "swagger-ui-dist@5.17.14" in d.text and "<script>" not in d.text  # no inline script under CSP
+    assert "https://cdn.jsdelivr.net" in d.headers["content-security-policy"]
+    js = c.get("/api/docs/init.js")
+    assert js.status_code == 200 and "SwaggerUIBundle" in js.text
 
 
 def test_register_login_and_profile(app_env):

@@ -18,7 +18,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-from starlette.responses import FileResponse, HTMLResponse, JSONResponse
+from starlette.responses import FileResponse, HTMLResponse, JSONResponse, Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
@@ -106,18 +106,27 @@ def create_app(settings: Settings | None = None) -> Starlette:
     async def openapi_json(request: Request):
         return JSONResponse(spec)
 
+    swagger = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14"
+    docs_csp = ("default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; "
+                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; "
+                "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'")
+
     async def docs(request: Request):
         return HTMLResponse(
-            "<!doctype html><html><head><title>ISL NOVA API</title><meta charset='utf-8'>"
-            "<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css'></head>"
-            "<body><div id='ui'></div><script src='https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js'>"
-            "</script><script>SwaggerUIBundle({url:'/api/v1/openapi.json',dom_id:'#ui'})</script></body></html>")
+            "<!doctype html><html lang='en'><head><title>ISL NOVA API</title><meta charset='utf-8'>"
+            f"<link rel='stylesheet' href='{swagger}/swagger-ui.css'></head>"
+            f"<body><div id='ui'></div><script src='{swagger}/swagger-ui-bundle.js'></script>"
+            "<script src='/api/docs/init.js'></script></body></html>", headers={"Content-Security-Policy": docs_csp})
+
+    async def docs_init(request: Request):
+        return Response("SwaggerUIBundle({url:'/api/v1/openapi.json',dom_id:'#ui'});",
+                        media_type="application/javascript")
 
     async def api_404(request: Request):
         return error_response(404, "not_found", "no such API route")
 
     routes = build_routes(state, ROUTERS)
-    routes += [Route("/api/v1/openapi.json", openapi_json), Route("/api/docs", docs),
+    routes += [Route("/api/v1/openapi.json", openapi_json), Route("/api/docs", docs), Route("/api/docs/init.js", docs_init),
                Route("/api/{rest:path}", api_404, methods=["GET", "POST", "PUT", "PATCH", "DELETE"])]
 
     dist = Path(settings.frontend_dist)
@@ -148,6 +157,8 @@ def create_app(settings: Settings | None = None) -> Starlette:
         response = await call_next(request)
         for k, v in SECURITY_HEADERS.items():
             response.headers.setdefault(k, v)
+        if settings.env == "production":
+            response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
         response.headers["X-Request-ID"] = rid
         if request.url.path.startswith("/api/"):
             log.info("request", extra={"request_id": rid, "method": request.method, "path": request.url.path,
