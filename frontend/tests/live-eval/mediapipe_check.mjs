@@ -47,6 +47,12 @@ while (Date.now() - t0 < 120000) {
   await page.waitForTimeout(1000);
 }
 rep.steps.ui = { result: ui, seconds: Math.round((Date.now() - t0) / 1000) };
+if (ui.includes('fps')) {
+  // the badge first shows 0 fps; read it again after frames have flowed for a few seconds
+  await page.waitForTimeout(5000);
+  rep.steps.ui.after_5s = await page.getByText(/fps · (GPU|CPU)/).first().textContent();
+  rep.steps.ui.video = await page.evaluate(() => { const v = document.querySelector('video'); return v && { readyState: v.readyState, currentTime: v.currentTime, w: v.videoWidth, h: v.videoHeight, paused: v.paused }; });
+}
 await browser.close();
 fs.writeFileSync(out, JSON.stringify(rep, null, 2));
 console.log(JSON.stringify(rep, null, 2));

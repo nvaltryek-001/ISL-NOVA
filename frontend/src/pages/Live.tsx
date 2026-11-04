@@ -48,7 +48,12 @@ export function LivePage() {
   const onState = useCallback((s: CameraState, ex: string) => setCam({ s, ex }), []);
 
   const send = useCallback(async (frames: { f: Frame; a: number }[]) => {
-    if (inflight.current || !frames.length) return;
+    if (inflight.current) return;
+    if (!frames.length) {
+      // never fail silently: no landmark frames were processed during the capture window
+      setPred({ state: 'insufficient_input', top: [], reasons: ['No camera frames were processed during the capture. Check that the camera preview is moving and hand tracking is active.'] });
+      return;
+    }
     inflight.current = true;
     try {
       const r = await api<Prediction>('/predict/sequence', { body: { frames: frames.map((x) => x.f), aspect: frames[frames.length - 1].a, top_k: 5 } });

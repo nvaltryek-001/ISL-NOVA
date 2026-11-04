@@ -28,6 +28,8 @@ for (const v of videos) {
     // in-browser MediaPipe is ready when the fps badge appears
     await page.getByText(/fps · (GPU|CPU)/).waitFor({ timeout: 120000 });
     r.delegate = (await page.getByText(/fps · (GPU|CPU)/).innerText()).split('· ')[1];
+    await page.waitForTimeout(3000); // let the fps badge measure real throughput before the timed run
+    r.fps = await page.getByText(/fps · (GPU|CPU)/).first().innerText();
     // restart the camera so the clip plays from its first frame, then capture immediately
     await page.getByRole('button', { name: 'Stop camera' }).click();
     await page.getByRole('button', { name: 'Start camera' }).click();
@@ -35,9 +37,12 @@ for (const v of videos) {
     await page.getByLabel('3-second countdown').uncheck();
     const secs = [1.5, 2.5, 3.5].find((s) => s >= v.duration_s) ?? 3.5;
     await page.getByLabel('Capture length').selectOption(String(secs));
-    const resp = page.waitForResponse((x) => x.url().endsWith('/api/v1/predict/sequence'), { timeout: 60000 });
+    const resp = page.waitForResponse((x) => x.url().endsWith('/api/v1/predict/sequence'), { timeout: 60000 }).then((x) => x.json(), (e) => ({ err: e }));
+    const empty = page.getByText(/No camera frames were processed/).waitFor({ timeout: 60000 })
+      .then(() => ({ state: 'insufficient_input', top: [], quality: { raw_frames: 0 }, no_frames: true }), (e) => ({ err: e }));
     await page.getByRole('button', { name: 'Capture sign now' }).click();
-    const body = await (await resp).json();
+    const body = await Promise.race([resp, empty]);
+    if (body.err) throw body.err;
     r.capture_s = secs;
     r.browser = { state: body.state, top1: body.top?.[0]?.sign_id ?? null, p: body.top?.[0]?.probability ?? null,
       top5: (body.top ?? []).map((t) => t.sign_id), quality: body.quality ?? null, model_id: body.model_id };
@@ -47,7 +52,7 @@ for (const v of videos) {
     await browser.close();
   }
   results.push(r);
-  console.log(`${r.gloss}: browser=${r.browser?.top1 ?? r.error} (${r.browser?.state ?? '-'}) offline=${v.offline.top1} truth=${v.sign_id}`);
+  console.log(`${r.gloss} [${r.fps ?? '-'}]: browser=${r.browser?.top1 ?? r.error} (${r.browser?.state ?? '-'}) offline=${v.offline.top1} truth=${v.sign_id}`);
 }
 
 const ok = results.filter((r) => r.browser);
