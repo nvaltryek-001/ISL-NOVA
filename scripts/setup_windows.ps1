@@ -117,7 +117,7 @@ if (-not (Test-Path $envFile)) {
     else { $l }
   }
   Set-Content -Path $envFile -Value $out -Encoding ascii
-  Ok ".env created (git-ignored). Local admin: $AdminEmail / $adminPw  (also stored in .env; change it after first login)"
+  Ok ".env created (git-ignored). Local admin: $AdminEmail, password in .env (BOOTSTRAP_ADMIN_PASSWORD); change it after first login"
 } else {
   Ok ".env already exists; left unchanged"
 }

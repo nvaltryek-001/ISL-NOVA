@@ -28,6 +28,17 @@ unknown classes were never used for training, calibration or choosing τ.
 | Known test states | 558 recognized · 54 uncertain · 23 unknown |
 | Unknown accepted at the threshold keeping 95 % of known (p ≥ 0.464) | 55.3 % |
 
+Treating *uncertain*, *unknown* and *insufficient input* as "rejected" (never
+presented as a vocabulary sign), computed from `open_set_rows.csv`:
+
+| Unknown-sign detection at the shipped threshold | Value |
+|---|---:|
+| False acceptance rate (unknown shown as a known sign) | **29.3 %** (260 / 887) |
+| False rejection rate (known test sign not recognized) | **12.1 %** (77 / 635) |
+| Precision of "rejected" for unknown signs | 89.1 % |
+| Recall of unknown signs (rejected / all unknown) | 70.7 % |
+| F1 | 0.788 |
+
 Threshold sweep (fraction of known test sequences whose top probability passes
 the threshold vs fraction of unknown sequences rejected):
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import logging
+import os
 import re
 import secrets
 import tempfile
@@ -88,10 +89,13 @@ def probe_video(data: bytes, suffix: str) -> dict:
     """Decode with OpenCV to verify the file is a real, readable video."""
     import cv2
 
-    with tempfile.NamedTemporaryFile(suffix=suffix) as tmp:
-        tmp.write(data)
-        tmp.flush()
-        cap = cv2.VideoCapture(tmp.name)
+    # Write to a closed temp file: on Windows a NamedTemporaryFile that is still
+    # open cannot be opened a second time by OpenCV.
+    fd, name = tempfile.mkstemp(suffix=suffix)
+    try:
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(data)
+        cap = cv2.VideoCapture(name)
         if not cap.isOpened():
             return {"decodable": False}
         fps = float(cap.get(cv2.CAP_PROP_FPS) or 0)
@@ -102,6 +106,11 @@ def probe_video(data: bytes, suffix: str) -> dict:
             ok, _ = cap.read()
             frames += int(ok)
         cap.release()
+    finally:
+        try:
+            os.unlink(name)
+        except OSError:
+            pass
     fps_eff = fps if 1 <= fps <= 240 else 30.0
     return {"decodable": frames > 0, "fps": fps or None, "width": w, "height": h,
             "frames": frames, "duration_s": round(frames / fps_eff, 3) if frames else 0.0}
