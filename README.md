@@ -12,13 +12,14 @@ An open, consent-first platform for **Indian Sign Language** recognition, learni
 ![version](https://img.shields.io/badge/version-0.1.0-8b5cf6)
 ![python](https://img.shields.io/badge/python-3.13-3776ab)
 ![react](https://img.shields.io/badge/react-19.2-22d3ee)
-![model](https://img.shields.io/badge/trained%20model-none%20yet-f43f5e)
+![model](https://img.shields.io/badge/LSTM%20(INCLUDE%20test)-91.7%25%20top--1%20·%20200%20classes-10b981)
 
 </div>
 
 > [!IMPORTANT]
 > **Project status, stated plainly.** The full software platform is built and tested: 200 vocabulary slots, the consent-first data pipeline, the training and evaluation pipeline, webcam recognition, and every application module.
-> **No recognition model has been trained on real ISL data yet**, and **none of the 200 signs has been linguistically verified**. The app says so wherever it matters (`model unavailable`). The steps to train the first real model are in [Train a model](#-train-a-model).
+> A **real model has now been trained on genuine INCLUDE recordings**: an LSTM covering all **200 classes**, at **91.7 % top-1 / 98.3 % top-5 / 91.7 % macro-F1** on the 635-video INCLUDE official test split. See [Results](#-results).
+> These results are **not signer-independent**: INCLUDE publishes no signer IDs, so signers in the test split may also appear in training. **None of the 200 signs has been linguistically verified yet.** The INCLUDE gloss is a label, not a reviewed ISL description.
 
 <p align="center">
   <img src="docs/screenshots/dashboard.png" alt="ISL NOVA dashboard showing 200 class slots, 0 verified, no trained model" width="100%" />
@@ -110,7 +111,7 @@ All screenshots were captured by the Playwright suite from the running applicati
 
 | | |
 |---|---|
-| ![Live recognition: camera on, model unavailable notice](docs/screenshots/live-recognition.png) **Live Recognition.** Fake test camera; in the offline sandbox MediaPipe could not load, and the UI says so. | ![Sign detail with licensed reference and review workflow](docs/screenshots/sign-detail.png) **Sign detail.** Licensed source, pending meanings, review workflow. |
+| ![Live recognition: camera on, model unavailable notice](docs/screenshots/live-recognition.png) **Live Recognition** before a model is installed. Fake test camera; in the offline sandbox MediaPipe could not load, and the UI says so. | ![Sign detail with licensed reference and review workflow](docs/screenshots/sign-detail.png) **Sign detail.** Licensed source, pending meanings, review workflow. |
 | ![Dataset Lab readiness funnel](docs/screenshots/dataset-lab.png) **Dataset Lab.** Readiness funnel and per-class table. | ![Sign explorer grid](docs/screenshots/sign-explorer.png) **Sign Explorer.** 200 slots, searchable. |
 | ![Communication composer](docs/screenshots/communication.png) **Communication.** Composer with unverified-meaning warnings. | ![Kiosk mode](docs/screenshots/kiosk.png) **Kiosk.** High-contrast, large targets. |
 
@@ -184,10 +185,12 @@ Vocabulary slots `ISL001`–`ISL200` are derived from the class list of **INCLUD
 | Class slots created | **200** |
 | Linguistically verified entries | **0** |
 | Entries with a licensed reference source | 200 |
-| External reference videos listed (INCLUDE official split) | 3,392, **not downloaded** |
-| Classes with authentic local recordings | 0 |
-| Classes approved for training | 0 |
-| Classes used for training / evaluated | 0 / 0 |
+| INCLUDE videos listed for these classes (official split) | 3,392 |
+| INCLUDE videos downloaded and processed (GitHub Actions, checksum-verified) | 4,284 in 44 parts (56.75 GB) |
+| Usable landmark sequences for the 200 classes | **3,370** (train 2,461 · val 274 · test 635), 0 failed, 15 flagged insufficient |
+| Classes with authentic local (app-recorded) recordings | 0 |
+| Classes trained / evaluated on INCLUDE | **200 / 200** (189 have samples in all three splits) |
+| Classes approved for training through the in-app review workflow | 0 (needs linguistic verification) |
 
 <details><summary>Slots by planning category (target vs actual)</summary>
 
@@ -217,6 +220,23 @@ INCLUDE has few everyday verbs and no food or question words. Closing these gaps
 
 ## 🧠 Train a model
 
+**Reproduce the published model on GitHub Actions (no local download).** Two manual workflows separate data from training, so the videos are downloaded once:
+
+1. **`INCLUDE data pipeline`** (`.github/workflows/include-data.yml`) runs a preflight (runner resources, Zenodo record and licence, vocabulary mapping). It then downloads each Zenodo part with MD5 verification, extracts MediaPipe hand and pose landmarks, deletes the raw video, and merges everything into the `include-landmarks-v1` artifact (176 MB).
+2. **`INCLUDE training`** (`.github/workflows/include-train.yml`) trains LSTM, GRU, logistic regression and DTW in parallel on that artifact. It selects by **validation** macro-F1, re-runs the test split through the production `Predictor`, and publishes the selected model as a pre-release.
+
+Start them with *Actions → Run workflow* once the files are on the default branch. Before that, push the run branch: `git push origin HEAD:run/include-data` (settings in `ml/runs/include-data.json`), then `HEAD:run/include-train` (`ml/runs/include-train.json`).
+
+**Install the published model into any deployment:**
+
+```bash
+PYTHONPATH=backend:ml python scripts/fetch_model.py --tag model-lstm-20261104T041414Z-s13 \
+  --registry artifacts/models --promote        # checksum-verified; restart the server to load it
+# Docker: docker compose exec app python /app/scripts/fetch_model.py --tag <tag> --registry /data/models --promote
+```
+
+**Or locally**, with the videos on your own disk:
+
 ```bash
 # 1. get data: INCLUDE videos (56.8 GB) from https://zenodo.org/records/4010759
 #    and MediaPipe hand_landmarker.task + pose_landmarker_lite.task
@@ -239,7 +259,25 @@ Recordings collected in the app train through *AI Laboratory → Experiments* (b
 
 ## 📊 Results
 
-**No recognition results exist yet.** No model has been trained on authentic ISL data, so there is no accuracy to report. [docs/MODEL_CARD.md](docs/MODEL_CARD.md) and [research/RESULTS_TEMPLATE.md](research/RESULTS_TEMPLATE.md) will be filled from `metrics.json` when one is.
+**Genuine results** from GitHub Actions run [41771084083](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41771084083) on data run [41764539272](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41764539272). Dataset `include-official-v1`, 200 classes, INCLUDE official train/val/test split, feature contract `isl-nova-fc-1.0.0`, seed 13. The test split was evaluated once, after model selection on validation.
+
+| Model | Val macro-F1 | Test top-1 | Test top-5 | Precision (macro) | Recall (macro) | Macro-F1 | Weighted-F1 | ECE | Latency / sample | Size |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| **LSTM** (selected) | 91.1 % | **91.7 %** | 98.3 % | 93.0 % | 92.4 % | **91.7 %** | 91.5 % | 0.027 | 0.73 ms | 1.78 MB |
+| Logistic regression (pooled stats) | 88.1 % | 89.1 % | 98.3 % | 90.4 % | 89.9 % | 88.8 % | 88.9 % | 0.024 | 0.02 ms | 0.99 MB |
+| GRU | 86.7 % | 86.5 % | 97.6 % | 88.0 % | 87.4 % | 86.1 % | 85.8 % | 0.017 | 0.17 ms | 1.44 MB |
+| DTW 1-NN | 80.7 % | 84.4 % | 94.6 % | 85.7 % | 84.8 % | 83.5 % | 83.8 % | 0.040 | 130 ms | 64 MB |
+
+Sample counts used: 2,448 train / 272 val / 635 test. The 15 insufficient-input sequences were excluded by the feature contract. Latency is batched model time per sample on a 4-vCPU runner.
+
+**End-to-end check.** The published LSTM was loaded through `isl_nova_ml.inference.Predictor` (the code the API uses) and run on all 635 test sequences. It reproduced **91.65 % top-1 / 98.27 % top-5**. States: 556 *recognized*, 57 *uncertain*, 22 *unknown*. Median latency per call was 24 ms, including feature extraction. In this sandbox the release was installed with `scripts/fetch_model.py`, and 24 held-out test sequences sent to `POST /api/v1/predict/sequence` came back 24/24 correct and *recognized*.
+
+<p align="center"><img src="docs/screenshots/ai-laboratory-model.png" alt="AI Laboratory showing the trained LSTM's held-out metrics" width="49%" /> <img src="docs/screenshots/evaluation.png" alt="Per-class F1 and 200-class confusion matrix" width="49%" /></p>
+
+> [!WARNING]
+> **What these numbers do not show.** INCLUDE has no signer IDs, so this is **not** signer-independent evaluation and says nothing about unseen signers. All signers come from one school in Chennai. Many classes have only 1–4 test videos, so per-class scores are noisy. Unknown-sign rejection was **not** evaluated, because no held-out unknown classes were used. Live webcam accuracy on new people has **not** been measured.
+
+Artifacts: model release [`model-lstm-20261104T041414Z-s13`](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/model-lstm-20261104T041414Z-s13) (weights, SHA-256, comparison, verification, test-landmark sample). The workflow artifacts `include-landmarks-v1` and `include-models` are kept for 90 days. Full model card: [docs/MODEL_CARD.md](docs/MODEL_CARD.md) · [research/RESULTS.md](research/RESULTS.md).
 
 Measured engineering latency (2 vCPU sandbox, synthetic input, untrained 200-class models; [details](docs/PERFORMANCE_BENCHMARK.md)):
 
@@ -299,7 +337,7 @@ Pseudonymous signers, explicit consent scopes, withdrawal as erasure, four-eyes 
 
 ## ⚠️ Limitations
 
-No trained model yet · vocabulary unverified · category gaps · INCLUDE has no signer IDs, so its split cannot be proven signer-independent · isolated signs only, no grammatical translation · no non-manual features · CPU NumPy models · not yet tested with Deaf users. Full list: [research/LIMITATIONS.md](research/LIMITATIONS.md).
+Results are on INCLUDE's official split, not signer-independent; unknown-sign rejection not evaluated · vocabulary unverified · category gaps · INCLUDE has no signer IDs, so its split cannot be proven signer-independent · isolated signs only, no grammatical translation · no non-manual features · CPU NumPy models · not yet tested with Deaf users. Full list: [research/LIMITATIONS.md](research/LIMITATIONS.md).
 
 ## 📁 Repository structure
 

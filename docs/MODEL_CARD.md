@@ -1,48 +1,53 @@
-# Model card
-
-## Status: **no production model exists**
-
-No model has been trained on authentic ISL recordings in this repository, because no such data was available in the build environment (see [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md)). The application reports `model_unavailable` everywhere a prediction would appear. **There are no accuracy figures to report.**
-
-## Implemented model families
-
-| Kind | Description | Role |
-|---|---|---|
-| `lstm` | 1-layer LSTM, concatenated last + mean hidden state → softmax; Adam, gradient clipping, weight decay, class weighting, early stopping on validation macro-F1, LR decay on plateau | **Baseline** |
-| `gru` | Same head on a GRU | Comparison |
-| `pooled_logreg` | mean/std/range over time → multinomial logistic regression | Non-temporal baseline |
-| `dtw_1nn` | Dynamic time warping, 1-nearest neighbour (Sakoe-Chiba band) | Reference method |
-
-All use the same feature contract and splits. The recurrent models' backward passes are verified against finite differences in `ml/tests/test_ml.py`.
-
-**Calibration and rejection.** Temperature scaling is fitted on validation logits. The rejection threshold τ keeps 95 % of correct validation predictions, and a top-1/top-2 margin is also required. Predictions resolve to *recognized* (p ≥ τ and margin met), *uncertain* (p ≥ 0.6 τ) or *unknown*.
-
-## How to produce the first real model
-
-```bash
-# 1. import INCLUDE (docs/DATASET_PROTOCOL.md), review, then approve
-PYTHONPATH=ml python -m isl_nova_ml.include_import --include-root /data/INCLUDE --out data/processed/include \
-    --hand-model models/hand_landmarker.task --pose-model models/pose_landmarker_lite.task --approve
-# 2. train the baseline (CPU; expect hours for 200 classes with the NumPy LSTM)
-PYTHONPATH=ml python -m isl_nova_ml.train --config ml/configs/lstm_baseline.json \
-    --manifest data/processed/include/manifest.json --data-root data/processed/include \
-    --registry artifacts/models --dataset-version include-official-v1
-# 3. inspect artifacts/models/<id>/metrics.json, then promote in the AI Laboratory (admin)
-```
-
-When a model is promoted, fill in the template below **from its `metrics.json`**.
+# Model card: `lstm-20261104T041414Z-s13`
 
 | Field | Value |
 |---|---|
-| Model ID | _TBD_ |
-| Training data / split | _TBD_ (INCLUDE official split: signer independence **unverified**) |
-| Classes | _TBD_ |
-| Test top-1 / top-5 / macro-F1 | _TBD_ |
-| ECE (after temperature scaling) | _TBD_ |
-| Unknown rejection (AUROC) | _TBD_ |
-| Intended use | Isolated-sign recognition for practice and assistive look-up; **not** for interpretation in medical, legal or emergency settings |
-| Known limitations | See [research/LIMITATIONS.md](../research/LIMITATIONS.md) |
+| Model | 1-layer LSTM (hidden 128), last + mean pooled state → softmax; 221,896 parameters (≈ 222k) |
+| Weights | [release `model-lstm-20261104T041414Z-s13`](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/model-lstm-20261104T041414Z-s13), tarball SHA-256 `e0979cd598c56bb839f3d689884e54bc7434e2cba47771c9ca3eaebdbfc543c0` |
+| Trained by | GitHub Actions run [41771084083](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41771084083) (4-vCPU runner, NumPy, CPU), seed 13 |
+| Training time | early stop at epoch 49 of max 60; job ≈ 8.5 min |
+| Data | INCLUDE (Sridhar et al., ACM MM 2020, doi:10.1145/3394171.3413528), CC BY 4.0, downloaded from Zenodo 4010759 and processed in data run [41764539272](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41764539272) |
+| Dataset version | `include-official-v1`: 3,370 landmark sequences for the 200 ISL NOVA classes |
+| Split | INCLUDE official train / val / test lists: 2,448 / 272 / 635 used (15 insufficient-input sequences excluded) |
+| Features | contract `isl-nova-fc-1.0.0` (32 × 204: hands, body-relative wrists and pose, two-hand distances, joint angles, presence, wrist velocity) from MediaPipe HandLandmarker + PoseLandmarker lite |
+| Calibration | temperature 1.025, fitted on validation; rejection τ = 0.673 (keeps 95 % of correct validation predictions); margin 0.10 |
 
-## Synthetic smoke test (not a model of ISL)
+## Held-out test results (INCLUDE official test split, evaluated once)
 
-`python -m isl_nova_ml.smoke` trains every model kind on procedurally generated trajectories, only to check that the code runs end to end. Those artefacts carry `synthetic: true`, use class IDs `SYN01…`, and are refused by the production registry. Their metrics must never be quoted.
+| Metric | Value |
+|---|---:|
+| Top-1 accuracy | **91.7 %** |
+| Top-5 accuracy | 98.3 % |
+| Macro precision / recall | 93.0 % / 92.4 % |
+| Macro-F1 / weighted-F1 | **91.7 %** / 91.5 % |
+| Expected calibration error | 0.027 |
+| Model latency (batched, per sample) | 0.73 ms |
+| End-to-end latency through `Predictor` (features + model + decision) | 24 ms median, 36 ms p95 |
+| Decision states on the test split | 556 recognized · 57 uncertain · 22 unknown |
+| Size | 1.78 MB |
+
+Weakest classes on test (F1, test support in brackets): Today 0.00 (1), Dress 0.29 (4), Bad 0.40 (4), Wife 0.40 (4), Friend 0.44 (4), Chair 0.50 (3), Clothing 0.50 (4). With 1–4 test videos per class, per-class figures carry wide uncertainty.
+
+## Comparison (same data, split, features and seed)
+
+| Model | Val macro-F1 | Test top-1 | Test macro-F1 |
+|---|---:|---:|---:|
+| **LSTM** (selected by validation) | 91.1 % | 91.7 % | 91.7 % |
+| Logistic regression on pooled statistics | 88.1 % | 89.1 % | 88.8 % |
+| GRU | 86.7 % | 86.5 % | 86.1 % |
+| DTW 1-NN | 80.7 % | 84.4 % | 83.5 % |
+
+Single seed. Differences of a few points between models are within what seed variation could produce; repeat runs are on the roadmap.
+
+## Intended use
+Isolated-sign recognition for practice, look-up and research in ISL NOVA. **Not** for interpretation in medical, legal, emergency or other high-stakes settings.
+
+## Limitations
+* **Not signer-independent.** INCLUDE publishes no signer IDs, so test signers may appear in training. These numbers do **not** estimate accuracy on new people.
+* **Narrow population.** INCLUDE was recorded with deaf students at one school in Chennai, under similar studio conditions. Accuracy on other signers, regions, lighting and webcams is unknown.
+* **Unknown-sign rejection not evaluated.** No held-out out-of-vocabulary classes were used; τ was set from known-class validation data only.
+* **Vocabulary unverified.** Class labels are INCLUDE glosses, not reviewed ISL descriptions.
+* **Isolated signs only**; no non-manual (facial) features.
+
+## Reproduce
+See README → *Train a model*. To install: `python scripts/fetch_model.py --tag model-lstm-20261104T041414Z-s13 --registry artifacts/models --promote`.

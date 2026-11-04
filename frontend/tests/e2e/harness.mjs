@@ -1,7 +1,7 @@
 // E2E harness: starts a fresh ISL NOVA server (temp SQLite DB, temp storage)
 // serving the production frontend build, and drives real Chromium with a fake
 // camera device. Requires `npm run build` first and Python deps installed.
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
@@ -15,7 +15,7 @@ export const ADMIN = { email: 'admin@example.org', password: 'admin-password-1' 
 
 const freePort = () => new Promise((res) => { const s = net.createServer(); s.listen(0, () => { const p = s.address().port; s.close(() => res(p)); }); });
 
-export async function startServer() {
+export async function startServer({ withModel = false } = {}) {
   if (!fs.existsSync(path.join(repo, 'frontend', 'dist', 'index.html'))) throw new Error('run `npm run build` before e2e');
   const port = await freePort();
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'isl-nova-e2e-'));
@@ -25,6 +25,12 @@ export async function startServer() {
     BOOTSTRAP_ADMIN_EMAIL: ADMIN.email, BOOTSTRAP_ADMIN_PASSWORD: ADMIN.password, PBKDF2_ITERATIONS: '1000',
     CORS_ORIGINS: `http://127.0.0.1:${port}`, AUTH_RATE_LIMIT_PER_MINUTE: '1000', RATE_LIMIT_PER_MINUTE: '10000',
   };
+  if (withModel && process.env.E2E_MODEL_TAG) {
+    // install the published, trained model exactly as an operator would
+    const r = spawnSync(process.env.PYTHON || 'python3', ['scripts/fetch_model.py', '--tag', process.env.E2E_MODEL_TAG, '--registry', `${dir}/models`, '--promote'],
+      { cwd: repo, env, encoding: 'utf8' });
+    if (r.status !== 0) throw new Error(`fetch_model failed: ${r.stderr}`);
+  }
   const proc = spawn(process.env.PYTHON || 'python3', ['-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', String(port), '--log-level', 'warning'],
     { cwd: path.join(repo, 'backend'), env, stdio: ['ignore', 'ignore', 'pipe'] });
   let stderr = '';

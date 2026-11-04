@@ -1,6 +1,6 @@
 # Limitations
 
-* **No trained model on real data.** Every recognition feature is implemented and tested, but no model trained on authentic ISL data exists in this repository.
+* **Evaluation is not signer-independent.** The 200-class LSTM (91.7 % top-1) was tested on INCLUDE's official split, and test signers may appear in training. Accuracy on new people is unknown. Live webcam recognition with real users has not been measured, and unknown-sign rejection has not been evaluated on held-out unknown classes.
 * **Vocabulary unverified.** All 200 entries come from INCLUDE folder names. A gloss is not an ISL sign: forms, regional variants and non-manual features need qualified review.
 * **Category gaps.** INCLUDE lacks most everyday actions, food words and question words; the planning targets are not met.
 * **INCLUDE signer IDs are unavailable**, so its official split cannot be proven signer-independent. INCLUDE was recorded at one institution in one city, which limits regional diversity.

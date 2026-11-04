@@ -24,6 +24,7 @@ COPY backend/app backend/app
 COPY ml/isl_nova_ml ml/isl_nova_ml
 COPY dataset/vocabulary dataset/vocabulary
 COPY dataset/sources dataset/sources
+COPY scripts scripts
 COPY --from=web /app/frontend/dist frontend/dist
 USER nova
 VOLUME ["/data"]

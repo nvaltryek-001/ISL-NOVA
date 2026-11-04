@@ -33,10 +33,17 @@ Terminate TLS at the platform or a reverse proxy; uvicorn runs with `--proxy-hea
 ## 4. Object storage and models
 The local storage adapter writes to `STORAGE_DIR` (a mounted volume). For S3-compatible storage, implement the four methods of `LocalStorage` (`put/get/exists/delete`). Model artefacts live in `MODEL_REGISTRY_DIR`; copy trained model directories there and promote one in the AI Laboratory.
 
+## 4b. Install the trained model
+```bash
+docker compose exec app python /app/scripts/fetch_model.py \
+  --tag model-lstm-20261104T041414Z-s13 --registry /data/models --promote
+docker compose restart app
+```
+
 ## 5. Post-deployment checklist
 - [ ] `GET /api/v1/health` returns `status: ok`, `migrations.pending: []`
 - [ ] SPA routes load (`/`, `/signs`, `/live`) over HTTPS
-- [ ] `GET /api/v1/model/info` shows the expected state (`model_unavailable` until a real model is promoted)
+- [ ] `GET /api/v1/model/info` shows the expected state (`ready` with `lstm-20261104T041414Z-s13` once the trained model is installed)
 - [ ] Login works; bootstrap admin password changed; open registration set as intended
 - [ ] Response headers include CSP, `X-Frame-Options: DENY`
 - [ ] No secrets in logs; `.env` not in the image (`.dockerignore`)

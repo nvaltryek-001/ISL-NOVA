@@ -69,6 +69,8 @@ jobs:
       - working-directory: frontend
         run: npx playwright install --with-deps chromium
       - working-directory: frontend
+        env:
+          E2E_MODEL_TAG: model-lstm-20261104T041414Z-s13
         run: npm run e2e
 
   docker:

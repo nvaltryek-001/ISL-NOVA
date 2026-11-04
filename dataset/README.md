@@ -9,10 +9,11 @@ This folder holds the **vocabulary** and **manifests** of the ISL NOVA dataset. 
 | Class slots created | **200** | `ISL001` – `ISL200`, stable IDs |
 | Linguistically verified entries | **0** | No qualified ISL reviewer has signed off yet |
 | Entries with a licensed reference source | 200 | Each maps to an INCLUDE class (CC BY 4.0) |
-| External videos listed for these classes | 3,392 | Counted from INCLUDE's official train/val/test path lists; **not downloaded** |
-| Classes with local recordings | 0 | |
-| Classes approved for training | 0 | |
-| Classes used for training / evaluated | 0 / 0 | No model has been trained on real data |
+| External videos listed for these classes | 3,392 | INCLUDE's official train/val/test path lists |
+| INCLUDE videos processed | 3,370 usable sequences | Downloaded and landmark-extracted on GitHub Actions (data run 41764539272); raw video never stored in the repo |
+| Classes with local (app-recorded) recordings | 0 | |
+| Classes approved through the in-app workflow | 0 | needs linguistic verification first |
+| Classes trained / evaluated | **200 / 200** | LSTM, INCLUDE official split; see docs/MODEL_CARD.md |
 
 The live, per-class numbers are always available at `GET /api/v1/dataset/stats` and in the Dataset Lab.
 

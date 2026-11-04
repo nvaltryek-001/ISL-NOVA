@@ -17,6 +17,11 @@ _Last updated: 2026-11-03, branch `feat/isl-nova-platform`._ Every result below 
 | Production build | `npm run build` | ✅ JS 405 kB, CSS 49 kB (minified, before gzip) |
 | End-to-end (Chromium, fake camera) | `npm run e2e` | ✅ **15 passed** (4 consecutive clean runs after the light-theme redesign); screenshot run (`E2E_SCREENSHOTS=1`) also passed |
 | Synthetic ML smoke test | `python -m isl_nova_ml.smoke` | ✅ all 4 model kinds train, calibrate, evaluate and register. **Metrics are synthetic and are not ISL results.** |
+| INCLUDE preflight + download + landmark extraction | `INCLUDE data pipeline`, run [41764539272](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41764539272) | ✅ 44/44 parts, 56.75 GB, MD5-verified; 4,284 videos; **3,370 usable sequences for 200 classes**; 0 failed; 15 insufficient-input |
+| **Real training (4 models, 200 classes)** | `INCLUDE training`, run [41771084083](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41771084083) | ✅ LSTM test **91.7 % top-1 / 98.3 % top-5 / 91.7 % macro-F1** (INCLUDE official split, not signer-independent); GRU 86.5 %, LogReg 89.1 %, DTW 84.4 % top-1 |
+| Real model through production `Predictor` | `include_pipeline verify` (CI) | ✅ 635 test sequences, 91.65 % top-1 reproduced |
+| Real model through the API (this sandbox) | `fetch_model.py` + `POST /predict/sequence` | ✅ 24/24 held-out samples recognized correctly; `/model/info`, `/model/metrics`, 200×200 confusion matrix served |
+| Model-backed E2E | `E2E_MODEL_TAG=… npm run e2e` | ✅ 3 passed locally (UI shows live model and metrics; API sample 24/24; live studio with model) |
 | Docker image build + container health | `docker build .` and `/api/v1/health` (GitHub Actions) | ✅ passed in CI run 41678896858 (not buildable in the sandbox) |
 | Container layout + production start | files copied as in the Dockerfile; `ISL_NOVA_ENV=production` migrate + uvicorn | ✅ health ok, SPA served, 200 slots seeded; refuses to start without `JWT_SECRET` |
 | Deployment | - | ⛔ not deployed (no credentials) |
@@ -43,7 +48,8 @@ _Last updated: 2026-11-03, branch `feat/isl-nova-platform`._ Every result below 
 | | consent/review workflow works | ✅ E2E: signer → consent → record → annotate → second-reviewer approval |
 | | manifests validate; actual counts shown | ✅ |
 | AI | versioned feature contract; train/infer parity | ✅ |
-| | genuine model artefacts load; inference tested | ⚠️ loading and inference tested with a **synthetic** model only; **no genuine model exists** |
+| | genuine model artefacts load; inference tested | ✅ INCLUDE-trained LSTM loaded via release, `Predictor` and API; tested on held-out data |
+| | live webcam recognition with a real person | ⛔ not tested: no real camera or person in the build environment |
 | | unknown/uncertain handling | ✅ |
 | | metrics from held-out evaluation; no fabricated accuracy | ✅ pipeline evaluates test once; no ISL metrics claimed |
 | Product | core routes work, no dead buttons, responsive, loading/error/empty states, server-side permissions | ✅ (E2E covers all routes, 390 px layout, unnamed-button check) |
@@ -57,10 +63,10 @@ _Last updated: 2026-11-03, branch `feat/isl-nova-platform`._ Every result below 
 |---|---:|
 | Class slots | 200 |
 | Linguistically verified | 0 |
-| Classes with authentic local recordings | 0 |
-| Classes approved for training | 0 |
-| Classes used for training / evaluated | 0 / 0 |
-| External videos listed (INCLUDE, not downloaded) | 3,392 |
+| Classes with authentic local (app) recordings | 0 |
+| Classes approved via in-app review workflow | 0 |
+| INCLUDE videos listed / usable sequences | 3,392 / 3,370 |
+| **Classes trained / evaluated (INCLUDE)** | **200 / 200** (189 with samples in all splits) |
 
 ## Continuation notes
 1. Review and merge PR #1 (CI green).
