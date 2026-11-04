@@ -34,3 +34,9 @@ jobs:
       - name: SwiftShader WebGL
         working-directory: frontend
         run: node tests/live-eval/mediapipe_check.mjs http://127.0.0.1:8000 ../swiftshader.json --use-angle=swiftshader --enable-unsafe-swiftshader
+      - name: File-backed fake camera (as in the virtual-camera evaluation)
+        working-directory: frontend
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg
+          ffmpeg -loglevel error -f lavfi -i testsrc=size=640x480:rate=25 -t 3 -pix_fmt yuv420p "$RUNNER_TEMP/clip.y4m"
+          node tests/live-eval/mediapipe_check.mjs http://127.0.0.1:8000 ../file.json "--use-file-for-fake-video-capture=$RUNNER_TEMP/clip.y4m"
