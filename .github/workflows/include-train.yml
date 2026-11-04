@@ -116,6 +116,22 @@ jobs:
           best=$(python -c "import json;print(json.load(open('report/comparison.json'))['best'])")
           tar -czf "$best.tar.gz" -C registry "$best"
           sha256sum "$best.tar.gz" > "$best.tar.gz.sha256"
-          gh release create "model-$best" "$best.tar.gz" "$best.tar.gz.sha256" report/comparison.md report/comparison.json report/verify.json \
+          # small labelled sample of INCLUDE test-split landmarks (CC BY 4.0, attribution in notes) for integration tests
+          python - <<'PY'
+          import json, tarfile
+          m = json.load(open("data/manifest.json"))
+          seen, rows = set(), []
+          for e in m["entries"]:
+              if e["split"] == "test" and e["sign_id"] not in seen and e["quality"]["status"] == "ok":
+                  seen.add(e["sign_id"]); rows.append(e)
+              if len(rows) == 24:
+                  break
+          json.dump({"source": m["source"], "note": "INCLUDE test-split landmark sample for integration tests", "entries": rows}, open("sample_manifest.json", "w"), indent=1)
+          with tarfile.open("include_test_landmark_sample.tar.gz", "w:gz") as t:
+              t.add("sample_manifest.json", arcname="manifest.json")
+              for e in rows:
+                  t.add("data/" + e["landmarks_path"], arcname=e["landmarks_path"])
+          PY
+          gh release create "model-$best" "$best.tar.gz" "$best.tar.gz.sha256" report/comparison.md report/comparison.json report/verify.json include_test_landmark_sample.tar.gz \
             --target "$GITHUB_SHA" --prerelease --title "ISL NOVA model $best (INCLUDE official split)" \
             --notes "Trained by workflow run $GITHUB_RUN_ID on INCLUDE (Sridhar et al., ACM MM 2020, CC BY 4.0) landmarks from data run ${{ needs.settings.outputs.data_run_id }}. Evaluated on the INCLUDE official test split; INCLUDE has no signer IDs, so results are NOT signer-independent. See comparison.md."
