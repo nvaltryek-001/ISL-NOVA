@@ -174,7 +174,20 @@ describe('vocabulary', () => {
     await page.getByRole('dialog').getByLabel('Review note').fill('Compared with INCLUDE reference video');
     await page.getByRole('button', { name: 'Confirm' }).click();
     await page.getByRole('button', { name: '→ verified' }).click();
-    await page.getByRole('dialog').getByLabel('Review note').fill('Form confirmed by reviewer');
+    await page.getByText('Document the sign first').waitFor();
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole('button', { name: 'Edit sign' }).click();
+    const ed = page.getByRole('dialog');
+    await ed.getByLabel('Hands required').selectOption('one');
+    await ed.getByLabel('Movement').selectOption('dynamic');
+    await ed.getByLabel('Linguistic description').fill('Flat hand moves outward from the forehead');
+    await ed.getByRole('button', { name: 'Save changes' }).click();
+    await ed.waitFor({ state: 'hidden' });
+    await page.getByRole('button', { name: '→ verified' }).click();
+    const dlg = page.getByRole('dialog');
+    await dlg.getByLabel('Review note').fill('Form confirmed by reviewer');
+    assert.equal(await dlg.getByRole('button', { name: 'Confirm' }).isDisabled(), true, 'checklist gates verification');
+    for (const l of ['I watched the licensed reference', 'Handshape, location, movement', 'The English meaning is an accurate']) await dlg.getByLabel(new RegExp(l)).check();
     await page.getByRole('button', { name: 'Confirm' }).click();
     await page.getByRole('dialog').waitFor({ state: 'hidden' });
     // once verified, the only forward action offered is "→ review pending"

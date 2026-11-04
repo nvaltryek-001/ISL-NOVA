@@ -74,3 +74,17 @@ def make_video(path: Path, seconds: float = 1.0, size=(320, 240), fps=30, seed=0
         vw.write(frame)
     vw.release()
     return path.read_bytes()
+
+
+CHECKLIST = {"reference_reviewed": True, "form_matches_reference": True, "meaning_confirmed": True}
+DESCRIBED = {"linguistic_description": "Flat hand moves outward from the chin", "hands_required": "one",
+             "movement_type": "dynamic"}
+
+
+def verify_sign(c, sid, ling, note="matches reference"):
+    """Document, move to review and verify a sign as a linguist."""
+    assert c.patch(f"/api/v1/signs/{sid}", json=DESCRIBED, headers=ling).status_code == 200
+    c.post(f"/api/v1/signs/{sid}/review", json={"to_status": "review_pending", "note": "start review"}, headers=ling)
+    r = c.post(f"/api/v1/signs/{sid}/review", json={"to_status": "verified", "note": note, "checklist": CHECKLIST}, headers=ling)
+    assert r.status_code == 200, r.text
+    return r.json()

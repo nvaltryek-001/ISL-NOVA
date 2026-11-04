@@ -8,7 +8,7 @@ from isl_nova_ml.synthetic import make_sequence, write_synthetic_dataset
 from isl_nova_ml.train import run
 from starlette.testclient import TestClient
 
-from tests.conftest import Api, make_settings, make_video
+from tests.conftest import Api, make_settings, make_video, verify_sign
 
 A = "/api/v1"
 
@@ -234,8 +234,7 @@ def test_history_feedback_learning_phrases(app_env):
     assert len(c.get(f"{A}/learning/lessons", params={"include_unverified": True}).json()["lessons"]) == 12
     assert c.get(f"{A}/learning/quiz").json()["available"] is False
     for sid, word in (("ISL020", "Hello"), ("ISL021", "How are you")):
-        c.post(f"{A}/signs/{sid}/review", json={"to_status": "review_pending", "note": "start"}, headers=ling)
-        c.post(f"{A}/signs/{sid}/review", json={"to_status": "verified", "note": "looks right"}, headers=ling)
+        verify_sign(c, sid, ling)
         c.put(f"{A}/signs/{sid}/translations/en", json={"text": word, "status": "verified"}, headers=ling)
     qz = c.get(f"{A}/learning/quiz", params={"n": 2}).json()
     assert qz["available"] and len(qz["questions"]) == 2 and len(qz["questions"][0]["options"]) == 2
@@ -275,3 +274,45 @@ def test_video_analysis_job(app_env, tmp_path):
     assert r["result"]["video"]["decodable"] is True and r["result"]["predictions"] == []
     assert c.get(f"{A}/analysis/videos/{j['id']}", headers=api.user(admin)).status_code == 404
     assert c.delete(f"{A}/analysis/videos/{j['id']}", headers=u).status_code == 200
+
+
+def test_new_signer_evaluation_run(tmp_path):
+    """Exercise the evaluation-run workflow end to end (synthetic model: code path only)."""
+    settings = make_settings(tmp_path, allow_synthetic_model=True)
+    root = settings.storage_dir.parent / "syn"
+    write_synthetic_dataset(root, n_classes=3, n_signers=4, reps=2, unknown_classes=0)
+    m = json.loads((root / "manifest.json").read_text())
+    for e in m["entries"]:  # classes map onto vocabulary ids so local recordings can reference them
+        e["sign_id"] = "ISL%03d" % int(e["sign_id"][3:])
+    (root / "manifest.json").write_text(json.dumps(m))
+    res = run({"model": "pooled_logreg"}, root / "manifest.json", root, settings.model_registry_dir, None, "syn")
+    with TestClient(create_app(settings)) as c:
+        api = Api(c)
+        admin = api.login("admin@example.org", "admin-password-1")
+        assert c.post(f"{A}/evaluation/runs", json={"dataset_version_id": 1}, headers=admin).status_code == 409
+        c.post(f"{A}/models/{res['model_id']}/promote", headers=admin)
+        assert c.post(f"{A}/evaluation/runs", json={"dataset_version_id": 99}, headers=admin).status_code == 404
+        # a "new signer" records two consented clips with landmarks; a second reviewer approves them
+        ling = api.user(admin, "linguist")
+        s, _, sess = _signer_with_consent(c, admin)
+        for i, sid in enumerate(("ISL001", "ISL002")):
+            frames = make_sequence(int(sid[-1]), np.random.default_rng(40 + i), 40)
+            rec = c.post(f"{A}/dataset/recordings", data={"sign_id": sid, "session_id": str(sess["id"]),
+                                                          "landmarks": json.dumps({"aspect": 4 / 3, "frames": frames})},
+                         files={"file": ("v.mp4", make_video(tmp_path / f"n{i}.mp4", seed=60 + i), "video/mp4")},
+                         headers=admin).json()
+            ann = c.post(f"{A}/annotations", json={"recording_id": rec["id"], "label_sign_id": sid}, headers=admin).json()
+            c.patch(f"{A}/annotations/{ann['id']}", json={"decision": "approved"}, headers=ling)
+        v = c.post(f"{A}/dataset/versions", json={"version": "9.0.0", "description": "new signer eval"}, headers=admin).json()
+        r = c.post(f"{A}/evaluation/runs", json={"dataset_version_id": v["id"], "note": "new signer"}, headers=admin).json()
+        assert r["report"]["status"] == "running"
+        for _ in range(50):
+            got = c.get(f"{A}/evaluation/runs/{r['id']}", headers=admin).json()
+            if got["report"]["status"] != "running":
+                break
+            time.sleep(0.1)
+        rep = got["report"]
+        assert rep["status"] == "completed", rep
+        assert rep["overall"]["n"] == 2 and rep["signers"] == 1 and s["signer_code"] in rep["per_signer"]
+        assert len(rep["rows"]) == 2 and "rows" not in c.get(f"{A}/evaluation/runs", headers=admin).json()[0]["report"]
+        assert c.get(f"{A}/evaluation/runs", headers=api.user(admin)).status_code == 403

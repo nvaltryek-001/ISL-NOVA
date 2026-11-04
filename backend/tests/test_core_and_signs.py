@@ -3,6 +3,7 @@ from app.config import Settings
 from app.db import Database
 from app.migrate import MigrationError, migrate, status
 from app.services import LocalStorage
+from tests.conftest import CHECKLIST, DESCRIBED
 
 A = "/api/v1"
 
@@ -121,11 +122,19 @@ def test_verification_workflow_requires_linguist(app_env):
     r = c.post(f"{A}/signs/ISL001/review", json={"to_status": "verified", "note": "looks right"}, headers=admin)
     assert r.status_code == 403 and r.json()["error"]["code"] == "linguist_required"
     r = c.post(f"{A}/signs/ISL001/review", json={"to_status": "verified", "note": "matches reference"}, headers=ling)
+    assert r.status_code == 422 and r.json()["error"]["code"] == "incomplete_entry"
+    assert set(r.json()["error"]["details"]["missing_fields"]) == {"linguistic_description", "hands_required", "movement_type"}
+    c.patch(f"{A}/signs/ISL001", json=DESCRIBED, headers=ling)
+    r = c.post(f"{A}/signs/ISL001/review", json={"to_status": "verified", "note": "matches reference",
+                                                 "checklist": {**CHECKLIST, "meaning_confirmed": False}}, headers=ling)
+    assert r.status_code == 422 and r.json()["error"]["code"] == "checklist_incomplete"
+    r = c.post(f"{A}/signs/ISL001/review", json={"to_status": "verified", "note": "matches reference",
+                                                 "checklist": CHECKLIST}, headers=ling)
     d = r.json()
     assert d["verification_status"] == "verified" and d["reviewer"] == "Dr Linguist" and d["approval_date"]
     assert c.get(f"{A}/dataset/stats").json()["verified_classes"] == 1
     # substantive edit after verification sends it back to review
-    d = c.patch(f"{A}/signs/ISL001", json={"hands_required": "two"}, headers=ling).json()
+    d = c.patch(f"{A}/signs/ISL001", json={"hands_required": "two", "movement_type": "static"}, headers=ling).json()
     assert d["verification_status"] == "review_pending"
     assert [e["to_status"] for e in d["verification_events"]][:3] == ["review_pending", "verified", "review_pending"]
 
@@ -208,3 +217,14 @@ def test_production_settings_are_strict(monkeypatch):
     monkeypatch.setenv("ALLOW_SYNTHETIC_MODEL", "1")
     with pytest.raises(RuntimeError, match="SYNTHETIC"):
         Settings.from_env()
+
+
+def test_review_sheet_export(app_env):
+    c, api, admin, _ = app_env
+    learner = api.user(admin)
+    assert c.get(f"{A}/signs/review-sheet.csv", headers=learner).status_code == 403
+    r = c.get(f"{A}/signs/review-sheet.csv", headers=admin)
+    assert r.status_code == 200 and r.headers["content-type"].startswith("text/csv")
+    lines = r.text.strip().splitlines()
+    assert len(lines) == 201 and lines[0].startswith("sign_id,name,category,status")
+    assert lines[1].startswith("ISL001,")

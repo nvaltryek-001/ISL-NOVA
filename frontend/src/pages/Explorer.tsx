@@ -5,7 +5,7 @@ import { api, qs } from '../lib/api';
 import { invalidate, useMutation, useQuery } from '../lib/query';
 import { Link, navigate, useLocation } from '../lib/router';
 import { speak } from '../lib/speech';
-import { can, toast, useAuth, usePrefs } from '../lib/store';
+import { auth, can, toast, useAuth, usePrefs } from '../lib/store';
 import type { Category, SignDetail, SignSummary } from '../lib/types';
 
 const LANG_LABEL: Record<string, string> = { en: 'English', hi: 'हिन्दी', kn: 'ಕನ್ನಡ' };
@@ -34,7 +34,14 @@ export function ExplorerPage() {
   return (
     <div>
       <PageHeader kicker="NOVA Sign Explorer" title="Sign Explorer"
-        actions={can(user, 'signs:write') && <Button variant="primary" icon="plus" onClick={() => setCreating(true)}>New sign</Button>}>
+        actions={<>
+          {can(user, 'signs:review') && <Button icon="download" onClick={async () => {
+            const r = await fetch('/api/v1/signs/review-sheet.csv', { headers: { Authorization: `Bearer ${auth.get().token}` } });
+            if (!r.ok) { toast('Could not export the review sheet', 'error'); return; }
+            const a = document.createElement('a'); a.href = URL.createObjectURL(await r.blob()); a.download = 'isl-nova-review-sheet.csv'; a.click();
+          }}>Review sheet (CSV)</Button>}
+          {can(user, 'signs:write') && <Button variant="primary" icon="plus" onClick={() => setCreating(true)}>New sign</Button>}
+        </>}>
         Search the 200-slot ISL NOVA vocabulary in English, Hindi or Kannada. Status badges show how far each entry is through qualified review.
       </PageHeader>
       <div className="mb-5 grid gap-3 md:grid-cols-[1fr_auto_auto]">
@@ -158,7 +165,8 @@ export function SignDetailPage({ id }: { id: string }) {
   const [reportText, setReportText] = useState('');
 
   const inv = [key, '/signs', '/dashboard', '/dataset', '/learning'];
-  const reviewM = useMutation((b: { to_status: string; note: string }) => api(`${key}/review`, { body: b }), { invalidates: inv, onSuccess: () => { toast('Status updated'); setReview(null); setNote(''); } });
+  const [check, setCheck] = useState({ reference_reviewed: false, form_matches_reference: false, meaning_confirmed: false });
+  const reviewM = useMutation((b: { to_status: string; note: string }) => api(`${key}/review`, { body: b.to_status === 'verified' ? { ...b, checklist: check } : b }), { invalidates: inv, onSuccess: () => { toast('Status updated'); setReview(null); setNote(''); setCheck({ reference_reviewed: false, form_matches_reference: false, meaning_confirmed: false }); } });
   const trM = useMutation((b: { lang: string; text: string; status: string }) => api(`${key}/translations/${b.lang}`, { method: 'PUT', body: { text: b.text, status: b.status } }), { invalidates: inv, onSuccess: () => { toast('Translation saved'); setTr(null); } });
   const bmM = useMutation((on: boolean) => api(`/bookmarks/${id}`, { method: on ? 'PUT' : 'DELETE' }), { invalidates: [key, '/bookmarks', '/signs'] });
   const retireM = useMutation((retire: boolean) => api(retire ? key : `${key}/restore`, { method: retire ? 'DELETE' : 'POST' }), { invalidates: inv, onSuccess: (r: { retired: boolean }) => toast(r.retired ? 'Sign retired' : 'Sign restored') });
@@ -264,9 +272,25 @@ export function SignDetailPage({ id }: { id: string }) {
 
       <SignForm open={editing} onClose={() => setEditing(false)} sign={s} categories={cats.data ?? []} />
       <Dialog open={!!review} onClose={() => setReview(null)} title={`Move to "${review?.replaceAll('_', ' ')}"`}
-        footer={<><Button variant="ghost" onClick={() => setReview(null)}>Cancel</Button><Button variant="primary" loading={reviewM.pending} disabled={note.trim().length < 3} onClick={() => reviewM.mutate({ to_status: review!, note })}>Confirm</Button></>}>
-        <ErrorNote error={reviewM.error} />
-        <Field label="Review note" hint="Required. Recorded permanently in the verification log.">{(fid) => <Textarea id={fid} value={note} onChange={(e) => setNote(e.target.value)} />}</Field>
+        footer={<><Button variant="ghost" onClick={() => setReview(null)}>Cancel</Button><Button variant="primary" loading={reviewM.pending} disabled={note.trim().length < 3 || (review === 'verified' && !(check.reference_reviewed && check.form_matches_reference && check.meaning_confirmed))} onClick={() => reviewM.mutate({ to_status: review!, note })}>Confirm</Button></>}>
+        <div className="space-y-4">
+          <ErrorNote error={reviewM.error} />
+          {review === 'verified' && (() => {
+            const missing = (['linguistic_description', 'hands_required', 'movement_type'] as const).filter((f) => !s[f]);
+            return (
+              <>
+                {missing.length > 0 && <Notice tone="warn" title="Document the sign first">Missing: {missing.map((m) => m.replaceAll('_', ' ')).join(', ')}. Use <b>Edit sign</b> to add them.</Notice>}
+                <fieldset className="space-y-2 rounded-xl border border-ink-700 p-3 text-sm">
+                  <legend className="label px-1">Verification checklist (all required)</legend>
+                  {([['reference_reviewed', 'I watched the licensed reference recording(s) for this sign'], ['form_matches_reference', 'Handshape, location, movement and orientation match the reference'], ['meaning_confirmed', 'The English meaning is an accurate gloss for this ISL sign']] as const).map(([k, label]) => (
+                    <label key={k} className="flex items-start gap-2"><input type="checkbox" className="mt-1 accent-nova-500" checked={check[k]} onChange={(e) => setCheck({ ...check, [k]: e.target.checked })} />{label}</label>
+                  ))}
+                </fieldset>
+              </>
+            );
+          })()}
+          <Field label="Review note" hint="Required. Recorded permanently in the verification log.">{(fid) => <Textarea id={fid} value={note} onChange={(e) => setNote(e.target.value)} />}</Field>
+        </div>
       </Dialog>
       <Dialog open={!!tr} onClose={() => setTr(null)} title={`${tr ? LANG_LABEL[tr.lang] : ''} meaning`}
         footer={<><Button variant="ghost" onClick={() => setTr(null)}>Cancel</Button><Button variant="primary" loading={trM.pending} onClick={() => tr && trM.mutate(tr)}>Save</Button></>}>

@@ -298,3 +298,104 @@ def _train_job(state, eid: int) -> None:
         except Exception as exc:  # noqa: BLE001
             conn.update("experiments", {"status": "failed", "error": f"{exc}\n{traceback.format_exc()[-2000:]}",
                                         "finished_at": utcnow(), "log": "\n".join(log_lines[-400:])}, "id = ?", (eid,))
+
+
+# --------------------------------------------------------------------------- new-signer evaluation
+
+class EvalRunIn(BaseModel):
+    dataset_version_id: int
+    note: str | None = Field(default=None, max_length=500)
+
+
+def evaluate_entries(pred, entries: list[dict], data_root) -> dict:
+    """Run the served model on manifest entries; metrics per signer and overall."""
+    from collections import Counter, defaultdict
+    from pathlib import Path
+
+    from isl_nova_ml.data import load_landmarks
+
+    known = {c["sign_id"] for c in pred.classes}
+    rows, skipped = [], Counter()
+    for e in entries:
+        if e["sign_id"] not in known:
+            skipped["class not in model"] += 1
+            continue
+        try:
+            frames, aspect = load_landmarks(Path(data_root) / e["landmarks_path"])
+        except (OSError, ValueError):
+            skipped["landmarks missing"] += 1
+            continue
+        out = pred.predict(frames, aspect, 5)
+        ids = [t["sign_id"] for t in out["top"]]
+        rows.append({"recording_id": e["recording_id"], "signer_id": e["signer_id"], "sign_id": e["sign_id"],
+                     "state": out["state"], "top1": ids[0] if ids else None, "correct": bool(ids) and ids[0] == e["sign_id"],
+                     "top5": e["sign_id"] in ids})
+    by = defaultdict(list)
+    for r in rows:
+        by[r["signer_id"]].append(r)
+    agg = lambda rs: {"n": len(rs), "top1": sum(r["correct"] for r in rs) / len(rs) if rs else None,  # noqa: E731
+                      "top5": sum(r["top5"] for r in rs) / len(rs) if rs else None,
+                      "states": dict(Counter(r["state"] for r in rs))}
+    return {"overall": agg(rows), "per_signer": {s: agg(rs) for s, rs in sorted(by.items())},
+            "signers": len(by), "classes_evaluated": len({r["sign_id"] for r in rows}), "skipped": dict(skipped),
+            "rows": rows}
+
+
+def _eval_job(state, rid: int, vid: int) -> None:
+    from .dataset import _manifest_for_version
+
+    with state.db.connect() as conn:
+        try:
+            p = state.models.predictor
+            if p is None:
+                raise RuntimeError("no active model")
+            fake = type("C", (), {"db": conn, "app": state})()
+            m = _manifest_for_version(fake, vid)
+            rep = evaluate_entries(p, m["entries"], state.settings.storage_dir)
+            rep.update(status="completed", dataset_version=m["dataset_version"], finished_at=utcnow())
+        except Exception as exc:  # noqa: BLE001 - stored on the run
+            rep = {"status": "failed", "error": str(exc)[:500], "finished_at": utcnow()}
+        old = jload(conn.scalar("SELECT report FROM evaluation_results WHERE id = ?", (rid,))) or {}
+        conn.update("evaluation_results", {"report": jdump({**old, **rep})}, "id = ?", (rid,))
+
+
+@router.post("/evaluation/runs", summary="Evaluate the active model on a dataset version (e.g. new signers)",
+             perm="experiments:write", body=EvalRunIn, status=201)
+def create_eval_run(ctx: Ctx):
+    b: EvalRunIn = ctx.body
+    p = ctx.app.models.predictor
+    if p is None:
+        raise ApiError(409, "model_unavailable", "promote a model before evaluating")
+    v = ctx.db.one("SELECT * FROM dataset_versions WHERE id = ?", (b.dataset_version_id,))
+    if not v:
+        raise not_found("dataset version")
+    sync_registry(ctx.app, ctx.db)
+    rid = ctx.db.insert("evaluation_results", {
+        "model_id": p.info["model_id"], "split": "new_signer", "created_at": utcnow(),
+        "report": jdump({"status": "running", "dataset_version": v["version"], "dataset_version_id": v["id"], "note": b.note,
+                         "model_training_data": p.info["lineage"].get("dataset_version")})})
+    audit(ctx.db, ctx.uid, "evaluation.run", f"{p.info['model_id']}:{v['version']}", ip=ctx.ip)
+    ctx.app.jobs.submit(_eval_job, ctx.app, rid, v["id"])
+    return _eval_row(ctx, rid)
+
+
+def _eval_row(ctx: Ctx, rid: int, rows: bool = False) -> dict:
+    r = ctx.db.one("SELECT * FROM evaluation_results WHERE id = ?", (rid,))
+    if not r:
+        raise not_found("evaluation run")
+    r["report"] = jload(r["report"]) or {}
+    if not rows:
+        r["report"].pop("rows", None)
+    return r
+
+
+@router.get("/evaluation/runs", summary="Evaluation runs on dataset versions", perm="experiments:read")
+def list_eval_runs(ctx: Ctx):
+    ids = [x["id"] for x in ctx.db.all("SELECT id FROM evaluation_results WHERE split = ? ORDER BY id DESC LIMIT 50",
+                                       ("new_signer",))]
+    return [_eval_row(ctx, i) for i in ids]
+
+
+@router.get("/evaluation/runs/{rid}", summary="Evaluation run detail with per-recording rows", perm="experiments:read")
+def get_eval_run(ctx: Ctx):
+    return _eval_row(ctx, int(ctx.params["rid"]), rows=True)

@@ -7,18 +7,19 @@ import { useMutation, useQuery } from '../lib/query';
 import { can, toast, useAuth } from '../lib/store';
 import type { ModelInfo } from '../lib/types';
 
-type Tab = 'model' | 'evaluation' | 'registry' | 'experiments' | 'contract';
+type Tab = 'model' | 'evaluation' | 'newsigners' | 'registry' | 'experiments' | 'contract';
 
 export function AILabPage() {
   const [tab, setTab] = useState<Tab>('model');
   return (
     <div className="space-y-5">
       <PageHeader kicker="NOVA AI Laboratory" title="AI Laboratory"
-        actions={<Tabs value={tab} onChange={setTab} tabs={[{ id: 'model', label: 'Active model' }, { id: 'evaluation', label: 'Evaluation' }, { id: 'registry', label: 'Registry' }, { id: 'experiments', label: 'Experiments' }, { id: 'contract', label: 'Feature contract' }]} />}>
+        actions={<Tabs value={tab} onChange={setTab} tabs={[{ id: 'model', label: 'Active model' }, { id: 'evaluation', label: 'Evaluation' }, { id: 'newsigners', label: 'New signers' }, { id: 'registry', label: 'Registry' }, { id: 'experiments', label: 'Experiments' }, { id: 'contract', label: 'Feature contract' }]} />}>
         Models, experiments and held-out evaluation. Metrics shown here are read from the artefacts written by the training pipeline. None are typed in by hand.
       </PageHeader>
       {tab === 'model' && <ActiveModel />}
       {tab === 'evaluation' && <Evaluation />}
+      {tab === 'newsigners' && <RequireAuth perm="experiments:read"><NewSigners /></RequireAuth>}
       {tab === 'registry' && <RequireAuth perm="experiments:read"><Registry /></RequireAuth>}
       {tab === 'experiments' && <RequireAuth perm="experiments:read"><Experiments /></RequireAuth>}
       {tab === 'contract' && <Contract />}
@@ -190,6 +191,67 @@ function Contract() {
         </dl>
         <p className="muted mt-4 text-xs">The browser runs a TypeScript port of this contract that is tested for numerical parity with the Python training code.</p>
       </Card>
+    </div>
+  );
+}
+
+function NewSigners() {
+  const { user } = useAuth();
+  const versions = useQuery<any[]>('/dataset/versions');
+  const runs = useQuery<any[]>('/evaluation/runs', { poll: 4000 });
+  const model = useQuery<ModelInfo>('/model/info');
+  const [vid, setVid] = useState('');
+  const [open, setOpen] = useState<number | null>(null);
+  const detail = useQuery<any>(open ? `/evaluation/runs/${open}` : null);
+  const start = useMutation(() => api('/evaluation/runs', { body: { dataset_version_id: Number(vid), note: 'new-signer evaluation' } }),
+    { invalidates: ['/evaluation/runs'], onSuccess: () => toast('Evaluation started') });
+  return (
+    <div className="space-y-4">
+      <Notice title="Estimate accuracy on people the model has never seen">
+        The INCLUDE results are not signer-independent. To measure generalisation, record consenting signers who are <b>not</b> in INCLUDE
+        (Dataset Lab → Signers &amp; consent → Recording Studio), approve the clips through review, freeze them as a dataset version, then evaluate it here.
+        Results are reported overall and per signer.
+      </Notice>
+      <Card title="Run an evaluation" subtitle={model.data?.available ? `Active model: ${model.data.model_id}` : 'No active model'}>
+        {can(user, 'experiments:write') ? (
+          <div className="flex flex-wrap items-end gap-3">
+            <Field label="Dataset version">{(id) => <Select id={id} value={vid} onChange={(e) => setVid(e.target.value)} className="w-72"><option value="">Choose…</option>{versions.data?.map((v) => <option key={v.id} value={v.id}>{v.version} · {v.summary.recordings} recordings · {v.summary.signers} signers</option>)}</Select>}</Field>
+            <Button variant="primary" icon="play" disabled={!vid || !model.data?.available} loading={start.pending} onClick={() => start.mutate(undefined)}>Evaluate</Button>
+          </div>
+        ) : <p className="muted text-sm">Requires the researcher or admin role.</p>}
+        {!versions.data?.length && <p className="muted mt-3 text-sm">No dataset versions yet: no new-signer recordings have been collected.</p>}
+        <ErrorNote error={start.error} />
+      </Card>
+      <Card title="Evaluation runs">
+        {!runs.data?.length ? <Empty icon="user" title="No new-signer evaluations yet">There are no results to show until recordings from new signers exist.</Empty> : (
+          <Table head={['#', 'Model', 'Dataset', 'Status', 'Recordings', 'Signers', 'Top-1', 'Top-5', '']}>
+            {runs.data.map((r) => (
+              <tr key={r.id}>
+                <td className="px-3 py-2 text-ink-400">{r.id}</td>
+                <td className="px-3 py-2 font-mono text-xs">{r.model_id}</td>
+                <td className="px-3 py-2">{r.report.dataset_version}</td>
+                <td className="px-3 py-2"><StatusBadge status={r.report.status === 'completed' ? 'succeeded' : r.report.status} /></td>
+                <td className="px-3 py-2 tabular-nums">{r.report.overall?.n ?? '-'}</td>
+                <td className="px-3 py-2 tabular-nums">{r.report.signers ?? '-'}</td>
+                <td className="px-3 py-2 tabular-nums">{fmt.pct(r.report.overall?.top1)}</td>
+                <td className="px-3 py-2 tabular-nums">{fmt.pct(r.report.overall?.top5)}</td>
+                <td className="px-3 py-2 text-right"><Button size="sm" onClick={() => setOpen(r.id)}>Per signer</Button></td>
+              </tr>
+            ))}
+          </Table>
+        )}
+      </Card>
+      {detail.data && (
+        <Card title={`Run #${detail.data.id}: per signer`} action={<Button size="sm" variant="ghost" icon="close" aria-label="Close" onClick={() => setOpen(null)} />}>
+          {detail.data.report.error ? <ErrorNote error={{ name: 'Error', status: 0, code: 'failed', message: detail.data.report.error } as any} /> : (
+            <Table head={['Signer', 'Recordings', 'Top-1', 'Top-5', 'States']}>
+              {Object.entries(detail.data.report.per_signer ?? {}).map(([sig, v]: [string, any]) => (
+                <tr key={sig}><td className="px-3 py-2 font-mono text-xs">{sig}</td><td className="px-3 py-2">{v.n}</td><td className="px-3 py-2">{fmt.pct(v.top1)}</td><td className="px-3 py-2">{fmt.pct(v.top5)}</td><td className="px-3 py-2 text-xs text-ink-400">{Object.entries(v.states).map(([k, n]) => `${k} ${n}`).join(' · ')}</td></tr>
+              ))}
+            </Table>
+          )}
+        </Card>
+      )}
     </div>
   );
 }

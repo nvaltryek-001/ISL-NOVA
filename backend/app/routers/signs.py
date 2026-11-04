@@ -71,9 +71,18 @@ class SignPatch(BaseModel):
     data_readiness: str | None = Field(default=None, pattern="^(excluded|auto)$")
 
 
+class VerifyChecklist(BaseModel):
+    reference_reviewed: bool = False   # watched the licensed reference recording(s)
+    form_matches_reference: bool = False  # handshape, location, movement, orientation agree
+    meaning_confirmed: bool = False    # the English meaning is an accurate gloss for this ISL sign
+
+
 class ReviewIn(BaseModel):
     to_status: str = Field(pattern="^(proposed|reference_found|review_pending|verified|rejected)$")
     note: str = Field(min_length=3, max_length=2000)
+    checklist: VerifyChecklist | None = None
+
+VERIFY_REQUIRED_FIELDS = ("linguistic_description", "hands_required", "movement_type")
 
 
 class TranslationIn(BaseModel):
@@ -172,6 +181,37 @@ def list_signs(ctx: Ctx):
         r["translations"] = tr[r["sign_id"]]
         r["bookmarked"] = r["sign_id"] in marks
     return {"items": rows, "total": total, "page": q.page, "size": q.size}
+
+
+@router.get("/signs/review-sheet.csv", summary="CSV review sheet of all signs for offline linguistic review",
+            perm="signs:review")
+def review_sheet(ctx: Ctx):
+    import csv
+    import io
+
+    from starlette.responses import Response
+
+    rows = ctx.db.all("SELECT s.sign_id, s.canonical_sign_name, s.category_label, s.verification_status, s.data_readiness, "
+                      "s.linguistic_description, s.hands_required, s.movement_type, s.non_manual_cue, s.regional_variation, "
+                      "s.reviewer, s.approval_date FROM signs s WHERE s.retired = ? ORDER BY s.sign_id", (False,))
+    tr = translations_for(ctx.db, [r["sign_id"] for r in rows])
+    refs = {r["sign_id"]: r for r in ctx.db.all("SELECT sign_id, source_url, doi FROM sign_references")}
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow(["sign_id", "name", "category", "status", "readiness", "english", "hindi", "kannada", "description", "hands",
+                "movement", "non_manual", "regional_variation", "reference", "reviewer", "approval_date",
+                "reviewer_decision (verify/reject/needs_changes)", "reviewer_notes"])
+    for r in rows:
+        t = tr[r["sign_id"]]
+        ref = refs.get(r["sign_id"], {})
+        w.writerow([r["sign_id"], r["canonical_sign_name"], r["category_label"], r["verification_status"], r["data_readiness"],
+                    t.get("en", {}).get("text", ""), t.get("hi", {}).get("text", ""), t.get("kn", {}).get("text", ""),
+                    r["linguistic_description"] or "", r["hands_required"] or "", r["movement_type"] or "",
+                    r["non_manual_cue"] or "", r["regional_variation"] or "", ref.get("source_url") or "",
+                    r["reviewer"] or "", r["approval_date"] or "", "", ""])
+    audit(ctx.db, ctx.uid, "sign.review_sheet_export", None, {"rows": len(rows)}, ctx.ip)
+    return Response(buf.getvalue(), media_type="text/csv",
+                    headers={"Content-Disposition": 'attachment; filename="isl-nova-review-sheet.csv"'})
 
 
 @router.get("/signs/categories", summary="Categories with slot counts", auth="none")
@@ -279,14 +319,22 @@ def review_sign(ctx: Ctx):
                        {"allowed": sorted(TRANSITIONS.get(cur, set()))})
     if b.to_status == "verified" and "linguist" not in ctx.roles:
         raise ApiError(403, "linguist_required", "only a qualified ISL reviewer (linguist role) can verify a sign")
+    if b.to_status == "verified":
+        missing = [f for f in VERIFY_REQUIRED_FIELDS if not s.get(f)]
+        if missing:
+            raise ApiError(422, "incomplete_entry", "document the sign before verifying it", {"missing_fields": missing})
+        ck = b.checklist
+        if not ck or not (ck.reference_reviewed and ck.form_matches_reference and ck.meaning_confirmed):
+            raise ApiError(422, "checklist_incomplete", "all three verification checklist items must be confirmed")
     now = utcnow()
     vals: dict = {"verification_status": b.to_status, "updated_at": now}
     if b.to_status == "verified":
         vals.update(reviewer=ctx.user["display_name"], approval_date=now)
     with ctx.db.transaction():
         ctx.db.update("signs", vals, "sign_id = ?", (sid,))
+        note = b.note if b.to_status != "verified" else f"{b.note} [checklist: reference reviewed, form matches, meaning confirmed]"
         ctx.db.insert("verification_events", {"sign_id": sid, "from_status": cur, "to_status": b.to_status,
-                                              "actor_id": ctx.uid, "note": b.note, "created_at": now})
+                                              "actor_id": ctx.uid, "note": note, "created_at": now})
         recompute_readiness(ctx.db, sid)
         audit(ctx.db, ctx.uid, "sign.review", sid, {"from": cur, "to": b.to_status}, ctx.ip)
     return get_sign(ctx)
