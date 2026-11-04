@@ -40,6 +40,8 @@ outside the vocabulary**, never used in training or threshold selection
 | Unknown signs wrongly *recognized* at τ = 0.673 | **29.3 %** |
 | Unknown signs answered *uncertain* / *unknown* | 36.0 % / 34.3 % |
 | Known signs recognized and correct at τ | 84.4 % |
+| False acceptance / false rejection at τ | 29.3 % / 12.1 % |
+| Unknown-detection precision / recall | 89.1 % / 70.7 % |
 
 Full threshold sweep: [research/OPEN_SET_EVALUATION.md](../research/OPEN_SET_EVALUATION.md).
 

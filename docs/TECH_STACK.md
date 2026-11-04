@@ -14,6 +14,9 @@
 | Computer vision | OpenCV, MediaPipe | **MediaPipe Tasks** (browser via jsDelivr, pinned 0.10.14; Python 0.10.32) + **OpenCV 5** for decoding/probing | |
 | ML | TensorFlow/Keras, PyTorch | **NumPy** LSTM and GRU with hand-written backprop (gradient-checked), scikit-learn logistic-regression baseline, DTW 1-NN | No DL framework installable; TCN/Transformer documented as next candidates |
 | Experiment tracking | MLflow | JSON artefacts per run (`model.json`, `metrics.json`, `training_log.jsonl`) + `experiments` tables | Not installable |
-| Infra | Docker, GitHub Actions | Multi-stage `Dockerfile`, `docker-compose.yml` (PostgreSQL 16), CI with SQLite + PostgreSQL tests, E2E and image build | |
+| Infra | Docker, GitHub Actions | Multi-stage `Dockerfile`, `docker-compose.yml` (PostgreSQL 16), CI with SQLite + PostgreSQL tests, E2E and image build; staged data/train/evaluation workflows; Render free plan for the demo | |
+| Local setup | - | `scripts/setup_windows.ps1`, `start_windows.ps1`, `test_windows.ps1` (Windows PowerShell 5.1 and 7), checked on a Windows runner by `windows-local.yml` | Developers on Windows can run everything without WSL or Docker |
 
 Pinned Python versions: `backend/requirements.txt`. Node: `frontend/package.json`.
+
+**Supported versions:** Python 3.11–3.13 (CI and the Windows runner use 3.13), Node.js 20+ (CI uses 22), Chromium-based browsers, Firefox and Safari with camera access on `https://` or `localhost`. PostgreSQL 16 for persistent deployments; SQLite otherwise.

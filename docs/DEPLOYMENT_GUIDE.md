@@ -2,6 +2,10 @@
 
 **Status: not deployed.** No hosting credentials were provided, and none were created. No paid resources were provisioned. There is no live URL.
 
+## 0. Local development (Windows, Linux, macOS)
+
+Windows: `scripts\setup_windows.ps1`, then `scripts\start_windows.ps1` (see the README section *Windows setup*). Linux/macOS: the README *Quick start*. Both use SQLite and install the trained model with `scripts/fetch_model.py`. After starting, `python scripts/check_predictions.py --base http://127.0.0.1:8000` sends 24 held-out INCLUDE sequences through your server.
+
 ## 1. Local, production-like (Docker Compose)
 
 ```bash
