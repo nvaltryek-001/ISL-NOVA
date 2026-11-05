@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  actions: read   # train_windows.ps1 downloads the landmark artifact
 
 jobs:
   windows:
@@ -36,6 +37,13 @@ jobs:
           # held-out INCLUDE test landmarks (from the model release) through the recognition API
           .\.venv\Scripts\python.exe scripts\check_predictions.py --base http://127.0.0.1:8000
           if ($LASTEXITCODE -ne 0) { throw "prediction check failed" }
+          # a second start on the same port must refuse instead of reporting the old server
+          powershell -ExecutionPolicy Bypass -File scripts\start_windows.ps1 -Background -Port 8000
+          if ($LASTEXITCODE -eq 0) { throw "second start on a busy port should fail" }
+          $global:LASTEXITCODE = 0
           Get-Process python -ErrorAction SilentlyContinue | Stop-Process -Force
+      - name: train_windows.ps1 (download INCLUDE landmarks, train logistic regression on real data)
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: .\scripts\train_windows.ps1 -Model pooled-logreg
       - name: test_windows.ps1 -E2E -WithModel
         run: .\scripts\test_windows.ps1 -E2E -WithModel

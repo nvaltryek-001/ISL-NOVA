@@ -55,6 +55,14 @@ $origins = @("http://127.0.0.1:$Port", "http://localhost:$Port")
 if ($env:CORS_ORIGINS) { $origins += $env:CORS_ORIGINS.Split(",") }
 $env:CORS_ORIGINS = ($origins | Select-Object -Unique) -join ","
 
+# refuse to start if something already listens on the port (e.g. an earlier ISL NOVA window)
+$busy = $false
+try { $c = New-Object System.Net.Sockets.TcpClient; $c.Connect("127.0.0.1", $Port); $busy = $c.Connected; $c.Close() } catch { $busy = $false }
+if ($busy) {
+  Fail ("port $Port is already in use. Is ISL NOVA already running in another window? Open $base, " +
+        "stop the other server with Ctrl+C, or start on another port: scripts\start_windows.ps1 -Port 8080")
+}
+
 # database migrations are idempotent
 & $venvPy -m app.migrate | Out-Null
 if ($LASTEXITCODE -ne 0) { Fail "database migration failed; check DATABASE_URL in .env" }

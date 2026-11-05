@@ -413,7 +413,13 @@ powershell -ExecutionPolicy Bypass -File scripts\start_windows.ps1
 powershell -ExecutionPolicy Bypass -File scripts\test_windows.ps1              # lint, pytest, tsc, unit
 powershell -ExecutionPolicy Bypass -File scripts\test_windows.ps1 -E2E -WithModel   # + browser E2E with the model
 
-# 5. check recognition through your running server (24 held-out INCLUDE sequences)
+# 5. download the processed INCLUDE dataset (176 MB of landmarks) and train locally
+#    needs the GitHub CLI once: winget install GitHub.cli ; gh auth login
+powershell -ExecutionPolicy Bypass -File scripts\train_windows.ps1                  # LSTM (released recipe)
+powershell -ExecutionPolicy Bypass -File scripts\train_windows.ps1 -Model all       # LSTM, GRU, LogReg, DTW
+powershell -ExecutionPolicy Bypass -File scripts\train_windows.ps1 -Promote         # make the new model active
+
+# 6. check recognition through your running server (24 held-out INCLUDE sequences)
 .\.venv\Scripts\python.exe scripts\check_predictions.py --base http://127.0.0.1:8000
 ```
 
@@ -457,7 +463,15 @@ This downloads the tarball and its `.sha256`, verifies both, unpacks path-safely
 | `deploy-smoke.yml` | `run/deploy-smoke` | Read-only checks of a running deployment |
 | `windows-local.yml` | `run/windows-check` | The Windows setup, start and test scripts |
 
-**Or locally**, with the INCLUDE videos on your disk:
+**Train locally on the processed landmarks (recommended).** `scripts/train_local.py` (Windows wrapper: `scripts\train_windows.ps1`) downloads the 3,370 landmark sequences that the data workflow extracted (artifact `include-landmarks-v1`, 176 MB, needs the [GitHub CLI](https://cli.github.com/) signed in with `gh auth login`, or download the zip from [the run page](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41764539272) and pass `--data <folder>`). It then trains with the same configs, official split and validation-only selection as CI and prints a comparison table. New models are registered but **not promoted** unless you pass `--promote`. The artifact expires in early February 2027; after that, rerun the data workflow or use the raw videos below.
+
+```bash
+python scripts/train_local.py --model lstm          # or gru, pooled-logreg, dtw-1nn, all; --promote
+```
+
+For reference, training the LSTM took about 8.5 minutes on a 4-vCPU GitHub runner (early stop at epoch 49). Logistic regression is the quickest way to check your setup.
+
+**Or from the raw INCLUDE videos** on your disk:
 
 ```bash
 # 1. INCLUDE videos (56.8 GB): https://zenodo.org/records/4010759
