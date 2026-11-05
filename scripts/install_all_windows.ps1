@@ -83,8 +83,10 @@ if ($busy) {
   & $venvPy scripts\check_predictions.py --base "http://127.0.0.1:$Port"
   $checkOk = ($LASTEXITCODE -eq 0)
 } else {
-  & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "start_windows.ps1") -Background -Port $Port | Out-Host
+  # run in-process: a child PowerShell whose output is piped would wait for the background server to exit
+  & (Join-Path $PSScriptRoot "start_windows.ps1") -Background -NoBrowser -Port $Port
   if ($LASTEXITCODE -ne 0) { Fail "the server did not start; see storage\server.log.err" }
+  Set-Location $Root
   & $venvPy scripts\check_predictions.py --base "http://127.0.0.1:$Port"
   $checkOk = ($LASTEXITCODE -eq 0)
   Get-CimInstance Win32_Process -Filter "Name='python.exe'" -ErrorAction SilentlyContinue |
