@@ -74,6 +74,7 @@
 
 **Run it**
 - [Quick start](#-quick-start)
+- [One-command install](#-one-command-install-everything)
 - [Windows setup](#-windows-setup)
 - [Database setup](#-database-setup)
 - [Model installation](#-model-installation)
@@ -387,6 +388,24 @@ uvicorn app.main:app --app-dir backend --port 8000
 ```
 
 Open <http://localhost:8000>, sign in with the bootstrap admin and go to **Live Recognition**. API docs: <http://localhost:8000/api/docs>. Run `cd frontend && npm run dev` in a second terminal to rebuild the client on change.
+
+## ⚡ One-command install (everything)
+
+One script sets up **everything** in a single run: packages, the frontend build, `.env`, the database, the trained model, the MediaPipe files and the INCLUDE dataset. It then checks recognition end to end, and can train and start the app. It was checked on **Windows, Ubuntu and macOS** runners ([run 41977728731](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41977728731)): 24/24 held-out sequences, and logistic regression trained to 89.1–89.3 % top-1.
+
+**Windows (PowerShell):**
+```powershell
+git clone https://github.com/nvaltryek-001/ISL-NOVA.git ; cd ISL-NOVA ; git checkout feat/isl-nova-platform
+powershell -ExecutionPolicy Bypass -File scripts\install_all_windows.ps1 -Start
+#   add -Train lstm (or -Train all) to also train; -SkipDataset to skip the 176 MB download
+```
+
+**Linux / macOS (bash):**
+```bash
+git clone https://github.com/nvaltryek-001/ISL-NOVA.git && cd ISL-NOVA && git checkout feat/isl-nova-platform
+bash scripts/install_all.sh --start          # --train lstm | all · --skip-dataset · --port 8080
+bash scripts/start.sh                        # later starts
+```
 
 ## 🪟 Windows setup
 
