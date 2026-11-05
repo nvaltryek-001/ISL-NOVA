@@ -1,0 +1,64 @@
+source_gloss,source_category,reason,external_videos
+actor,Jobs,low everyday priority,14
+adult,People,overlaps with 'man'/'woman',20
+alive,Adjectives,low everyday priority,8
+artist,Jobs,low everyday priority,14
+attack,Society,violence-related; low priority for assistive use,15
+author,Jobs,low everyday priority,14
+box,Home,low everyday priority,14
+card,Home,ambiguous gloss,14
+colour,Colours,generic; colour names kept instead,20
+cool,Adjectives,ambiguous (temperature vs slang),21
+court,Places,low everyday priority,23
+crowd,People,low everyday priority,20
+curved,Adjectives,low communication priority,8
+death,Society,overlaps with 'dead',14
+deep,Adjectives,low communication priority,8
+dream,Home,abstract,14
+election,Society,low everyday priority,14
+energy,Society,abstract,14
+exmonsoon,Seasons,source gloss unclear,14
+fall,Seasons,ambiguous English gloss (season vs action),15
+famous,Adjectives,low everyday priority,8
+female,Adjectives,overlaps with 'woman',8
+flat,Adjectives,ambiguous (apartment vs level),8
+god,Society,abstract,14
+ground,Places,ambiguous gloss,21
+gun,Society,violence-related; low priority for assistive use,14
+king,People,low everyday priority,20
+lamp,Electronics,overlaps with light-related signs,14
+light,Adjectives,ambiguous English gloss (weight vs illumination),8
+loose,Adjectives,low communication priority,8
+male,Adjectives,overlaps with 'man',8
+mean,Adjectives,ambiguous English gloss (unkind vs average),8
+mouse,Animals,ambiguous (animal vs computer device),20
+narrow,Adjectives,low communication priority,21
+page,Home,low everyday priority,14
+paint,Home,ambiguous (verb vs noun),15
+peace,Society,abstract,14
+player,People,low everyday priority,20
+pocket,Clothes,low everyday priority,20
+president,People,low everyday priority,20
+priest,Jobs,low everyday priority,15
+queen,People,low everyday priority,20
+raceethnicity,Society,sensitive/abstract; needs community review before use,14
+religion,Society,abstract,14
+reporter,Jobs,low everyday priority,14
+ring,Home,ambiguous (jewellery vs phone ring),14
+science,Society,abstract,14
+screen,Electronics,low everyday priority,14
+secondnumber,Days and Time,ambiguous with 'second' (time); keep one,8
+secretary,Jobs,low everyday priority,14
+shallow,Adjectives,low communication priority,8
+skirt,Clothes,low everyday priority,19
+soldier,Jobs,low everyday priority,14
+suit,Clothes,low everyday priority,19
+team,Society,low everyday priority,14
+technology,Society,abstract,14
+temple,Places,low everyday priority,21
+thick,Adjectives,low communication priority,8
+thin,Adjectives,low communication priority,4
+tight,Adjectives,low communication priority,8
+tool,Home,generic gloss,14
+war,Society,violence-related; low priority for assistive use,14
+wide,Adjectives,low communication priority,21

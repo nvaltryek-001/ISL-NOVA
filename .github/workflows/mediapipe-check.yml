@@ -1,0 +1,42 @@
+# Diagnostic: does in-browser MediaPipe load in CI Chromium? (~5 min)
+# Manual: push run/mediapipe-check.
+name: Browser MediaPipe check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["run/mediapipe-check"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: pip install -r backend/requirements.txt
+      - working-directory: frontend
+        run: npm install --no-audit --no-fund && npm run build && npx playwright install --with-deps chromium
+      - name: Start ISL NOVA
+        run: |
+          (cd backend && DATABASE_URL=sqlite:///$RUNNER_TEMP/db.sqlite STORAGE_DIR=$RUNNER_TEMP/obj MODEL_REGISTRY_DIR=$RUNNER_TEMP/m \
+            PYTHONPATH=$GITHUB_WORKSPACE/backend:$GITHUB_WORKSPACE/ml nohup python -m uvicorn app.main:app --port 8000 > $RUNNER_TEMP/server.log 2>&1 &)
+          for i in $(seq 1 30); do curl -fsS localhost:8000/api/v1/health >/dev/null && break; sleep 2; done
+      - name: Default flags
+        working-directory: frontend
+        run: node tests/live-eval/mediapipe_check.mjs http://127.0.0.1:8000 ../default.json
+      - name: SwiftShader WebGL
+        working-directory: frontend
+        run: node tests/live-eval/mediapipe_check.mjs http://127.0.0.1:8000 ../swiftshader.json --use-angle=swiftshader --enable-unsafe-swiftshader
+      - name: File-backed fake camera (as in the virtual-camera evaluation)
+        working-directory: frontend
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg
+          ffmpeg -loglevel error -f lavfi -i testsrc=size=640x480:rate=25 -t 3 -pix_fmt yuv420p "$RUNNER_TEMP/clip.y4m"
+          node tests/live-eval/mediapipe_check.mjs http://127.0.0.1:8000 ../file.json "--use-file-for-fake-video-capture=$RUNNER_TEMP/clip.y4m"

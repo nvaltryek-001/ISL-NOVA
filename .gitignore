@@ -1,3 +1,36 @@
-node_modules/
+# dependencies / builds
+node_modules
+frontend/dist/
 __pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+.venv/
+
+# secrets
 .env
+.env.*
+!.env.example
+
+# data and artefacts that must never be committed
+data/
+storage/
+artifacts/
+*.task
+*.tflite
+*.mp4
+*.mov
+*.MOV
+*.webm
+*.avi
+*.npz
+!frontend/tests/fixtures/*.json
+
+# local databases / logs
+*.db
+*.sqlite3
+*.log
+test-results/
+playwright-report/

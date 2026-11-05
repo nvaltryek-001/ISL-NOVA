@@ -1,0 +1,46 @@
+# Runs the one-command local installers exactly as a developer would, on
+# Windows, Ubuntu and macOS. Manual: push run/local-install.
+name: One-command local install
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["run/local-install"]
+
+permissions:
+  contents: read
+
+jobs:
+  unix:
+    strategy:
+      fail-fast: false
+      matrix: { os: [ubuntu-24.04, macos-14] }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: bash scripts/install_all.sh --train pooled-logreg
+        run: PYTHON=python bash scripts/install_all.sh --train pooled-logreg
+      - name: start.sh serves the app
+        run: |
+          bash scripts/start.sh --port 8011 > start.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8011/api/v1/model/info && break; sleep 1; done | head -c 200
+          curl -fsS http://127.0.0.1:8011/api/v1/model/info | grep -q '"available": *true'
+          ! bash scripts/start.sh --port 8011   # second start must refuse the busy port
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults: { run: { shell: powershell } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: install_all_windows.ps1 -Train pooled-logreg
+        run: .\scripts\install_all_windows.ps1 -Train pooled-logreg -Python python

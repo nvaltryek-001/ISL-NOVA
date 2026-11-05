@@ -1,0 +1,6 @@
+{
+  "data_run_id": 41764539272,
+  "epochs": 60,
+  "publish_release": true,
+  "purpose": "train LSTM, GRU, logistic regression and DTW on include-official-v1 landmarks (3,370 sequences, 200 classes)"
+}

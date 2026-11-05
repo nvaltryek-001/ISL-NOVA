@@ -1,0 +1,122 @@
+# Stage 1: download INCLUDE (CC BY 4.0) from Zenodo, extract MediaPipe landmarks,
+# merge into a versioned landmark dataset. Manual trigger only.
+# Raw videos never leave the runner; only landmarks + manifests are uploaded.
+name: INCLUDE data pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Optional comma-separated zip names or category prefixes (empty = all parts)"
+        required: false
+        default: ""
+      max_parallel:
+        description: "Parallel extraction jobs (keep moderate to respect Zenodo)"
+        required: false
+        default: "8"
+  # workflow_dispatch only works once this file is on the default branch; until
+  # then a run is started explicitly by pushing the dedicated run branch, with
+  # its settings recorded in ml/runs/include-data.json
+  push:
+    branches: ["run/include-data"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: include-data
+  cancel-in-progress: false
+
+env:
+  HAND_MODEL_URL: https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
+  POSE_MODEL_URL: https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task
+  PYTHONPATH: ml
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      parts: ${{ steps.parts.outputs.parts }}
+      max_parallel: ${{ steps.cfg.outputs.max_parallel }}
+      reserve: ${{ steps.cfg.outputs.reserve }}
+      version: ${{ steps.cfg.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: pip install -r backend/requirements.txt
+      - id: cfg
+        name: Run settings (dispatch inputs, else ml/runs/include-data.json)
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          cfg = json.load(open("ml/runs/include-data.json")) if os.path.exists("ml/runs/include-data.json") else {}
+          only = "${{ inputs.only }}" if "${{ github.event_name }}" == "workflow_dispatch" else cfg.get("only", "")
+          par = "${{ inputs.max_parallel }}" if "${{ github.event_name }}" == "workflow_dispatch" else str(cfg.get("max_parallel", 8))
+          print(f"only={only}"); print(f"max_parallel={par}")
+          print("reserve=" + str(cfg.get("include_reserve", False)).lower()); print("version=" + cfg.get("version", "include-official-v1"))
+          PY
+      - name: Runner resources
+        run: |
+          { echo "## Runner"; echo '```'; nproc; free -h; df -h /; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Preflight (Zenodo record, licence, vocabulary mapping, estimates)
+        run: python -m isl_nova_ml.include_pipeline preflight --out preflight.json
+      - name: MediaPipe model files
+        run: |
+          curl -fsSL -o hand.task "$HAND_MODEL_URL" && curl -fsSL -o pose.task "$POSE_MODEL_URL"
+          sha256sum hand.task pose.task | tee models.sha256
+      - id: parts
+        run: echo "parts=$(python -m isl_nova_ml.include_pipeline parts --only '${{ steps.cfg.outputs.only }}')" >> "$GITHUB_OUTPUT"
+      - name: Summary
+        run: |
+          { echo "## Preflight"; echo '```json'; cat preflight.json; echo '```'; echo "## Model files"; echo '```'; cat models.sha256; echo '```'; echo "Parts: ${{ steps.parts.outputs.parts }}"; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: { name: preflight, path: "preflight.json\nmodels.sha256", retention-days: 30 }
+
+  extract:
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ fromJson(needs.preflight.outputs.max_parallel) }}
+      matrix:
+        part: ${{ fromJson(needs.preflight.outputs.parts) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libgl1
+      - run: pip install -r backend/requirements.txt
+      - name: MediaPipe models
+        run: curl -fsSL -o hand.task "$HAND_MODEL_URL" && curl -fsSL -o pose.task "$POSE_MODEL_URL"
+      - id: name
+        run: echo "safe=$(echo '${{ matrix.part }}' | tr -c 'A-Za-z0-9._-' '_')" >> "$GITHUB_OUTPUT"
+      - name: Download, verify, extract landmarks (raw video deleted afterwards)
+        run: |
+          python -m isl_nova_ml.include_pipeline extract-part --part "${{ matrix.part }}" \
+            --out out --work "$RUNNER_TEMP/work" --hand-model hand.task --pose-model pose.task ${{ needs.preflight.outputs.reserve == 'true' && '--include-reserve' || '' }}
+      - uses: actions/upload-artifact@v4
+        with: { name: "landmarks-${{ steps.name.outputs.safe }}", path: out, retention-days: 14 }
+
+  merge:
+    needs: [preflight, extract]
+    if: ${{ always() && needs.preflight.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: pip install -r backend/requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { pattern: "landmarks-*", path: parts }
+      - name: Merge into versioned landmark dataset
+        run: python -m isl_nova_ml.include_pipeline merge --inputs parts --out include-landmarks --version ${{ needs.preflight.outputs.version }}
+      - name: Summary
+        if: always()
+        run: |
+          { echo "## Merged dataset"; echo '```json'; python -c "import json;print(json.dumps(json.load(open('include-landmarks/manifest.json'))['summary'],indent=2))"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: { name: "${{ needs.preflight.outputs.version == 'include-official-v1' && 'include-landmarks-v1' || format('landmarks-{0}', needs.preflight.outputs.version) }}", path: include-landmarks, retention-days: 90 }

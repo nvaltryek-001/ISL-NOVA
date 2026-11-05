@@ -1,0 +1,7 @@
+{
+  "only": "",
+  "max_parallel": 8,
+  "include_reserve": true,
+  "version": "include-official-v2",
+  "purpose": "re-extract all parts including the 63 reserve glosses as held-out unknown classes for open-set evaluation"
+}
