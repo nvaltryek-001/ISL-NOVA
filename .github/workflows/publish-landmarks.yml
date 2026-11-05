@@ -1,0 +1,54 @@
+# Publishes the processed INCLUDE landmark dataset (derived from INCLUDE,
+# CC BY 4.0) as a pre-release asset, so local training needs no GitHub sign-in
+# and does not depend on the 90-day artifact retention. Raw videos are not
+# included. Manual: push run/publish-landmarks.
+name: Publish landmark dataset
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["run/publish-landmarks"]
+
+permissions:
+  contents: write   # create the release
+  actions: read     # download the artifact from the data run
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      TAG: dataset-include-landmarks-v1
+      DATA_RUN: "41764539272"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: include-landmarks-v1
+          path: include-landmarks-v1
+          run-id: ${{ env.DATA_RUN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Package with attribution
+        run: |
+          test -f include-landmarks-v1/manifest.json
+          cp dataset/sources/include/LICENSE-AI4Bharat-INCLUDE-code.txt include-landmarks-v1/
+          cat > include-landmarks-v1/ATTRIBUTION.md <<'TXT'
+          # ISL NOVA processed landmarks: include-official-v1
+          MediaPipe hand + pose landmarks extracted by ISL NOVA from the INCLUDE dataset:
+          A. Sridhar, R. G. Ganesan, P. Kumar, M. Khapra. "INCLUDE: A Large Scale Dataset for
+          Indian Sign Language Recognition." ACM Multimedia 2020. doi:10.1145/3394171.3413528.
+          Original data: https://zenodo.org/records/4010759, licensed CC BY 4.0
+          (https://creativecommons.org/licenses/by/4.0/). Changes: videos converted to landmark
+          coordinates with MediaPipe; no video is included. Produced by GitHub Actions run 41764539272.
+          TXT
+          tar -czf include-landmarks-v1.tar.gz include-landmarks-v1
+          sha256sum include-landmarks-v1.tar.gz | tee include-landmarks-v1.tar.gz.sha256
+          ls -la include-landmarks-v1.tar.gz
+      - name: Create or update the pre-release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create "$TAG" -R "$GITHUB_REPOSITORY" --prerelease --target "$GITHUB_SHA" \
+              --title "INCLUDE landmark dataset (include-official-v1)" \
+              --notes "3,370 MediaPipe landmark sequences for the 200 ISL NOVA classes (INCLUDE official train/val/test split), derived from INCLUDE (Sridhar et al., ACM MM 2020), CC BY 4.0. No video. Used by scripts/train_local.py. See ATTRIBUTION.md inside the archive."
+          gh release upload "$TAG" include-landmarks-v1.tar.gz include-landmarks-v1.tar.gz.sha256 --clobber -R "$GITHUB_REPOSITORY"

@@ -6,11 +6,11 @@
     python scripts/train_local.py --model pooled-logreg # fastest (about a minute)
     python scripts/train_local.py --promote             # make the new model the active one
 
-Data: the 3,370 landmark sequences (176 MB) that the `INCLUDE data pipeline`
-workflow extracted from the INCLUDE videos (CC BY 4.0). They are a GitHub
-Actions artifact of run 41764539272, so downloading them needs the GitHub CLI
-(`gh`, signed in with `gh auth login`). Alternatively download the artifact zip
-from the run page in a browser, unzip it and pass --data <folder>.
+Data: the 3,370 landmark sequences (~176 MB) that the `INCLUDE data pipeline`
+workflow extracted from the INCLUDE videos (CC BY 4.0, attribution in the
+archive). They are downloaded from the GitHub release
+`dataset-include-landmarks-v1` (no sign-in, SHA-256 verified). Fallbacks: the
+GitHub CLI (`gh run download`), or --data <folder> with the unzipped artifact.
 
 Training uses the INCLUDE official train/val/test split, selects on
 validation and evaluates the test split once, exactly as in CI. A new model is
@@ -21,11 +21,16 @@ restarted to load a newly promoted model. Works on Windows, macOS and Linux.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import io
 import json
 import shutil
 import subprocess
 import sys
+import tarfile
 import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +39,7 @@ sys.path[:0] = [str(ROOT / "backend"), str(ROOT / "ml")]
 REPO = "nvaltryek-001/ISL-NOVA"
 DATA_RUN = "41764539272"
 ARTIFACT = "include-landmarks-v1"
+RELEASE = "dataset-include-landmarks-v1"
 CONFIGS = {"lstm": "lstm_baseline.json", "gru": "gru.json", "pooled-logreg": "pooled-logreg.json", "dtw-1nn": "dtw-1nn.json"}
 
 
@@ -42,17 +48,48 @@ def fail(msg: str) -> None:
     raise SystemExit(1)
 
 
+def _https_get(url: str) -> bytes:
+    if not url.startswith("https://"):
+        fail(f"refusing non-https URL {url}")
+    req = urllib.request.Request(url, headers={"User-Agent": "isl-nova-train-local"})  # noqa: S310
+    with urllib.request.urlopen(req, timeout=600) as r:  # noqa: S310 - https only, checked above
+        return r.read()
+
+
+def from_release(data: Path) -> bool:
+    """Download the published landmark archive (no sign-in needed) and verify its SHA-256."""
+    base = f"https://github.com/{REPO}/releases/download/{RELEASE}"
+    try:
+        print(f"data: downloading {RELEASE} (~176 MB) from GitHub releases ...")
+        want = _https_get(f"{base}/{ARTIFACT}.tar.gz.sha256").decode().split()[0]
+        blob = _https_get(f"{base}/{ARTIFACT}.tar.gz")
+    except urllib.error.URLError as e:
+        print(f"data: release download not available ({e})")
+        return False
+    got = hashlib.sha256(blob).hexdigest()
+    if got != want:
+        fail(f"checksum mismatch for the dataset archive (expected {want}, got {got})")
+    data.parent.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(fileobj=io.BytesIO(blob)) as tf:
+        tf.extractall(data.parent, filter="data")  # archive root is include-landmarks-v1/
+    if (data.parent / ARTIFACT) != data and (data.parent / ARTIFACT).exists():
+        shutil.move(str(data.parent / ARTIFACT), str(data))
+    print(f"data: SHA-256 verified, extracted to {data}")
+    return (data / "manifest.json").exists()
+
+
 def ensure_data(data: Path, run_id: str) -> Path:
     if (data / "manifest.json").exists():
         print(f"data: using {data}")
         return data
+    if from_release(data):
+        return data
     gh = shutil.which("gh")
     if not gh:
-        fail(f"no dataset at {data} and the GitHub CLI is not installed.\n"
-             f"  Option 1: install it (https://cli.github.com/), run `gh auth login`, then rerun this script.\n"
-             f"  Option 2: open https://github.com/{REPO}/actions/runs/{run_id}, download the '{ARTIFACT}' artifact,\n"
-             f"            unzip it into {data} (so that {data / 'manifest.json'} exists) and rerun.")
-    print(f"data: downloading artifact '{ARTIFACT}' from run {run_id} (~176 MB) ...")
+        fail(f"no dataset at {data}, the release download failed and the GitHub CLI is not installed.\n"
+             f"  Open https://github.com/{REPO}/actions/runs/{run_id} while signed in, download the '{ARTIFACT}' artifact,\n"
+             f"  unzip it into {data} (so that {data / 'manifest.json'} exists) and rerun.")
+    print(f"data: downloading artifact '{ARTIFACT}' from run {run_id} with the GitHub CLI ...")
     data.mkdir(parents=True, exist_ok=True)
     r = subprocess.run([gh, "run", "download", run_id, "-R", REPO, "-n", ARTIFACT, "-D", str(data)])  # noqa: S603
     if r.returncode != 0 or not (data / "manifest.json").exists():
