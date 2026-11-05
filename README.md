@@ -25,7 +25,8 @@
   <a href="#-results"><b>📊 Results</b></a> ·
   <a href="#-implemented-vs-tested"><b>🧪 What is tested</b></a> ·
   <a href="#-windows-setup"><b>🪟 Windows setup</b></a> ·
-  <a href="docs/MODEL_CARD.md"><b>📄 Model card</b></a>
+  <a href="docs/MODEL_CARD.md"><b>📄 Model card</b></a> ·
+  <a href="docs/report/ISL_NOVA_Project_Report.pdf"><b>📘 Project report (PDF)</b></a>
 </p>
 
 <img src="docs/screenshots/dashboard-model.png" alt="ISL NOVA dashboard with the trained 200-class model live" width="100%" />

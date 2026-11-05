@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ISL NOVA: Project Report</title>
+<style>
+@page { size: A4; margin: 0; }
+:root {
+  --ink: #1e1b4b; --text: #334155; --muted: #64748b; --line: #e2e8f0; --soft: #f5f3ff; --soft2: #ecfeff;
+  --v: #6d28d9; --v2: #8b5cf6; --c: #0891b2; --g: #059669; --a: #d97706; --r: #e11d48;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: "Inter", sans-serif; color: var(--text); font-size: 9.6pt; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 210mm; height: 297mm; padding: 14mm 15mm 16mm; position: relative; overflow: hidden; page-break-after: always; background: #fff; }
+.page:last-child { page-break-after: auto; }
+.foot { position: absolute; bottom: 7mm; left: 15mm; right: 15mm; display: flex; justify-content: space-between; font-size: 7.5pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 2mm; }
+.chapter { display: flex; align-items: center; gap: 4mm; margin: -14mm -15mm 6mm; padding: 9mm 15mm 7mm; background: linear-gradient(120deg, #1e1b4b 0%, #4c1d95 55%, #0e7490 100%); color: #fff; }
+.chapter .num { font-size: 30pt; font-weight: 800; opacity: .9; line-height: 1; }
+.chapter h1 { margin: 0; font-size: 19pt; letter-spacing: -.01em; }
+.chapter p { margin: 1mm 0 0; font-size: 9pt; opacity: .85; }
+.cont { margin: -14mm -15mm 6mm; padding: 6mm 15mm; border-bottom: 1px solid var(--line); color: var(--v); font-weight: 700; font-size: 9pt; letter-spacing: .04em; text-transform: uppercase; }
+h2 { font-size: 12.5pt; color: var(--ink); margin: 4mm 0 2mm; letter-spacing: -.01em; }
+h2::before { content: ""; display: inline-block; width: 3mm; height: 3mm; border-radius: 1mm; background: var(--v); margin-right: 2mm; vertical-align: 1px; }
+h3 { font-size: 10pt; color: var(--ink); margin: 3mm 0 1mm; }
+p { margin: 0 0 2.2mm; }
+.lead { font-size: 10.5pt; color: var(--ink); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; }
+.card { border: 1px solid var(--line); border-radius: 3mm; padding: 3mm 3.5mm; background: #fff; }
+.card.v { background: var(--soft); border-color: #ddd6fe; }
+.card.c { background: var(--soft2); border-color: #a5f3fc; }
+.card.g { background: #ecfdf5; border-color: #a7f3d0; }
+.card.a { background: #fffbeb; border-color: #fde68a; }
+.card.r { background: #fff1f2; border-color: #fecdd3; }
+.card h4 { margin: 0 0 1mm; font-size: 9.6pt; color: var(--ink); }
+.card p, .card li { font-size: 8.6pt; }
+.stat { text-align: left; }
+.stat b { display: block; font-size: 17pt; color: var(--v); line-height: 1.1; letter-spacing: -.02em; }
+.stat span { font-size: 7.8pt; color: var(--muted); }
+.stat.c b { color: var(--c); } .stat.g b { color: var(--g); } .stat.a b { color: var(--a); } .stat.r b { color: var(--r); }
+table { width: 100%; border-collapse: collapse; font-size: 8.4pt; margin: 1mm 0 3mm; }
+th { background: #f1f5f9; color: var(--ink); text-align: left; font-weight: 700; padding: 1.6mm 2mm; border-bottom: 1px solid #cbd5e1; }
+td { padding: 1.4mm 2mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+tr.best td { background: #f5f3ff; font-weight: 600; }
+figure { margin: 0 0 3mm; }
+figure img { width: 100%; display: block; border-radius: 2mm; }
+figure.shot img { border: 1px solid var(--line); box-shadow: 0 1.5mm 4mm rgba(30, 27, 75, .10); }
+figcaption { font-size: 7.8pt; color: var(--muted); margin-top: 1.2mm; }
+ul { margin: 0 0 2mm; padding-left: 4.5mm; } li { margin: .6mm 0; }
+.pill { display: inline-block; padding: .4mm 2mm; border-radius: 10mm; font-size: 7.4pt; font-weight: 700; background: #ede9fe; color: var(--v); margin: 0 1mm 1mm 0; }
+.pill.c { background: #cffafe; color: #0e7490; } .pill.g { background: #d1fae5; color: #047857; } .pill.a { background: #fef3c7; color: #b45309; } .pill.r { background: #ffe4e6; color: #be123c; }
+.note { border-left: 1.2mm solid var(--a); background: #fffbeb; padding: 2.5mm 3.5mm; border-radius: 0 2mm 2mm 0; font-size: 8.6pt; margin: 2mm 0 3mm; }
+.note.v { border-color: var(--v); background: var(--soft); }
+.note.r { border-color: var(--r); background: #fff1f2; }
+code, .mono { font-family: "DejaVu Sans Mono", monospace; font-size: 7.8pt; }
+pre { font-family: "DejaVu Sans Mono", monospace; font-size: 7.4pt; line-height: 1.45; background: #0f172a; color: #e2e8f0; border-radius: 2.5mm; padding: 3mm 3.5mm; margin: 0 0 3mm; white-space: pre; overflow: hidden; }
+pre .k { color: #c4b5fd; } pre .c { color: #67e8f9; } pre .m { color: #94a3b8; }
+/* flow diagrams */
+.flow { display: flex; align-items: stretch; gap: 0; margin: 2mm 0 3mm; }
+.flow .box { flex: 1; border-radius: 2.5mm; padding: 2.4mm 2mm; text-align: center; font-size: 7.8pt; color: #fff; display: flex; flex-direction: column; justify-content: center; min-height: 15mm; }
+.flow .box b { font-size: 8.6pt; display: block; margin-bottom: .6mm; }
+.flow .arr { width: 5mm; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 12pt; font-weight: 700; }
+.b1 { background: linear-gradient(135deg, #6d28d9, #8b5cf6); } .b2 { background: linear-gradient(135deg, #4338ca, #6366f1); }
+.b3 { background: linear-gradient(135deg, #0e7490, #06b6d4); } .b4 { background: linear-gradient(135deg, #047857, #10b981); }
+.b5 { background: linear-gradient(135deg, #b45309, #f59e0b); } .b6 { background: linear-gradient(135deg, #be123c, #f43f5e); }
+.b7 { background: linear-gradient(135deg, #334155, #64748b); }
+.arch { border: 1px dashed #c4b5fd; border-radius: 3mm; padding: 3mm; margin-bottom: 3mm; }
+.arch .lbl { font-size: 7.6pt; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--v); margin-bottom: 2mm; }
+.arch.cy { border-color: #67e8f9; } .arch.cy .lbl { color: #0e7490; }
+.arch.gr { border-color: #6ee7b7; } .arch.gr .lbl { color: #047857; }
+.down { text-align: center; color: #94a3b8; font-size: 7.8pt; margin: -1.5mm 0 1.5mm; font-weight: 700; }
+.tree { font-family: "DejaVu Sans Mono", monospace; font-size: 7.6pt; line-height: 1.5; background: #f8fafc; border: 1px solid var(--line); border-radius: 2.5mm; padding: 3mm 4mm; white-space: pre; }
+.tree b { color: var(--v); } .tree i { color: var(--muted); font-style: normal; }
+/* cover */
+.cover { padding: 0; background: radial-gradient(circle at 85% 10%, #22d3ee55 0, transparent 40%), radial-gradient(circle at 10% 90%, #a78bfa55 0, transparent 45%), linear-gradient(150deg, #1e1b4b 0%, #312e81 45%, #4c1d95 75%, #0e7490 100%); color: #fff; }
+.cover .inner { padding: 22mm 18mm 0; }
+.cover .tag { display: inline-block; border: 1px solid #ffffff55; border-radius: 10mm; padding: 1mm 3.5mm; font-size: 8pt; letter-spacing: .12em; text-transform: uppercase; }
+.cover h1 { font-size: 46pt; margin: 8mm 0 0; letter-spacing: -.03em; line-height: 1; }
+.cover h1 span { background: linear-gradient(90deg, #c4b5fd, #67e8f9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cover .sub { font-size: 15pt; margin: 3mm 0 0; opacity: .92; font-weight: 300; }
+.cover .desc { font-size: 10.5pt; max-width: 150mm; margin: 6mm 0 0; opacity: .85; line-height: 1.55; }
+.cover .hero { margin: 9mm 18mm 0; border-radius: 4mm; overflow: hidden; box-shadow: 0 6mm 16mm rgba(0,0,0,.45); border: 1px solid #ffffff33; }
+.cover .hero img { width: 100%; display: block; }
+.cover .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 8mm 18mm 0; }
+.cover .kpi { background: #ffffff14; border: 1px solid #ffffff2e; border-radius: 3mm; padding: 3mm; }
+.cover .kpi b { display: block; font-size: 18pt; letter-spacing: -.02em; }
+.cover .kpi span { font-size: 7.8pt; opacity: .8; }
+.cover .meta { position: absolute; bottom: 10mm; left: 18mm; right: 18mm; display: flex; justify-content: space-between; font-size: 8pt; opacity: .75; }
+.toc { list-style: none; padding: 0; margin: 0; }
+.toc li { display: flex; align-items: baseline; gap: 3mm; padding: 2.1mm 0; border-bottom: 1px dashed var(--line); font-size: 10pt; color: var(--ink); }
+.toc li .n { width: 9mm; font-weight: 800; color: var(--v); font-size: 12pt; }
+.toc li .t { flex: 1; font-weight: 600; } .toc li .d { font-size: 8.2pt; color: var(--muted); font-weight: 400; display: block; }
+.toc li .p { color: var(--muted); font-variant-numeric: tabular-nums; }
+.check li { list-style: none; margin-left: -4.5mm; } .check li::before { content: "✓"; color: var(--g); font-weight: 800; margin-right: 2mm; }
+.cross li { list-style: none; margin-left: -4.5mm; } .cross li::before { content: "!"; color: #fff; background: var(--a); border-radius: 50%; display: inline-block; width: 3.6mm; height: 3.6mm; text-align: center; line-height: 3.6mm; font-size: 6.5pt; font-weight: 800; margin-right: 2mm; vertical-align: 1px; }
+.gal { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+.small { font-size: 8pt; color: var(--muted); }
+.fit img { object-fit: cover; object-position: top left; }
+table.dense { font-size: 7.3pt; } table.dense td, table.dense th { padding: 1.2mm 1.2mm; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<!-- ============ 1 COVER ============ -->
+<section class="page cover">
+  <div class="inner">
+    <span class="tag">Project Report · Version 0.1.0 · November 2026</span>
+    <h1>ISL <span>NOVA</span></h1>
+    <div class="sub">Beyond Gestures. Towards Understanding.</div>
+    <div class="desc">An open, consent-first platform for <b>Indian Sign Language</b> recognition, learning and dataset building.
+      Real-time recognition of <b>200 ISL signs</b> in the browser, a model trained on the genuine <b>INCLUDE</b> dataset,
+      and every result traced, tested and stated honestly.</div>
+  </div>
+  <div class="hero"><img src="SHOTS/dashboard-model.png" alt=""></div>
+  <div class="kpis">
+    <div class="kpi"><b>200</b><span>ISL sign classes trained</span></div>
+    <div class="kpi"><b>91.7 %</b><span>top-1 on 635 held-out test videos</span></div>
+    <div class="kpi"><b>3,370</b><span>real landmark sequences (INCLUDE)</span></div>
+    <div class="kpi"><b>12</b><span>application modules, all tested</span></div>
+  </div>
+  <div class="meta"><span>github.com/nvaltryek-001/ISL-NOVA · branch feat/isl-nova-platform</span><span>Live demo: isl-nova.onrender.com</span></div>
+</section>
+
+<!-- ============ 2 CONTENTS ============ -->
+<section class="page">
+  <div class="cont">Contents</div>
+  <h2>What is inside this report</h2>
+  <ul class="toc">
+    <li><span class="n">01</span><span class="t">Introduction and problem statement<span class="d">Why ISL needs better tools, objectives, what we built</span></span><span class="p">3</span></li>
+    <li><span class="n">02</span><span class="t">System architecture and technology<span class="d">Modular monolith, browser vision, full technology stack</span></span><span class="p">5</span></li>
+    <li><span class="n">03</span><span class="t">Dataset: INCLUDE and the 200-sign vocabulary<span class="d">Source, licence, splits, categories, real dataset images, data pipeline</span></span><span class="p">7</span></li>
+    <li><span class="n">04</span><span class="t">Computer vision and feature engineering<span class="d">MediaPipe landmarks, the 32 × 204 feature contract</span></span><span class="p">10</span></li>
+    <li><span class="n">05</span><span class="t">Models and algorithms<span class="d">LSTM, GRU, logistic regression, DTW, calibration, rejection</span></span><span class="p">11</span></li>
+    <li><span class="n">06</span><span class="t">Results and evaluation<span class="d">Model comparison, confusion matrix, unknown signs, full pipeline</span></span><span class="p">13</span></li>
+    <li><span class="n">07</span><span class="t">The application and its interface<span class="d">12 modules, analytics dashboard, screenshots</span></span><span class="p">17</span></li>
+    <li><span class="n">08</span><span class="t">Testing, quality and security<span class="d">Test suites, CI, bugs found and fixed, security controls</span></span><span class="p">20</span></li>
+    <li><span class="n">09</span><span class="t">Deployment, setup and project structure<span class="d">Live demo, Docker, Windows scripts, folder structure, API</span></span><span class="p">21</span></li>
+    <li><span class="n">10</span><span class="t">Limitations, future work and conclusion<span class="d">What is not yet proven, next steps, references</span></span><span class="p">23</span></li>
+  </ul>
+  <h2>The project at a glance</h2>
+  <div class="grid4">
+    <div class="card v stat"><b>91.7 %</b><span>LSTM top-1 · 98.3 % top-5</span></div>
+    <div class="card c stat c"><b>0.900</b><span>unknown-sign AUROC</span></div>
+    <div class="card g stat g"><b>96</b><span>automated tests passing (60 + 17 + 19)</span></div>
+    <div class="card a stat a"><b>56.75 GB</b><span>of video processed, MD5-verified</span></div>
+    <div class="card stat"><b>4</b><span>model families compared</span></div>
+    <div class="card stat c"><b>84</b><span>REST API operations</span></div>
+    <div class="card stat g"><b>24 / 24</b><span>held-out samples via the live API</span></div>
+    <div class="card stat a"><b>74.0 %</b><span>top-1 through the full browser pipeline</span></div>
+  </div>
+  <div class="note v"><b>How to read this report.</b> Every number in it was produced by a command that actually ran (GitHub Actions runs are cited by ID). Where something has <i>not</i> been measured, such as accuracy on new signers or a test with a real person at a webcam, the report says so plainly.</div>
+  <div class="foot"><span>ISL NOVA · Project report</span><span>2</span></div>
+</section>
+
+<!-- ============ 3 CH1 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">01</div><div><h1>Introduction and problem statement</h1><p>Why Indian Sign Language needs open, honest tools</p></div></div>
+  <p class="lead">India has millions of Deaf and hard-of-hearing people and very few certified ISL interpreters. Software cannot replace interpreters, but it can help people practise signs, look them up, and communicate simple messages. ISL NOVA is an end-to-end platform built to do that responsibly.</p>
+  <h2>The problem</h2>
+  <div class="grid2">
+    <div class="card r"><h4>1 · Scarce, unconsented data</h4><p>Few ISL datasets are openly licensed, and fewer record who signed and what they agreed to. Training on scraped videos is neither legal nor fair to the signers.</p></div>
+    <div class="card r"><h4>2 · Inflated accuracy claims</h4><p>Many demos test on the same people they trained on. A high number then says little about how the system works for a new user.</p></div>
+    <div class="card r"><h4>3 · Systems that always guess</h4><p>A plain classifier always returns some class, even for a sign it never saw, a half-visible hand or an empty frame.</p></div>
+    <div class="card r"><h4>4 · Unverified vocabulary</h4><p>Glosses copied from a dataset are labels, not reviewed ISL descriptions. Without expert review, a "sign dictionary" can mislead learners.</p></div>
+  </div>
+  <h2>Objectives</h2>
+  <ol>
+    <li><b>Recognise a 200-sign ISL vocabulary in real time</b> in the browser, with calibrated confidence and explicit rejection of unknown or poor input.</li>
+    <li><b>Make every result traceable:</b> licensed source, verification state, data readiness, dataset version, model lineage and checksums.</li>
+    <li><b>Collect data consent-first:</b> no recording without consent, no training without <i>model_training</i> consent, and withdrawal erases media.</li>
+    <li><b>Evaluate honestly:</b> held-out tests evaluated once, signer-independent splits when signer IDs exist, open-set and new-signer workflows.</li>
+    <li><b>Be usable by everyone:</b> learning, communication and kiosk modes, light and dark themes, phone to desktop, accessible by keyboard.</li>
+  </ol>
+  <h2>Our approach in one line</h2>
+  <div class="flow">
+    <div class="box b1"><b>Webcam</b>in the browser</div><div class="arr">→</div>
+    <div class="box b2"><b>MediaPipe</b>hands + pose landmarks</div><div class="arr">→</div>
+    <div class="box b3"><b>Feature contract</b>32 × 204 numbers</div><div class="arr">→</div>
+    <div class="box b4"><b>LSTM model</b>200 classes, calibrated</div><div class="arr">→</div>
+    <div class="box b5"><b>Decision</b>recognized · uncertain · unknown</div><div class="arr">→</div>
+    <div class="box b6"><b>Output</b>text, meaning, speech</div>
+  </div>
+  <p class="small">Only landmark coordinates leave the device. Video never does.</p>
+  <div class="foot"><span>Chapter 1 · Introduction</span><span>3</span></div>
+</section>
+
+<!-- ============ 4 CH1 cont ============ -->
+<section class="page">
+  <div class="cont">01 · Introduction · What we built</div>
+  <h2>What we delivered</h2>
+  <div class="grid3">
+    <div class="card v"><h4>🎥 Real-time recognition</h4><p>In-browser hand and pose tracking with automatic GPU→CPU fallback, capture-one-sign and continuous modes, top-5 answers, speech output.</p></div>
+    <div class="card c"><h4>🧠 A real trained model</h4><p>LSTM trained on 2,448 genuine INCLUDE recordings for all 200 classes; 91.7 % top-1 on the official test split.</p></div>
+    <div class="card g"><h4>🗂️ 200-sign vocabulary</h4><p>ISL001–ISL200 with licensed references, verification and readiness states, English/Hindi/Kannada meanings (pending where unknown).</p></div>
+    <div class="card a"><h4>🔒 Consent-first data lab</h4><p>Pseudonymous signers, consent scopes, recording studio, four-eyes review, immutable dataset versions, erasure on withdrawal.</p></div>
+    <div class="card v"><h4>📊 AI laboratory</h4><p>Held-out metrics, 200 × 200 confusion matrix, model registry with promote/rollback, experiments, new-signer evaluation.</p></div>
+    <div class="card c"><h4>✅ Expert verification</h4><p>Only the linguist role can verify a sign, after documenting it and ticking a three-item checklist enforced by the API.</p></div>
+    <div class="card g"><h4>🎓 Learning and communication</h4><p>Lessons and quizzes built only from verified signs; a word-by-word message composer with speech.</p></div>
+    <div class="card a"><h4>☁️ Deployed and reproducible</h4><p>Docker image, free-tier live demo with the model installed at start-up, Windows one-command setup, GitHub Actions pipelines.</p></div>
+    <div class="card v"><h4>🧪 Tested end to end</h4><p>96 automated tests on Linux and Windows, PostgreSQL and SQLite, plus evaluation runs on real held-out data.</p></div>
+  </div>
+  <h2>Project journey</h2>
+  <table>
+    <tr><th style="width:24%">Stage</th><th>What happened</th><th style="width:22%">Evidence</th></tr>
+    <tr><td><span class="pill">1 · Audit &amp; design</span></td><td>Repository audit, specification, architecture, 200-slot vocabulary built from INCLUDE's class list</td><td>docs/, dataset/</td></tr>
+    <tr><td><span class="pill c">2 · Platform</span></td><td>API, database, auth/RBAC, 12 web modules, consent pipeline, ML package with gradient-checked LSTM/GRU</td><td>CI green</td></tr>
+    <tr><td><span class="pill g">3 · Data</span></td><td>44 Zenodo parts (56.75 GB) downloaded and MD5-checked on GitHub runners; MediaPipe extraction; raw video deleted</td><td>run 41764539272</td></tr>
+    <tr><td><span class="pill a">4 · Training</span></td><td>LSTM, GRU, logistic regression, DTW trained in parallel; best chosen on validation; published as a release</td><td>run 41771084083</td></tr>
+    <tr><td><span class="pill r">5 · Evaluation</span></td><td>Unknown-sign test (62 extra glosses), raw-video check, virtual-camera replay through the real UI</td><td>runs 41815223675, 41860050670</td></tr>
+    <tr><td><span class="pill">6 · Delivery</span></td><td>Render deployment, smoke tests against the live site, Windows scripts, local training, documentation</td><td>runs 41861458853, 41961463214</td></tr>
+  </table>
+  <div class="foot"><span>Chapter 1 · Introduction</span><span>4</span></div>
+</section>
+
+<!-- ============ 5 CH2 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">02</div><div><h1>System architecture and technology</h1><p>One Python service, one React app, one shared ML package</p></div></div>
+  <p>ISL NOVA is a <b>modular monolith</b>: a single Python process serves the JSON API and the built web client, and a shared ML package implements the feature contract, training and inference. This keeps deployment simple (one container) while modules stay cleanly separated.</p>
+  <div class="arch"><div class="lbl">Browser · React 19 + TypeScript + Tailwind v4</div>
+    <div class="flow" style="margin:0">
+      <div class="box b1"><b>Webcam</b>getUserMedia</div><div class="arr">→</div>
+      <div class="box b2"><b>MediaPipe Tasks</b>Hand + Pose landmarker (WebGL / WASM)</div><div class="arr">→</div>
+      <div class="box b3"><b>Landmark buffer</b>timestamps, overlay, quality</div><div class="arr">→</div>
+      <div class="box b7"><b>12 UI modules</b>router · query cache · store</div>
+    </div></div>
+  <div class="down">▼ landmarks as JSON over HTTPS (never video) ▼</div>
+  <div class="arch cy"><div class="lbl">Server · Python 3.13 · Starlette + Pydantic · 84 operations under /api/v1</div>
+    <div class="flow" style="margin:0 0 2mm">
+      <div class="box b7"><b>Security</b>JWT · RBAC · rate limit · CSP · audit</div><div class="arr">→</div>
+      <div class="box b3"><b>Feature contract</b>isl-nova-fc-1.0.0</div><div class="arr">→</div>
+      <div class="box b4"><b>Predictor</b>LSTM · temperature · τ + margin</div><div class="arr">→</div>
+      <div class="box b5"><b>Decision state</b>+ top-5 + meaning</div>
+    </div>
+    <div class="flow" style="margin:0">
+      <div class="box b2"><b>Routers</b>core · signs · dataset · ml · personal</div><div class="arr">→</div>
+      <div class="box b1"><b>Background jobs</b>training · video analysis · evaluation</div><div class="arr">→</div>
+      <div class="box b6"><b>Model registry</b>SHA-256 verified · promote · rollback</div>
+    </div></div>
+  <div class="down">▼ storage ▼</div>
+  <div class="arch gr"><div class="lbl">Data</div>
+    <div class="flow" style="margin:0">
+      <div class="box b4"><b>PostgreSQL 16 / SQLite</b>versioned, checksummed migrations</div><div class="arr">+</div>
+      <div class="box b3"><b>Object storage</b>path-safe local adapter</div><div class="arr">+</div>
+      <div class="box b5"><b>INCLUDE · CC BY 4.0</b>external, processed in CI</div>
+    </div></div>
+  <h2>Design principles</h2>
+  <div class="grid3">
+    <div class="card"><h4>Privacy by architecture</h4><p>Vision runs in the browser; the server only ever sees landmark coordinates for live recognition.</p></div>
+    <div class="card"><h4>One feature contract</h4><p>The same 204 features are computed in Python and TypeScript; a parity test keeps them within 2×10<sup>-5</sup>.</p></div>
+    <div class="card"><h4>Honest by default</h4><p>Five explicit answer states; synthetic models are flagged and can never be promoted in production.</p></div>
+  </div>
+  <div class="foot"><span>Chapter 2 · Architecture</span><span>5</span></div>
+</section>
+
+<!-- ============ 6 CH2 tech ============ -->
+<section class="page">
+  <div class="cont">02 · Architecture · Technology stack</div>
+  <h2>Technologies used</h2>
+  <table>
+    <tr><th style="width:18%">Layer</th><th style="width:38%">Technology</th><th>Role in ISL NOVA</th></tr>
+    <tr><td><b>Frontend</b></td><td>React 19.2, TypeScript 6 (strict), Tailwind CSS 4.3, esbuild 0.28</td><td>12 modules, design system with light/dark tokens, in-house router, query cache and store, SVG charts</td></tr>
+    <tr><td><b>Computer vision</b></td><td>Google MediaPipe Tasks Vision 0.10.14 (browser), MediaPipe 0.10.32 (Python), OpenCV 5</td><td>21-point hand landmarks ×2 and 33-point pose; video decoding, probing and server-side extraction</td></tr>
+    <tr><td><b>Backend</b></td><td>Python 3.13, Starlette 1.7, Pydantic 2.13, Uvicorn, PyJWT, PBKDF2</td><td>Typed routing with generated OpenAPI, validation, JWT auth, five roles, rate limits, structured logs</td></tr>
+    <tr><td><b>Database</b></td><td>PostgreSQL 16 (production), SQLite (development, demo)</td><td>28 tables, versioned checksummed migrations, transactions, audit log</td></tr>
+    <tr><td><b>Machine learning</b></td><td>NumPy (LSTM/GRU with hand-written backprop), scikit-learn, batched DTW</td><td>Training, temperature scaling, rejection threshold, registry, inference</td></tr>
+    <tr><td><b>Testing</b></td><td>pytest, node:test, Playwright (Chromium), Ruff</td><td>Unit, API, CRUD, RBAC, parity, end-to-end browser tests, lint</td></tr>
+    <tr><td><b>DevOps</b></td><td>GitHub Actions (Linux + Windows), Docker, Render (free plan)</td><td>CI, staged data/train/evaluation pipelines, model releases, live demo</td></tr>
+    <tr><td><b>Local setup</b></td><td>PowerShell scripts, Python helpers</td><td>One-command Windows setup, start, test, training and prediction check</td></tr>
+  </table>
+  <h2>Libraries and models list</h2>
+  <div class="grid2">
+    <div class="card v"><h4>Pretrained vision models (Google MediaPipe)</h4><ul>
+      <li><b>hand_landmarker.task</b> (float16): palm detector + 21-keypoint hand model</li>
+      <li><b>pose_landmarker_lite.task</b> (float16): 33-keypoint body pose</li>
+      <li>Delegates: GPU (WebGL) with automatic CPU (WASM / XNNPACK) fallback</li></ul></div>
+    <div class="card c"><h4>Models trained in this project</h4><ul>
+      <li><b>LSTM</b>: 1 layer, hidden 128, 221,896 parameters (selected)</li>
+      <li><b>GRU</b>: same shape, about 179k parameters</li>
+      <li><b>Logistic regression</b> on pooled statistics (scikit-learn)</li>
+      <li><b>DTW 1-NN</b>: nearest neighbour under dynamic time warping</li></ul></div>
+  </div>
+  <h2>Why these choices</h2>
+  <div class="grid3">
+    <div class="card"><h4>Landmarks, not pixels</h4><p>Pose landmarks are small, privacy-friendly and robust to background and clothing, so a compact model trains on CPU in minutes.</p></div>
+    <div class="card"><h4>NumPy models</h4><p>No deep-learning framework was installable in the build sandbox, so LSTM/GRU were implemented directly and gradient-checked.</p></div>
+    <div class="card"><h4>Starlette + esbuild</h4><p>The tested foundations of FastAPI and Vite; routes and bundling port 1:1 if the project later adopts those tools.</p></div>
+  </div>
+  <div class="note v">All dependency versions are pinned (backend/requirements.txt, frontend/package.json). A CI audit job runs pip-audit (no known vulnerabilities) and npm audit; the one advisory it found (zod) was fixed by removing the dependency.</div>
+  <div class="foot"><span>Chapter 2 · Technology</span><span>6</span></div>
+</section>
+
+<!-- ============ 7 CH3 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">03</div><div><h1>Dataset: INCLUDE and the 200-sign vocabulary</h1><p>Real, licensed recordings, processed reproducibly</p></div></div>
+  <div class="grid2">
+    <div>
+      <h2>INCLUDE at a glance</h2>
+      <p><b>INCLUDE</b> is a large isolated-sign ISL dataset by A. Sridhar, R. G. Ganesan, P. Kumar and M. Khapra (AI4Bharat, IIT Madras), published at ACM Multimedia 2020 and released on Zenodo (record 4010759) under <b>CC BY 4.0</b>. It contains 263 word signs recorded in 1920 × 1080 at 25 fps.</p>
+      <p>ISL NOVA uses 200 of those glosses as its vocabulary (<b>ISL001–ISL200</b>). The remaining 63 are held in reserve, and 62 of them now serve as the <b>unknown-sign</b> test set.</p>
+      <table>
+        <tr><th>Metric</th><th class="n">Value</th></tr>
+        <tr><td>Zenodo parts downloaded (MD5-verified)</td><td class="n">44 / 44</td></tr>
+        <tr><td>Data volume</td><td class="n">56.75 GB</td></tr>
+        <tr><td>Videos processed</td><td class="n">4,284</td></tr>
+        <tr><td>Usable sequences, 200 classes</td><td class="n"><b>3,370</b></td></tr>
+        <tr><td>Failed videos / insufficient input</td><td class="n">0 / 15</td></tr>
+        <tr><td>Classes with train + val + test</td><td class="n">189 / 200</td></tr>
+        <tr><td>Out-of-vocabulary sequences (62 glosses)</td><td class="n">887</td></tr>
+        <tr><td>Linguistically verified signs</td><td class="n">0 / 200</td></tr>
+      </table>
+    </div>
+    <div>
+      <figure><img src="IMG/split_donut.png" alt=""><figcaption>INCLUDE's official train / validation / test lists are kept exactly.</figcaption></figure>
+      <figure><img src="IMG/per_class_counts.png" alt=""><figcaption>Every one of the 200 classes has real recordings: median 20, range 4–22.</figcaption></figure>
+    </div>
+  </div>
+  <div class="note">INCLUDE publishes <b>no signer IDs</b>, so test signers may also appear in training. Results on this split are therefore <b>not signer-independent</b>; the platform includes a separate new-signer workflow for that.</div>
+  <div class="foot"><span>Chapter 3 · Dataset</span><span>7</span></div>
+</section>
+
+<!-- ============ 8 CH3 images ============ -->
+<section class="page">
+  <div class="cont">03 · Dataset · Vocabulary and real samples</div>
+  <h2>Real dataset images</h2>
+  <p>Below are genuine INCLUDE <b>test</b> recordings, shown as the landmarks our pipeline extracted (raw videos are not redistributed; landmarks are what the model actually sees). Cyan is the right hand, violet the left hand, grey the upper body; six frames are overlaid so the movement is visible.</p>
+  <figure><img src="IMG/dataset_landmarks.png" alt=""><figcaption>Eight held-out test recordings from INCLUDE (CC BY 4.0, Sridhar et al. 2020), rendered from the processed landmark files.</figcaption></figure>
+  <h2>The 200-sign vocabulary</h2>
+  <figure><img src="IMG/categories.png" alt="" style="width:82%;margin:0 auto"><figcaption>Vocabulary slots by planning category. INCLUDE has few everyday verbs and no food or question words, which new recordings must fill.</figcaption></figure>
+  <div class="grid3">
+    <div class="card v"><h4>Verification states</h4><p>proposed → reference_found → review_pending → <b>verified</b> | rejected. Only the linguist role verifies.</p></div>
+    <div class="card c"><h4>Readiness states</h4><p>no_data → collecting → ready_for_review → approved_for_training. Needs a verified sign, ≥ 10 recordings, ≥ 3 signers.</p></div>
+    <div class="card g"><h4>Meanings</h4><p>English from the source; Hindi and Kannada left <i>pending</i> rather than invented.</p></div>
+  </div>
+  <div class="foot"><span>Chapter 3 · Dataset</span><span>8</span></div>
+</section>
+
+<!-- ============ 9 CH3 pipeline ============ -->
+<section class="page">
+  <div class="cont">03 · Dataset · Data pipeline and governance</div>
+  <h2>How the data was processed</h2>
+  <p>The 56.75 GB of video never touched a laptop or the Git repository. A staged GitHub Actions workflow processed it in parallel and kept only landmarks.</p>
+  <div class="flow">
+    <div class="box b7"><b>Preflight</b>disk, RAM, Zenodo record, licence, label map</div><div class="arr">→</div>
+    <div class="box b2"><b>Download</b>44 parts in parallel, MD5 + retries</div><div class="arr">→</div>
+    <div class="box b3"><b>Match</b>official split lists, dedupe</div><div class="arr">→</div>
+    <div class="box b1"><b>Extract</b>MediaPipe hands + pose, downscale 960</div><div class="arr">→</div>
+    <div class="box b5"><b>Delete video</b>keep landmarks only</div><div class="arr">→</div>
+    <div class="box b4"><b>Merge</b>manifest, per-class counts, failures</div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h4>Integrity checks</h4><ul class="check">
+      <li>MD5 of every Zenodo part, SHA-256 of every landmark file and source video</li>
+      <li>Duplicate recording IDs fail the merge</li>
+      <li>Failures and insufficient-input sequences recorded, not hidden</li>
+      <li>Monotonic MediaPipe timestamps across videos</li></ul></div>
+    <div class="card"><h4>Outputs</h4><ul class="check">
+      <li><b>include-official-v1</b>: 3,370 sequences, 176 MB, published as release <span class="mono">dataset-include-landmarks-v1</span></li>
+      <li><b>include-official-v2</b>: adds 887 out-of-vocabulary sequences for open-set tests</li>
+      <li>Attribution file shipped inside the archive (CC BY 4.0)</li></ul></div>
+  </div>
+  <h2>Consent-first collection inside the app</h2>
+  <div class="flow">
+    <div class="box b1"><b>Signer</b>pseudonymous ID</div><div class="arr">→</div>
+    <div class="box b2"><b>Consent</b>scopes, retention</div><div class="arr">→</div>
+    <div class="box b3"><b>Session</b>lighting, distance</div><div class="arr">→</div>
+    <div class="box b4"><b>Record</b>video + landmarks, quality checks</div><div class="arr">→</div>
+    <div class="box b5"><b>Annotate</b>person A</div><div class="arr">→</div>
+    <div class="box b6"><b>Approve</b>a different person B</div><div class="arr">→</div>
+    <div class="box b7"><b>Freeze</b>dataset version</div>
+  </div>
+  <div class="grid3">
+    <div class="card a"><h4>No consent, no data</h4><p>Recording is impossible without a consent record; training requires the model_training scope.</p></div>
+    <div class="card a"><h4>Withdrawal = erasure</h4><p>Revoking consent deletes the signer's media and excludes it from future versions.</p></div>
+    <div class="card a"><h4>Four-eyes review</h4><p>Annotator and approver must be different people; every media access is audited.</p></div>
+  </div>
+  <figure class="shot fit"><img src="SHOTS/dataset-lab.png" alt="" style="height:62mm"><figcaption>Dataset Intelligence Lab: readiness funnel and per-class table driven by live database counts.</figcaption></figure>
+  <div class="foot"><span>Chapter 3 · Data pipeline</span><span>9</span></div>
+</section>
+
+<!-- ============ 10 CH4 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">04</div><div><h1>Computer vision and feature engineering</h1><p>From camera pixels to 32 × 204 numbers</p></div></div>
+  <h2>Landmark extraction with MediaPipe</h2>
+  <div class="grid3">
+    <div class="card v stat"><b>2 × 21</b><span>hand keypoints (x, y, z) per frame</span></div>
+    <div class="card c stat c"><b>33</b><span>pose keypoints with visibility</span></div>
+    <div class="card g stat g"><b>~10–30 fps</b><span>in the browser (CPU / GPU)</span></div>
+  </div>
+  <p>Frames are processed <b>unmirrored</b> so that left and right hands match between browser and server; only the preview is mirrored for the user. If the GPU delegate runs below 5 fps for three seconds (software WebGL, weak GPUs), the app switches to the CPU delegate automatically and shows a badge.</p>
+  <h2>The feature contract <span class="mono">isl-nova-fc-1.0.0</span></h2>
+  <figure><img src="IMG/feature_matrix.png" alt=""><figcaption>One real INCLUDE recording after the contract: 32 time steps × 204 features (colour = value).</figcaption></figure>
+  <table>
+    <tr><th>Feature group</th><th>What it captures</th><th class="n">Dims</th></tr>
+    <tr><td>Hand shape</td><td>21 landmarks per hand, relative to the wrist and scaled by hand size</td><td class="n">2 × 63</td></tr>
+    <tr><td>Hand position</td><td>wrists relative to the shoulders and torso, scaled by shoulder width</td><td class="n">≈ 6</td></tr>
+    <tr><td>Upper body</td><td>pose keypoints relative to the body centre</td><td class="n">≈ 30</td></tr>
+    <tr><td>Two-hand relation</td><td>distances between the hands and fingertips</td><td class="n">≈ 10</td></tr>
+    <tr><td>Joint angles</td><td>finger flexion angles</td><td class="n">≈ 20</td></tr>
+    <tr><td>Presence + motion</td><td>hand-present flags and wrist velocity</td><td class="n">≈ 8</td></tr>
+    <tr><td colspan="2"><b>Total per frame</b>, resampled to 32 frames</td><td class="n"><b>204</b></td></tr>
+  </table>
+  <div class="grid2">
+    <div class="card"><h4>Quality gate</h4><p>Too few frames or hands visible in too few frames → <b>insufficient_input</b> with a human-readable reason, instead of a guess.</p></div>
+    <div class="card"><h4>Parity</h4><p>The TypeScript port is tested against Python fixtures (two hands, one hand, gaps, no pose) to within 2×10<sup>-5</sup>.</p></div>
+  </div>
+  <p class="small">Group sizes are approximate; the authoritative list of all 204 named features is generated from code into docs/FEATURE_CONTRACT.md.</p>
+  <div class="foot"><span>Chapter 4 · Features</span><span>10</span></div>
+</section>
+
+<!-- ============ 11 CH5 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">05</div><div><h1>Models and algorithms</h1><p>Four model families, one honest decision rule</p></div></div>
+  <div class="grid2">
+    <div class="card v"><h4>LSTM: Long Short-Term Memory <span class="pill">selected</span></h4>
+      <p>A recurrent network that reads the 32 frames in order and keeps a memory of the movement. Final and mean-pooled hidden states feed a 200-way softmax.</p>
+      <ul><li>1 layer, hidden size 128, 221,896 parameters, 1.78 MB</li><li>Adam, lr 0.002, weight decay 1e-4, batch 32</li><li>Augmentation, inverse-√frequency class weights</li><li>Early stopping on validation (stopped at epoch 49)</li></ul></div>
+    <div class="card c"><h4>GRU: Gated Recurrent Unit</h4>
+      <p>A lighter recurrent network with update and reset gates instead of the LSTM's three gates and cell state.</p>
+      <ul><li>Same shape and recipe as the LSTM</li><li>About 179k parameters, 1.44 MB</li><li>Fastest recurrent model (0.17 ms / sample)</li></ul></div>
+    <div class="card g"><h4>Logistic regression on pooled statistics</h4>
+      <p>Each feature's mean, standard deviation, minimum and maximum over time form one vector, classified linearly (scikit-learn).</p>
+      <ul><li>No temporal order, but very strong baseline</li><li>0.02 ms / sample, 0.99 MB</li></ul></div>
+    <div class="card a"><h4>DTW 1-NN: Dynamic Time Warping</h4>
+      <p>Finds the training sequence that best aligns with the query when time is stretched or compressed, and copies its label.</p>
+      <ul><li>Batched NumPy DTW with a Sakoe–Chiba window</li><li>No training, but 130 ms / sample, 64 MB</li></ul></div>
+  </div>
+  <h2>From scores to an honest answer</h2>
+  <div class="flow">
+    <div class="box b1"><b>Logits</b>200 scores</div><div class="arr">→</div>
+    <div class="box b2"><b>Temperature scaling</b>T = 1.025 fitted on validation</div><div class="arr">→</div>
+    <div class="box b3"><b>Probabilities</b>calibrated, ECE 0.027</div><div class="arr">→</div>
+    <div class="box b4"><b>p ≥ τ (0.673) and margin ≥ 0.10</b>recognized</div><div class="arr">|</div>
+    <div class="box b5"><b>p ≥ 0.6 τ</b>uncertain</div><div class="arr">|</div>
+    <div class="box b7"><b>otherwise</b>unknown</div>
+  </div>
+  <p>τ is chosen on validation so that 95 % of correct validation predictions are kept. The test split never influences any choice. Two further states, <b>insufficient_input</b> and <b>model_unavailable</b>, are returned when the input or the server cannot support a prediction.</p>
+  <div class="foot"><span>Chapter 5 · Models</span><span>11</span></div>
+</section>
+
+<!-- ============ 12 CH5 training ============ -->
+<section class="page">
+  <div class="cont">05 · Models · Training pipeline</div>
+  <h2>Training pipeline</h2>
+  <div class="flow">
+    <div class="box b7"><b>Manifest</b>approved, licensed, consented only</div><div class="arr">→</div>
+    <div class="box b2"><b>Split</b>official or signer-independent</div><div class="arr">→</div>
+    <div class="box b6"><b>Leakage check</b>signer, session, file hash</div><div class="arr">→</div>
+    <div class="box b1"><b>Train</b>select on validation</div><div class="arr">→</div>
+    <div class="box b3"><b>Calibrate</b>T, τ on validation</div><div class="arr">→</div>
+    <div class="box b4"><b>Test once</b>held-out split</div><div class="arr">→</div>
+    <div class="box b5"><b>Register</b>SHA-256, lineage</div>
+  </div>
+  <figure><img src="IMG/training_curves.png" alt=""><figcaption>Genuine training log of the released LSTM: loss falls steadily while validation accuracy and macro-F1 climb above 90 %.</figcaption></figure>
+  <div class="grid2">
+    <div class="card"><h4>What every trained model records</h4><ul>
+      <li>Feature-contract version and dataset version</li><li>Manifest SHA-256 and the recording IDs per split</li><li>Leakage report and excluded recordings</li><li>Top-1/5, macro and weighted F1, per-class report, confusion matrix, ECE, open-set AUROC, latency, size</li></ul></div>
+    <div class="card"><h4>Registry rules</h4><ul>
+      <li>Weights hash verified at every load</li><li>Promotion and rollback by admins, audited</li><li>Synthetic models refused in production</li><li>Released model: <span class="mono">model-lstm-20261104T041414Z-s13</span>, SHA-256 <span class="mono">e0979cd5…c543c0</span></li></ul></div>
+  </div>
+  <h2>Where training ran</h2>
+  <table>
+    <tr><th>Environment</th><th>What</th><th class="n">Result</th></tr>
+    <tr><td>GitHub Actions, 4 vCPU (run 41771084083)</td><td>All four models in parallel, LSTM in about 8.5 min</td><td class="n">LSTM 91.7 % top-1</td></tr>
+    <tr><td>Windows runner (run 41961463214)</td><td><span class="mono">train_windows.ps1 -Model pooled-logreg</span> on the published landmarks</td><td class="n">89.1 %, identical to CI</td></tr>
+    <tr><td>Any laptop</td><td><span class="mono">python scripts/train_local.py --model all</span></td><td class="n">same recipe, small numeric differences</td></tr>
+  </table>
+  <div class="foot"><span>Chapter 5 · Training</span><span>12</span></div>
+</section>
+
+<!-- ============ 13 CH6 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">06</div><div><h1>Results and evaluation</h1><p>Genuine held-out results, evaluated once</p></div></div>
+  <figure><img src="IMG/model_comparison.png" alt=""><figcaption>All four models on the 635-video INCLUDE test split (training run 41771084083, seed 13).</figcaption></figure>
+  <table class="dense">
+    <tr><th>Model</th><th class="n">Val macro-F1</th><th class="n">Top-1</th><th class="n">Top-5</th><th class="n">Precision</th><th class="n">Recall</th><th class="n">Macro-F1</th><th class="n">Weighted-F1</th><th class="n">ECE</th><th class="n">ms / sample</th><th class="n">Size</th></tr>
+    <tr class="best"><td>LSTM ★</td><td class="n">91.1 %</td><td class="n">91.7 %</td><td class="n">98.3 %</td><td class="n">93.0 %</td><td class="n">92.4 %</td><td class="n">91.7 %</td><td class="n">91.5 %</td><td class="n">0.027</td><td class="n">0.73</td><td class="n">1.78 MB</td></tr>
+    <tr><td>Logistic regression</td><td class="n">88.1 %</td><td class="n">89.1 %</td><td class="n">98.3 %</td><td class="n">90.4 %</td><td class="n">89.9 %</td><td class="n">88.8 %</td><td class="n">88.9 %</td><td class="n">0.024</td><td class="n">0.02</td><td class="n">0.99 MB</td></tr>
+    <tr><td>GRU</td><td class="n">86.7 %</td><td class="n">86.5 %</td><td class="n">97.6 %</td><td class="n">88.0 %</td><td class="n">87.4 %</td><td class="n">86.1 %</td><td class="n">85.8 %</td><td class="n">0.017</td><td class="n">0.17</td><td class="n">1.44 MB</td></tr>
+    <tr><td>DTW 1-NN</td><td class="n">80.7 %</td><td class="n">84.4 %</td><td class="n">94.6 %</td><td class="n">85.7 %</td><td class="n">84.8 %</td><td class="n">83.5 %</td><td class="n">83.8 %</td><td class="n">0.040</td><td class="n">130</td><td class="n">64 MB</td></tr>
+  </table>
+  <div class="grid2">
+    <figure><img src="IMG/speed_accuracy.png" alt=""><figcaption>The LSTM gives the best accuracy at sub-millisecond model latency.</figcaption></figure>
+    <div>
+      <h3>Key findings</h3>
+      <ul class="check">
+        <li>LSTM wins on validation and on test, so model selection was not lucky.</li>
+        <li>Top-5 is 98.3 %: the right sign is almost always among the alternatives shown.</li>
+        <li>Calibration is good (ECE 0.027): a 90 % confidence means about 90 % correct.</li>
+        <li>Re-running all 635 tests through the production <span class="mono">Predictor</span> gave 91.65 %, 24 ms median per call.</li>
+      </ul>
+      <div class="note">Single seed. Differences of a few points between models can come from seed variation.</div>
+    </div>
+  </div>
+  <div class="foot"><span>Chapter 6 · Results</span><span>13</span></div>
+</section>
+
+<!-- ============ 14 CH6 confusion ============ -->
+<section class="page">
+  <div class="cont">06 · Results · Per-class analysis</div>
+  <div class="grid2">
+    <figure><img src="IMG/confusion.png" alt=""><figcaption>A strong diagonal across all 200 classes: most signs are rarely confused.</figcaption></figure>
+    <figure><img src="IMG/per_class_f1.png" alt=""><figcaption>133 of 200 classes reach F1 ≥ 0.9; a small tail of hard classes remains.</figcaption></figure>
+  </div>
+  <h2>Hardest classes on test</h2>
+  <table>
+    <tr><th>Sign</th><th class="n">F1</th><th class="n">Precision</th><th class="n">Recall</th><th class="n">Test videos</th></tr>
+    <tr><td>Today</td><td class="n">0.00</td><td class="n">0.00</td><td class="n">0.00</td><td class="n">1</td></tr>
+    <tr><td>Dress</td><td class="n">0.29</td><td class="n">0.33</td><td class="n">0.25</td><td class="n">4</td></tr>
+    <tr><td>Bad</td><td class="n">0.40</td><td class="n">1.00</td><td class="n">0.25</td><td class="n">4</td></tr>
+    <tr><td>Wife</td><td class="n">0.40</td><td class="n">1.00</td><td class="n">0.25</td><td class="n">4</td></tr>
+    <tr><td>Friend</td><td class="n">0.44</td><td class="n">0.40</td><td class="n">0.50</td><td class="n">4</td></tr>
+    <tr><td>Chair</td><td class="n">0.50</td><td class="n">1.00</td><td class="n">0.33</td><td class="n">3</td></tr>
+  </table>
+  <div class="note">With only 1–4 test videos per class, per-class scores carry wide uncertainty and should not be over-read.</div>
+  <h2>The evaluation dashboard</h2>
+  <figure class="shot fit"><img src="SHOTS/evaluation.png" alt="" style="height:66mm"><figcaption>The AI Laboratory's evaluation view renders the same per-class F1 and confusion matrix from the live model files.</figcaption></figure>
+  <div class="foot"><span>Chapter 6 · Per-class results</span><span>14</span></div>
+</section>
+
+<!-- ============ 15 CH6 open set ============ -->
+<section class="page">
+  <div class="cont">06 · Results · Unknown-sign detection</div>
+  <h2>Can it say "I don't know"?</h2>
+  <p>The model, unchanged, was given <b>887 recordings of 62 INCLUDE signs that are not in its vocabulary</b> (run 41815223675). They were never used for training, calibration or choosing the threshold. A good system should answer <i>uncertain</i> or <i>unknown</i> for them.</p>
+  <div class="grid2">
+    <figure><img src="IMG/openset_hist.png" alt=""><figcaption>Known signs cluster near 1.0; unknown signs spread widely, but many still pass τ.</figcaption></figure>
+    <figure><img src="IMG/openset_roc.png" alt=""><figcaption>ROC of the max-probability score: AUROC 0.900.</figcaption></figure>
+  </div>
+  <div class="grid4">
+    <div class="card v stat"><b>0.900</b><span>AUROC known vs unknown</span></div>
+    <div class="card r stat r"><b>29.3 %</b><span>false acceptance (unknown shown as known)</span></div>
+    <div class="card a stat a"><b>12.1 %</b><span>false rejection of known signs</span></div>
+    <div class="card g stat g"><b>89.1 / 70.7 %</b><span>unknown-detection precision / recall</span></div>
+  </div>
+  <h3>Threshold trade-off</h3>
+  <table>
+    <tr><th>Threshold</th><th class="n">0.40</th><th class="n">0.50</th><th class="n">0.60</th><th class="n">0.70</th><th class="n">0.80</th><th class="n">0.90</th></tr>
+    <tr><td>Known signs accepted</td><td class="n">96.7 %</td><td class="n">93.7 %</td><td class="n">89.9 %</td><td class="n">86.8 %</td><td class="n">82.4 %</td><td class="n">75.3 %</td></tr>
+    <tr><td>Unknown signs rejected</td><td class="n">33.5 %</td><td class="n">49.9 %</td><td class="n">63.2 %</td><td class="n">73.6 %</td><td class="n">82.7 %</td><td class="n">91.8 %</td></tr>
+  </table>
+  <div class="note r"><b>Honest reading.</b> About 3 in 10 unseen signs are still confidently mapped to a known sign. So the UI always shows the top-5 alternatives and the state, and never speaks a result automatically. Better detectors (energy scores, a background class, embedding distance) are future work.</div>
+  <div class="foot"><span>Chapter 6 · Open set</span><span>15</span></div>
+</section>
+
+<!-- ============ 16 CH6 pipeline ============ -->
+<section class="page">
+  <div class="cont">06 · Results · The real pipeline, end to end</div>
+  <h2>Accuracy at every stage</h2>
+  <p>A model score on stored landmarks is only the first step. We measured the system at each stage a real user's sign passes through.</p>
+  <figure><img src="IMG/pipeline_ladder.png" alt=""><figcaption>From stored landmarks to the full browser pipeline (runs 41771084083, 41774486592, 41860050670, 41861458853).</figcaption></figure>
+  <div class="grid2">
+    <div>
+      <h3>Virtual-camera replay through the Live page</h3>
+      <p>73 held-out INCLUDE test clips were played into headless Chromium <b>as its webcam</b>. Each went through in-browser MediaPipe, the capture button, the API and the model, exactly like a user.</p>
+      <table>
+        <tr><th>Metric</th><th class="n">Value</th></tr>
+        <tr><td>Clips completed</td><td class="n">73 / 73</td></tr>
+        <tr><td>Top-1 / top-5</td><td class="n"><b>74.0 %</b> / 89.0 %</td></tr>
+        <tr><td>"Recognized" answers that were correct</td><td class="n"><b>45 / 48</b></td></tr>
+        <tr><td>Same clips, offline Python</td><td class="n">91.8 %</td></tr>
+        <tr><td>Hand-tracking rate</td><td class="n">~10 fps (CPU)</td></tr>
+      </table>
+    </div>
+    <div>
+      <figure><img src="IMG/live_states.png" alt=""><figcaption>When the system says "recognized", it is right 94 % of the time.</figcaption></figure>
+      <div class="note">The gap to 91.8 % comes mainly from frame rate: the CI runner had no GPU, so MediaPipe ran at ~10 fps instead of the clips' 25 fps. This is a replay of recordings, <b>not a live person</b>.</div>
+    </div>
+  </div>
+  <div class="grid3">
+    <div class="card g"><h4>Live demo API</h4><p>24 / 24 held-out samples recognized correctly through isl-nova.onrender.com.</p></div>
+    <div class="card g"><h4>On Windows</h4><p>24 / 24 through a locally started server, on the runner and on the owner's PC.</p></div>
+    <div class="card a"><h4>Not yet measured</h4><p>A real person at a webcam, and signers outside INCLUDE.</p></div>
+  </div>
+  <div class="foot"><span>Chapter 6 · Pipeline</span><span>16</span></div>
+</section>
+
+<!-- ============ 17 CH7 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">07</div><div><h1>The application and its interface</h1><p>Twelve modules, one design system, light and dark</p></div></div>
+  <table>
+    <tr><th style="width:4%">#</th><th style="width:22%">Module</th><th>What it does</th></tr>
+    <tr><td>1</td><td><b>Analytics Dashboard</b></td><td>Live counts from the database and registry: slots, verified signs, recordings, training-ready classes, model status, system health</td></tr>
+    <tr><td>2</td><td><b>Live Recognition Studio</b></td><td>Camera selection, landmark overlay, capture one sign or continuous window, fps badge, top-5, meanings, speech, corrections</td></tr>
+    <tr><td>3</td><td><b>Video Analysis</b></td><td>Validated upload, background hand tracking, timeline, windowed inference, JSON export, 24-hour auto-deletion</td></tr>
+    <tr><td>4</td><td><b>Sign Explorer</b></td><td>Multilingual search, filters, licensed references, bookmarks, full CRUD for reviewers, verification checklist</td></tr>
+    <tr><td>5</td><td><b>Communication Workspace</b></td><td>Word-by-word composer from sign meanings, editable text, speech, saved phrases</td></tr>
+    <tr><td>6</td><td><b>Learning Academy</b></td><td>Lessons by category, quizzes from verified signs only, progress tracking</td></tr>
+    <tr><td>7</td><td><b>Dataset Intelligence Lab</b></td><td>Readiness funnel, signers, consent, Recording Studio, four-eyes review, validation, dataset versions</td></tr>
+    <tr><td>8</td><td><b>AI Laboratory</b></td><td>Held-out metrics, confusion matrix, registry, experiments, new-signer evaluation, feature-contract viewer</td></tr>
+    <tr><td>9</td><td><b>Research Centre</b></td><td>Research questions, protocols, verified references</td></tr>
+    <tr><td>10</td><td><b>3D Landmark Viewer</b></td><td>Orbit and step through real landmark sequences and wrist trajectories</td></tr>
+    <tr><td>11</td><td><b>Admin</b></td><td>User roles, feedback inbox, audit log</td></tr>
+    <tr><td>12</td><td><b>Kiosk Mode</b></td><td>Full-screen, high contrast, large targets, quick phrases, one-tap reset</td></tr>
+  </table>
+  <h2>Analytics dashboard interface</h2>
+  <figure class="shot fit"><img src="SHOTS/dashboard-model.png" alt="" style="height:88mm"><figcaption>Dashboard with the trained 200-class model live: every number comes from the database or the model registry, never hard-coded.</figcaption></figure>
+  <div class="foot"><span>Chapter 7 · Application</span><span>17</span></div>
+</section>
+
+<!-- ============ 18 CH7 gallery 1 ============ -->
+<section class="page">
+  <div class="cont">07 · Application · Screenshots</div>
+  <div class="gal">
+    <figure class="shot"><img src="SHOTS/live-recognition.png" alt=""><figcaption><b>Live Recognition.</b> Camera, landmark badges, capture controls and states (captured offline, before the model was installed).</figcaption></figure>
+    <figure class="shot"><img src="SHOTS/sign-explorer.png" alt=""><figcaption><b>Sign Explorer.</b> All 200 signs with status and readiness filters.</figcaption></figure>
+    <figure class="shot"><img src="SHOTS/sign-detail.png" alt=""><figcaption><b>Sign detail.</b> Licensed source, pending meanings and the review log.</figcaption></figure>
+    <figure class="shot"><img src="SHOTS/verification-checklist.png" alt=""><figcaption><b>Verification.</b> Confirm stays disabled until all three checks are ticked.</figcaption></figure>
+    <figure class="shot"><img src="SHOTS/ai-laboratory-new-signers.png" alt=""><figcaption><b>New-signer evaluation.</b> Per-signer accuracy on consented recordings from outside INCLUDE.</figcaption></figure>
+    <figure class="shot"><img src="SHOTS/communication.png" alt=""><figcaption><b>Communication.</b> Composer with unverified-meaning warnings and speech.</figcaption></figure>
+  </div>
+  <div class="foot"><span>Chapter 7 · Screenshots</span><span>18</span></div>
+</section>
+
+<!-- ============ 19 CH7 gallery 2 ============ -->
+<section class="page">
+  <div class="cont">07 · Application · Themes, kiosk and mobile</div>
+  <div class="gal">
+    <figure class="shot"><img src="SHOTS/dashboard-dark.png" alt=""><figcaption><b>Dark theme.</b> One token system drives both themes.</figcaption></figure>
+    <figure class="shot"><img src="SHOTS/kiosk.png" alt=""><figcaption><b>Kiosk mode.</b> High contrast and large targets for public counters.</figcaption></figure>
+  </div>
+  <div style="display:grid; grid-template-columns: 1fr 1fr 2fr; gap:4mm; align-items:start">
+    <figure class="shot"><img src="SHOTS/mobile-dashboard.png" alt=""><figcaption>Phone, 390 px.</figcaption></figure>
+    <figure class="shot"><img src="SHOTS/mobile-dataset.png" alt=""><figcaption>Dataset Lab, 360 px.</figcaption></figure>
+    <div>
+      <h2>Design and accessibility</h2>
+      <ul class="check">
+        <li>Light theme by default, dark toggle or "match my device"</li>
+        <li>Keyboard navigation, visible focus, skip link</li>
+        <li>Labelled controls, image alt text, named links, landmarks</li>
+        <li>High-contrast, reduced-motion and large-text modes</li>
+        <li>No horizontal scroll on 11 routes at 360, 768 and 1280 px (tested)</li>
+        <li>Every route has exactly one page heading and no unnamed buttons (tested)</li>
+      </ul>
+      <h3>Answer states a user can see</h3>
+      <span class="pill g">recognized</span><span class="pill a">uncertain</span><span class="pill">unknown</span><span class="pill c">insufficient input</span><span class="pill r">model unavailable</span><span class="pill r">camera unavailable</span>
+    </div>
+  </div>
+  <div class="foot"><span>Chapter 7 · Screenshots</span><span>19</span></div>
+</section>
+
+<!-- ============ 20 CH8 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">08</div><div><h1>Testing, quality and security</h1><p>96 automated tests, on Linux and Windows</p></div></div>
+  <div class="grid4">
+    <div class="card v stat"><b>60</b><span>backend + ML tests (pytest)</span></div>
+    <div class="card c stat c"><b>17</b><span>frontend unit + parity tests</span></div>
+    <div class="card g stat g"><b>19</b><span>end-to-end browser tests</span></div>
+    <div class="card a stat a"><b>0</b><span>failing in the final runs</span></div>
+  </div>
+  <table>
+    <tr><th>Suite</th><th>What it covers</th><th>Result</th></tr>
+    <tr><td>Ruff lint</td><td>Python style and security rules</td><td>✅ pass</td></tr>
+    <tr><td>pytest (SQLite + PostgreSQL 16)</td><td>API, auth, RBAC, CRUD, consent, erasure, dataset, registry, inference states, gradients, leakage, open set</td><td>✅ 60 passed, 1 skipped</td></tr>
+    <tr><td>TypeScript strict + unit</td><td>Feature parity with Python, router, store, UI components, validator</td><td>✅ 17 passed</td></tr>
+    <tr><td>Playwright E2E</td><td>Sign-up, login, RBAC, search, CRUD, verification, consent → record → review, camera states, kiosk, themes, layouts, 3 tests with the real model</td><td>✅ 19 passed</td></tr>
+    <tr><td>Docker</td><td>Image build and container health check</td><td>✅ pass</td></tr>
+    <tr><td>Windows runner + owner's PC</td><td>Setup, start, 24/24 via local API, all suites</td><td>✅ all passed</td></tr>
+    <tr><td>Live deployment smoke</td><td>Health, CSP/HSTS, model, 24/24 via public API, UI at 1280 and 390 px</td><td>✅ all passed</td></tr>
+  </table>
+  <h2>Bugs the tests found, and we fixed</h2>
+  <div class="grid2">
+    <ul>
+      <li><b>Windows video upload</b> failed: OpenCV cannot reopen an open temp file on Windows</li>
+      <li><b>GPU delegate at ~1 fps</b> on software WebGL → automatic CPU switch</li>
+      <li><b>Silent empty capture</b> → now an explicit <i>insufficient input</i></li>
+      <li><b>Fake-camera path</b> must be absolute for Chromium</li>
+      <li><b>API docs blocked</b> by our own CSP → same-origin init script</li>
+    </ul>
+    <ul>
+      <li><b>PostgreSQL FK order</b> on signer erasure (found by CI)</li>
+      <li><b>Decimal</b> values from PostgreSQL SUM() broke JSON</li>
+      <li><b>DTW memory blow-up</b> → batched einsum formulation</li>
+      <li><b>MediaPipe timestamps</b> must be monotonic across videos</li>
+      <li><b>Mobile overflow</b> of 7–38 px on narrow screens</li>
+    </ul>
+  </div>
+  <h2>Security controls</h2>
+  <div class="grid3">
+    <div class="card"><h4>Identity</h4><p>PBKDF2-SHA256 password hashing, JWT with expiry, server-side RBAC for 5 roles, rate-limited login.</p></div>
+    <div class="card"><h4>Web</h4><p>Strict CSP, X-Frame-Options DENY, HSTS in production, no wildcard CORS, upload magic-byte and decode checks.</p></div>
+    <div class="card"><h4>Data</h4><p>No secrets in Git, path-safe storage, audited media access, checksummed models and migrations.</p></div>
+  </div>
+  <div class="foot"><span>Chapter 8 · Testing</span><span>20</span></div>
+</section>
+
+<!-- ============ 21 CH9 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">09</div><div><h1>Deployment, setup and project structure</h1><p>Live online, and one command on a Windows PC</p></div></div>
+  <h2>Live deployment</h2>
+  <div class="flow">
+    <div class="box b7"><b>GitHub</b>feat/isl-nova-platform</div><div class="arr">→</div>
+    <div class="box b2"><b>Docker build</b>SPA + API, non-root</div><div class="arr">→</div>
+    <div class="box b1"><b>Entrypoint</b>migrate, fetch model, verify SHA-256</div><div class="arr">→</div>
+    <div class="box b3"><b>Render free plan</b>Singapore</div><div class="arr">→</div>
+    <div class="box b4"><b>isl-nova.onrender.com</b>smoke-tested</div>
+  </div>
+  <p>The demo runs with no paid resources. The free plan sleeps when idle (first request ~1 minute) and resets its SQLite database on every restart, so the demo has no admin account and should not receive real signer recordings.</p>
+  <h2>Run it on Windows</h2>
+<pre><span class="m"># 1. get the code</span>
+git clone https://github.com/nvaltryek-001/ISL-NOVA.git ; cd ISL-NOVA
+git checkout feat/isl-nova-platform
+<span class="m"># 2. one-time setup: venv, packages, frontend build, .env, database, trained model</span>
+<span class="k">powershell</span> -ExecutionPolicy Bypass -File <span class="c">scripts\setup_windows.ps1</span>
+<span class="m"># 3. start: http://127.0.0.1:8000</span>
+<span class="k">powershell</span> -ExecutionPolicy Bypass -File <span class="c">scripts\start_windows.ps1</span>
+<span class="m"># 4. download the INCLUDE landmarks (176 MB) and train locally</span>
+<span class="k">powershell</span> -ExecutionPolicy Bypass -File <span class="c">scripts\train_windows.ps1</span> -Model all
+<span class="m"># 5. tests</span>
+<span class="k">powershell</span> -ExecutionPolicy Bypass -File <span class="c">scripts\test_windows.ps1</span> -E2E -WithModel</pre>
+  <div class="grid3">
+    <div class="card v"><h4>Prerequisites</h4><p>Python 3.13, Node.js 22, Git. Optional: PostgreSQL 16, Docker Desktop.</p></div>
+    <div class="card c"><h4>Docker</h4><p><span class="mono">docker compose up --build</span> runs the app with PostgreSQL 16; <span class="mono">ISL_NOVA_MODEL_TAG</span> installs the model.</p></div>
+    <div class="card g"><h4>Verified</h4><p>Setup, start, tests and training all passed on a Windows runner and on the owner's PC.</p></div>
+  </div>
+  <h2>GitHub Actions workflows</h2>
+  <table>
+    <tr><th>Workflow</th><th>Purpose</th></tr>
+    <tr><td class="mono">ci.yml</td><td>Lint, tests on SQLite and PostgreSQL, frontend, E2E with the model, Docker, dependency audit</td></tr>
+    <tr><td class="mono">include-data · include-train</td><td>Download and extract INCLUDE; train, compare, verify and release models</td></tr>
+    <tr><td class="mono">include-open-set · include-live-eval</td><td>Unknown-sign test; virtual-camera replay through the Live page</td></tr>
+    <tr><td class="mono">deploy-smoke · windows-local · publish-landmarks</td><td>Live-site checks; Windows scripts; publish the landmark dataset</td></tr>
+  </table>
+  <div class="foot"><span>Chapter 9 · Deployment</span><span>21</span></div>
+</section>
+
+<!-- ============ 22 CH9 structure ============ -->
+<section class="page">
+  <div class="cont">09 · Deployment · Folder structure and API</div>
+  <h2>Folder structure</h2>
+<div class="tree"><b>ISL-NOVA/</b>
+├── <b>backend/</b>
+│   ├── app/                 <i>API framework, routers, db, migrations, security, services</i>
+│   │   ├── routers/         <i>core · signs · dataset · ml · personal</i>
+│   │   └── migrations/      <i>0001_core.sql (versioned, checksummed)</i>
+│   └── tests/               <i>API, RBAC, CRUD, consent, evaluation, inference tests</i>
+├── <b>ml/</b>
+│   ├── isl_nova_ml/         <i>contract · features · models · train · registry · inference</i>
+│   │                        <i>extract · include_pipeline · metrics · synthetic</i>
+│   ├── configs/             <i>lstm_baseline · gru · pooled-logreg · dtw-1nn</i>
+│   ├── runs/                <i>settings for the staged Actions workflows</i>
+│   └── tests/               <i>contract, gradients, leakage, registry, open set, parity</i>
+├── <b>frontend/</b>
+│   ├── src/pages/           <i>Dashboard, Live, Explorer, DatasetLab, AILab, Kiosk, …</i>
+│   ├── src/components/      <i>design system, charts, CameraStage, icons</i>
+│   ├── src/lib/             <i>api, router, query, store, features, landmarks</i>
+│   └── tests/               <i>unit, e2e, live-eval, deploy smoke</i>
+├── <b>dataset/</b>
+│   ├── vocabulary/          <i>signs_master.csv (200), translations, references, categories</i>
+│   └── sources/include/     <i>label map, official train/val/test lists, licence</i>
+├── <b>docs/</b>                    <i>architecture, API, schema, model card, deployment, status</i>
+├── <b>research/</b>                <i>results, open set, protocols, limitations, references</i>
+├── <b>scripts/</b>                 <i>setup/start/test/train_windows.ps1, fetch_model, train_local</i>
+├── <b>.github/workflows/</b>       <i>ci + data, train, evaluation, deploy, Windows pipelines</i>
+├── Dockerfile · docker-compose.yml · .env.example
+└── README.md</div>
+  <h2>API overview (84 operations)</h2>
+  <div class="grid2">
+    <table>
+      <tr><th>Area</th><th>Examples</th></tr>
+      <tr><td>Core</td><td class="mono">GET /health · POST /auth/login · GET /me</td></tr>
+      <tr><td>Signs</td><td class="mono">GET /signs · POST /signs · POST /signs/{id}/review</td></tr>
+      <tr><td>Recognition</td><td class="mono">POST /predict/sequence · GET /model/info</td></tr>
+    </table>
+    <table>
+      <tr><th>Area</th><th>Examples</th></tr>
+      <tr><td>Dataset</td><td class="mono">POST /dataset/recordings · /consents · /versions</td></tr>
+      <tr><td>AI Lab</td><td class="mono">POST /experiments/{id}/run · /models/{id}/promote</td></tr>
+      <tr><td>Evaluation</td><td class="mono">GET /evaluation/metrics · POST /evaluation/runs</td></tr>
+    </table>
+  </div>
+  <p class="small">Interactive documentation is served at <span class="mono">/api/docs</span>; the full contract is generated from the code into docs/API_CONTRACT.md.</p>
+  <div class="foot"><span>Chapter 9 · Structure</span><span>22</span></div>
+</section>
+
+<!-- ============ 23 CH10 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">10</div><div><h1>Limitations, future work and conclusion</h1><p>What is proven, what is not, and what comes next</p></div></div>
+  <div class="grid2">
+    <div class="card a"><h4>Limitations, stated plainly</h4><ul class="cross">
+      <li>Results are on INCLUDE's official split, <b>not signer-independent</b></li>
+      <li><b>29 %</b> of unseen signs are still recognized as a known sign</li>
+      <li>No test yet with <b>a real person at a webcam</b> or with new signers</li>
+      <li><b>0 / 200</b> signs verified by qualified ISL reviewers</li>
+      <li>Isolated signs only; no grammar, translation or facial expressions</li>
+      <li>Free demo sleeps when idle and loses its data on restart</li></ul></div>
+    <div class="card v"><h4>Future work</h4><ul>
+      <li>Consented recordings from ≥ 10 new signers for a true signer-independent test</li>
+      <li>Stronger unknown-sign detection: energy scores, background class, embeddings</li>
+      <li>TCN and Transformer models; feature ablations; multiple seeds</li>
+      <li>Real-user studies with Deaf signers, with consent and a protocol</li>
+      <li>Verified Hindi and Kannada meanings and regional variants</li>
+      <li>Persistent hosting with managed PostgreSQL</li></ul></div>
+  </div>
+  <h2>Conclusion</h2>
+  <p class="lead">ISL NOVA turns a genuine, licensed ISL dataset into a working, tested and deployed recognition platform. An LSTM trained on 3,370 real INCLUDE recordings recognises all 200 signs with <b>91.7 % top-1</b> on held-out videos, and the same model answers correctly through the live public API.</p>
+  <p>Just as important, the project knows its limits. Each answer carries a calibrated state; unknown-sign rejection, new-signer accuracy and real-webcam use are measured or marked as open; data collection is built around consent; and every number in this report can be traced to the run that produced it.</p>
+  <h2>References</h2>
+  <ol class="small">
+    <li>Sridhar, A., Ganesan, R. G., Kumar, P., Khapra, M. (2020). INCLUDE: A Large Scale Dataset for Indian Sign Language Recognition. ACM Multimedia. doi:10.1145/3394171.3413528</li>
+    <li>Joshi, A. et al. (2024). iSign: A Benchmark for Indian Sign Language Processing. Findings of ACL.</li>
+    <li>Hochreiter, S., Schmidhuber, J. (1997). Long Short-Term Memory. Neural Computation 9(8).</li>
+    <li>Guo, C. et al. (2017). On Calibration of Modern Neural Networks. ICML.</li>
+    <li>Hendrycks, D., Gimpel, K. (2017). A Baseline for Detecting Misclassified and Out-of-Distribution Examples. ICLR.</li>
+    <li>Lugaresi, C. et al. (2019). MediaPipe: A Framework for Building Perception Pipelines. arXiv:1906.08172.</li>
+  </ol>
+  <div class="note v"><b>Dataset attribution.</b> INCLUDE by A. Sridhar, R. G. Ganesan, P. Kumar and M. Khapra (AI4Bharat, IIT Madras), CC BY 4.0. Landmark images in this report are derived from it. MediaPipe is © Google, used under its licence.</div>
+  <div class="foot"><span>Chapter 10 · Conclusion</span><span>23</span></div>
+</section>
+</body>
+</html>
