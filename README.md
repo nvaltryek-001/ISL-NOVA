@@ -469,7 +469,7 @@ This downloads the tarball and its `.sha256`, verifies both, unpacks path-safely
 python scripts/train_local.py --model lstm          # or gru, pooled-logreg, dtw-1nn, all; --promote
 ```
 
-For reference, training the LSTM took about 8.5 minutes on a 4-vCPU GitHub runner (early stop at epoch 49). Logistic regression is the quickest way to check your setup.
+Checked on a Windows runner ([run 41961463214](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41961463214)): `train_windows.ps1 -Model pooled-logreg` downloaded the landmarks and trained in 4.7 minutes, reproducing the CI result exactly (89.1 % top-1, 98.3 % top-5, 88.8 % macro-F1). The LSTM took about 8.5 minutes on a 4-vCPU Linux runner in CI; expect similar or longer on a laptop.
 
 **Or from the raw INCLUDE videos** on your disk:
 
