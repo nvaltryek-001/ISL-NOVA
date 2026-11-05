@@ -9,10 +9,9 @@
       powershell -ExecutionPolicy Bypass -File scripts\train_windows.ps1 -Model pooled-logreg   # ~1 min
       powershell -ExecutionPolicy Bypass -File scripts\train_windows.ps1 -Promote        # make it active
 
-  The 176 MB landmark dataset is downloaded with the GitHub CLI (winget install
-  GitHub.cli, then gh auth login). Or download the 'include-landmarks-v1'
-  artifact from https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41764539272,
-  unzip it to data\include-landmarks-v1 and run this script.
+  The 176 MB landmark dataset is downloaded from the GitHub release
+  dataset-include-landmarks-v1 (no sign-in, SHA-256 verified) into
+  data\include-landmarks-v1. Use -Data <folder> for an existing copy.
 #>
 [CmdletBinding()]
 param(

@@ -413,8 +413,7 @@ powershell -ExecutionPolicy Bypass -File scripts\start_windows.ps1
 powershell -ExecutionPolicy Bypass -File scripts\test_windows.ps1              # lint, pytest, tsc, unit
 powershell -ExecutionPolicy Bypass -File scripts\test_windows.ps1 -E2E -WithModel   # + browser E2E with the model
 
-# 5. download the processed INCLUDE dataset (176 MB of landmarks) and train locally
-#    needs the GitHub CLI once: winget install GitHub.cli ; gh auth login
+# 5. download the processed INCLUDE dataset (176 MB of landmarks, no sign-in) and train locally
 powershell -ExecutionPolicy Bypass -File scripts\train_windows.ps1                  # LSTM (released recipe)
 powershell -ExecutionPolicy Bypass -File scripts\train_windows.ps1 -Model all       # LSTM, GRU, LogReg, DTW
 powershell -ExecutionPolicy Bypass -File scripts\train_windows.ps1 -Promote         # make the new model active
@@ -463,13 +462,13 @@ This downloads the tarball and its `.sha256`, verifies both, unpacks path-safely
 | `deploy-smoke.yml` | `run/deploy-smoke` | Read-only checks of a running deployment |
 | `windows-local.yml` | `run/windows-check` | The Windows setup, start and test scripts |
 
-**Train locally on the processed landmarks (recommended).** `scripts/train_local.py` (Windows wrapper: `scripts\train_windows.ps1`) downloads the 3,370 landmark sequences that the data workflow extracted (artifact `include-landmarks-v1`, 176 MB, needs the [GitHub CLI](https://cli.github.com/) signed in with `gh auth login`, or download the zip from [the run page](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41764539272) and pass `--data <folder>`). It then trains with the same configs, official split and validation-only selection as CI and prints a comparison table. New models are registered but **not promoted** unless you pass `--promote`. The artifact expires in early February 2027; after that, rerun the data workflow or use the raw videos below.
+**Train locally on the processed landmarks (recommended).** `scripts/train_local.py` (Windows wrapper: `scripts\train_windows.ps1`) downloads the 3,370 landmark sequences that the data workflow extracted from the published release [`dataset-include-landmarks-v1`](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/dataset-include-landmarks-v1) (176 MB, no sign-in, SHA-256 verified; derived from INCLUDE under CC BY 4.0, attribution inside, no video). It then trains with the same configs, official split and validation-only selection as CI and prints a comparison table. New models are registered but **not promoted** unless you pass `--promote`. Offline? Pass `--data <folder>` with an unzipped copy.
 
 ```bash
 python scripts/train_local.py --model lstm          # or gru, pooled-logreg, dtw-1nn, all; --promote
 ```
 
-Checked on a Windows runner ([run 41961463214](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41961463214)): `train_windows.ps1 -Model pooled-logreg` downloaded the landmarks and trained in 4.7 minutes, reproducing the CI result exactly (89.1 % top-1, 98.3 % top-5, 88.8 % macro-F1). The LSTM took about 8.5 minutes on a 4-vCPU Linux runner in CI; expect similar or longer on a laptop.
+Checked on a Windows runner ([run 41961463214](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41961463214)): `train_windows.ps1 -Model pooled-logreg` downloaded the landmarks and trained in 4.7 minutes, reproducing the CI result exactly (89.1 % top-1, 98.3 % top-5, 88.8 % macro-F1). On a Linux machine the same command gave 89.3 % / 98.3 % / 88.9 %: expect small differences between computers. The LSTM took about 8.5 minutes on a 4-vCPU Linux runner in CI; expect similar or longer on a laptop.
 
 **Or from the raw INCLUDE videos** on your disk:
 
