@@ -106,6 +106,7 @@ def main(argv=None) -> int:
     ap.add_argument("--epochs", type=int, help="override the configured maximum epochs (early stopping still applies)")
     ap.add_argument("--seed", type=int, help="override the random seed (released model: 13)")
     ap.add_argument("--promote", action="store_true", help="promote the best new model (by validation macro-F1)")
+    ap.add_argument("--download-only", action="store_true", help="only download and verify the dataset, do not train")
     a = ap.parse_args(argv)
 
     from isl_nova_ml.registry import Registry
@@ -117,6 +118,9 @@ def main(argv=None) -> int:
         print(f"data: {summary.get('usable_landmark_sequences')} sequences, {summary.get('classes_with_data')} classes, "
               f"split {summary.get('by_split')}")
 
+    if a.download_only:
+        print("data: ready (download only, no training)")
+        return 0
     kinds = list(CONFIGS) if a.model == "all" else [a.model]
     results = []
     for kind in kinds:
