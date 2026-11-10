@@ -1,6 +1,6 @@
 {
   "parts": "Greetings_1of2.zip,Greetings_2of2.zip,Seasons_1of1.zip,Colours_1of2.zip",
-  "model_tag": "model-lstm-20261104T041414Z-s13",
+  "model_tag": "model-lstm-20261110T111537Z-s7",
   "limit": 0,
-  "purpose": "virtual-camera replay of held-out INCLUDE test videos through the Live Recognition page"
+  "purpose": "v2: frame-rate-augmented LSTM through the Live page (virtual camera), same 73 held-out clips as run 41860050670"
 }
