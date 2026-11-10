@@ -8,15 +8,17 @@
 
 **An open, consent-first platform for Indian Sign Language recognition, learning and dataset building,<br/>honest about what it can and cannot do yet.**
 
-[![CI](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/ci.yml/badge.svg?branch=feat%2Fisl-nova-platform)](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/ci.yml)
+[![CI](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/ci.yml/badge.svg?branch=feat%2Fisl-nova-v2)](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/ci.yml)
 [![Windows setup](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/windows-local.yml/badge.svg?branch=run%2Fwindows-check)](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/windows-local.yml)
-![version](https://img.shields.io/badge/version-0.1.0-8b5cf6)
+![version](https://img.shields.io/badge/version-2.0.0--dev-8b5cf6)
 ![python](https://img.shields.io/badge/python-3.11%E2%80%933.13-3776ab)
 ![node](https://img.shields.io/badge/node-22-5fa04e)
 ![react](https://img.shields.io/badge/react-19.2-22d3ee)
 <br/>
-![model](https://img.shields.io/badge/LSTM%20·%20200%20classes-91.7%25%20top--1%20(INCLUDE%20test)-10b981)
-![open-set](https://img.shields.io/badge/unknown--sign%20AUROC-0.900-f59e0b)
+![model](https://img.shields.io/badge/LSTM%20v2%20·%20200%20classes-92.0%25%20top--1%20(INCLUDE%20test)-10b981)
+![browser](https://img.shields.io/badge/browser%20pipeline-83.6%25%20top--1-10b981)
+![languages](https://img.shields.io/badge/languages-English%20·%20हिन्दी%20·%20ಕನ್ನಡ-22d3ee)
+![open-set](https://img.shields.io/badge/unknown--sign%20AUROC-0.918-f59e0b)
 ![verified](https://img.shields.io/badge/linguistically%20verified-0%20%2F%20200-ef4444)
 [![demo](https://img.shields.io/badge/live%20demo-isl--nova.onrender.com-8b5cf6)](https://isl-nova.onrender.com)
 
@@ -38,11 +40,12 @@
 >
 > | | |
 > |---|---|
-> | ✅ **Platform** | 12 application modules, consent-first data pipeline, training and evaluation, webcam recognition. CI green: **60** Python tests, **17** unit tests, **19** end-to-end tests. Setup scripts verified on a Windows runner. |
-> | ✅ **Real model** | LSTM trained on genuine INCLUDE recordings, all **200 classes**: **91.7 % top-1 · 98.3 % top-5 · 91.7 % macro-F1** on the 635-video official test split. Through the full browser pipeline (held-out clips as a virtual webcam): **74.0 % top-1**. |
-> | ✅ **Deployed** | Free-tier demo with that model at **[isl-nova.onrender.com](https://isl-nova.onrender.com)**, checked from outside: 24/24 held-out samples correct through the public API. |
-> | ⚠️ **Unknown signs** | Tested on 62 held-out INCLUDE glosses: AUROC 0.900, but **29 % of unseen signs are still "recognized"**. |
-> | ⛔ **Not yet shown** | Accuracy on **new signers** (INCLUDE has no signer IDs, so results are **not signer-independent**) · recognition with **a real person at a webcam** · **linguistic verification** (0 / 200 signs verified). |
+> | ✅ **Platform (v2)** | 15 modules incl. **Practice Coach**, **Text-to-Sign**, **Conversation mode**, installable **offline PWA**; interface and all 200 sign meanings in **English, हिन्दी and ಕನ್ನಡ**; sign-out-everywhere, password reset, optional **two-factor sign-in**, retention job, Prometheus metrics. CI green: **75** Python tests, **20** unit tests, **24** end-to-end tests incl. an **axe-core WCAG 2.1 AA scan** of 18 routes in both themes. |
+> | ✅ **Real model (v2)** | LSTM with frame-rate augmentation, trained on genuine INCLUDE recordings, **200 classes**: **92.0 % top-1 · 98.7 % top-5** on the 635-video official test split (3-seed mean **93.0 ± 0.7 %** vs 90.6 ± 0.9 % without augmentation). Through the full browser pipeline (held-out clips as a virtual webcam): **83.6 % top-1** (v1: 74.0 %). |
+> | ✅ **Deployed (v1)** | Free-tier demo at **[isl-nova.onrender.com](https://isl-nova.onrender.com)** runs the v1 platform and model; 24/24 held-out samples correct through the public API. v2 is not deployed yet. |
+> | ⚠️ **Unknown signs** | 62 held-out INCLUDE glosses: AUROC 0.918, but **34 % of unseen signs are still "recognized"** at the shipped threshold (v1: 29 %). Target FAR < 10 % not met. |
+> | ⚠️ **Hindi / Kannada** | All 200 meanings exist as **machine drafts**, clearly marked; **0 verified by a linguist**. |
+> | ⛔ **Not yet shown** | Accuracy on **new signers** (INCLUDE has no signer IDs, so results are **not signer-independent**) · recognition with **a real person at a webcam** · **linguistic verification** (0 / 200 signs verified) · any user study. |
 
 ---
 
@@ -130,7 +133,12 @@ India has millions of Deaf people and very few ISL interpreters. Software can he
 | 🎥 | **Real-time recognition** | In-browser MediaPipe hand + pose, GPU→CPU fallback, capture-one-sign or continuous mode, top-5 with smoothing, speech and text output |
 | 🧭 | **Honest answers** | Temperature-calibrated probabilities, rejection threshold τ + margin → `recognized · uncertain · unknown · insufficient_input · model_unavailable` |
 | 🔒 | **Privacy by design** | Video never leaves the device for live use; pseudonymous signers; consent scopes; withdrawal as erasure; audit log |
-| 🗂️ | **200-class vocabulary** | `ISL001`–`ISL200` with licensed references, verification and readiness states, multilingual meanings (en/hi/kn, pending where unknown) |
+| 🗂️ | **200-class vocabulary** | `ISL001`–`ISL200` with licensed references, verification and readiness states; meanings in English, Hindi and Kannada with transliteration (Hindi/Kannada are labelled machine drafts until a linguist verifies them) |
+| 🌐 | **Three-language interface** | Every screen in English, हिन्दी or ಕನ್ನಡ (switcher in the header, remembered); speech output in the chosen language; translation coverage, review-sheet export and linguist-only import |
+| 🎯 | **Practice Coach** | Pick a sign, watch a reference animation built from real INCLUDE landmarks, try it on camera, get a 0–100 similarity score, per-part feedback (hands, shape, movement) and what the model read |
+| 🔁 | **Text-to-Sign & Conversation** | Type English or Hindi → the matching signs as reference animations (unknown words flagged); two-way mode: hearing person speaks (speech-to-text), deaf person signs (continuous recognition), each side sees the other's words. Output is a *recognized word sequence*, **not a translation** |
+| 📴 | **Installable & offline** | PWA: install to the home screen; the app shell and MediaPipe assets are cached so it opens offline (recognition still needs the server) |
+| 🛡️ | **Account security** | Sign out everywhere (token versioning), admin-issued one-time reset codes, optional TOTP two-factor (RFC 6238), audit-logged |
 | ✅ | **Expert verification** | Only the `linguist` role verifies; a documented entry and a three-item checklist are enforced by the API; CSV review sheet for all 200 signs |
 | 🧪 | **Full ML lifecycle** | Versioned feature contract, leakage checks, four model families, calibration, registry with promote/rollback, background training jobs |
 | 📈 | **Evaluation workflows** | Held-out test, open-set (unknown signs), new-signer evaluation runs with per-signer accuracy, virtual-camera replay |
@@ -305,6 +313,24 @@ All models share the feature contract, select on **validation** only, get **temp
 
 ## 📊 Results
 
+### v2 at a glance (2026-11-10)
+
+Default model [`model-lstm-20261110T111537Z-s7`](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/model-lstm-20261110T111537Z-s7): the same LSTM, trained with landmark sequences that simulate 8–30 fps, cropped starts/ends and missed hand detections. Same data, split and features as v1; selected by **validation** score. Model card: [docs/MODEL_CARD.md](docs/MODEL_CARD.md).
+
+| Measured | v1 (`…041414Z-s13`) | **v2 (`…111537Z-s7`)** | Run |
+|---|---:|---:|---|
+| Test top-1 / top-5 (635 videos) | 91.7 % / 98.3 % | **92.0 % / 98.7 %** | [42804474143](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42804474143) |
+| Test top-1, mean ± std over 3 seeds | 90.6 ± 0.9 % (baseline recipe) | **93.0 ± 0.7 %** | same |
+| Calibration error (ECE) | 0.027 | **0.015** | same |
+| **Browser pipeline**, 73 held-out clips as a virtual webcam | 74.0 % | **83.6 %** (target ≥ 85 %: not met) | [42807661120](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42807661120) |
+| Unknown-sign AUROC | 0.900 | **0.918** | [42807661840](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42807661840) |
+| Unknown signs *recognized* at the shipped τ | **29.3 %** | 34.0 % ⚠️ | same |
+| Best detector (combined), ~10 % false rejection | FAR 17.8 % | **FAR 13.7 %** (target < 10 %: not met) | same |
+| Practice Coach: same-sign vs other-sign similarity | — | median 93 vs 13 (own sign higher in 88 % of pairs) | local, 120 test recordings |
+
+Full write-ups: [FPS_ROBUSTNESS.md](research/FPS_ROBUSTNESS.md) · [OPEN_SET_V2.md](research/OPEN_SET_V2.md) · [RESULTS.md](research/RESULTS.md). Everything below this point describes the v1 evaluation in detail.
+
+
 **Genuine results** from GitHub Actions run [41771084083](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41771084083) on data run [41764539272](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41764539272): dataset `include-official-v1`, 200 classes, INCLUDE official train/val/test split, contract `isl-nova-fc-1.0.0`, seed 13.
 
 ### Model comparison (held-out test split, 635 videos)
@@ -366,6 +392,17 @@ Artifacts: model release [`model-lstm-20261104T041414Z-s13`](https://github.com/
 | Responsive + accessibility basics | ✅ | E2E: 11 routes × 360/768/1280 px + wide font; labels, alt, names, landmarks | CI |
 | Windows local setup | ✅ | `setup_windows.ps1`, `start_windows.ps1`, `test_windows.ps1` on a Windows runner (PowerShell 5.1) | [workflow](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/windows-local.yml) |
 | Free-tier deployment with model | ✅ | Read-only smoke test from GitHub Actions | [isl-nova.onrender.com](https://isl-nova.onrender.com) |
+| **v2** · Hindi / Kannada interface and 200 draft meanings | ✅ | unit test (≥ 90 % string coverage, measured 100 %), API tests, E2E language switch | drafts only; **0 linguist-verified** |
+| **v2** · Frame-rate-robust model | ✅ | 3 seeds on the test split; virtual-camera replay | 92.0 % test, **83.6 % browser** |
+| **v2** · Unknown-sign detector comparison | ✅ | disjoint unknown glosses for tuning vs evaluation | combined AUROC 0.932; **not shipped in the Predictor yet** |
+| **v2** · Practice Coach scoring | ✅ | pytest + E2E (camera gated); 120 test recordings locally | own vs other median 93 vs 13 |
+| **v2** · Text-to-Sign, Conversation mode | ✅ | E2E for Text-to-Sign; Conversation: unit/E2E of the page, **speech recognition not testable headless** | — |
+| **v2** · Installable PWA, offline shell | ✅ | E2E: manifest, service worker, offline reload, offline badge | — |
+| **v2** · Vocabulary proposals (toward 500) | ✅ | pytest: duplicates refused, linguist accept/reject, drafts created | — |
+| **v2** · Sign out everywhere, reset codes, TOTP 2FA | ✅ | pytest (RFC 6238 vectors, replay refused) + E2E for all three | — |
+| **v2** · Retention job, Prometheus `/metrics` | ✅ | pytest (dry run, apply, counts; metrics format) | — |
+| **v2** · Automated accessibility scan | ✅ | axe-core WCAG 2.1 A/AA, 18 routes × light/dark; 0 serious/critical after fixes | CI |
+| Live webcam / new signers / user study | ✅ tooling | ⛔ **not run** — needs people ([protocol](research/USER_STUDY_PROTOCOL.md)) | — |
 
 ## 🚀 Quick start
 
@@ -375,7 +412,7 @@ Artifacts: model release [`model-lstm-20261104T041414Z-s13`](https://github.com/
 
 ```bash
 git clone https://github.com/nvaltryek-001/ISL-NOVA.git && cd ISL-NOVA
-git checkout feat/isl-nova-platform
+git checkout feat/isl-nova-v2
 
 python -m venv .venv && source .venv/bin/activate
 pip install -r backend/requirements-dev.txt
@@ -383,7 +420,7 @@ pip install -r backend/requirements-dev.txt
 
 export PYTHONPATH=backend:ml
 export BOOTSTRAP_ADMIN_EMAIL=you@example.org BOOTSTRAP_ADMIN_PASSWORD='a-long-password'
-python scripts/fetch_model.py --tag model-lstm-20261104T041414Z-s13 --registry artifacts/models --promote
+python scripts/fetch_model.py --tag model-lstm-20261110T111537Z-s7 --registry artifacts/models --promote
 uvicorn app.main:app --app-dir backend --port 8000
 ```
 
@@ -395,14 +432,14 @@ One script sets up **everything** in a single run: packages, the frontend build,
 
 **Windows (PowerShell):**
 ```powershell
-git clone https://github.com/nvaltryek-001/ISL-NOVA.git ; cd ISL-NOVA ; git checkout feat/isl-nova-platform
+git clone https://github.com/nvaltryek-001/ISL-NOVA.git ; cd ISL-NOVA ; git checkout feat/isl-nova-v2
 powershell -ExecutionPolicy Bypass -File scripts\install_all_windows.ps1 -Start
 #   add -Train lstm (or -Train all) to also train; -SkipDataset to skip the 176 MB download
 ```
 
 **Linux / macOS (bash):**
 ```bash
-git clone https://github.com/nvaltryek-001/ISL-NOVA.git && cd ISL-NOVA && git checkout feat/isl-nova-platform
+git clone https://github.com/nvaltryek-001/ISL-NOVA.git && cd ISL-NOVA && git checkout feat/isl-nova-v2
 bash scripts/install_all.sh --start          # --train lstm | all · --skip-dataset · --port 8080
 bash scripts/start.sh                        # later starts
 ```
@@ -417,7 +454,7 @@ Three PowerShell scripts do everything from the repository root. They are tested
 # 1. get the code
 git clone https://github.com/nvaltryek-001/ISL-NOVA.git
 cd ISL-NOVA
-git checkout feat/isl-nova-platform        # later: git pull
+git checkout feat/isl-nova-v2        # later: git pull
 
 # 2. one-time setup: .venv, Python + npm packages, frontend build, .env (random secret,
 #    local admin), SQLite database, trained model download (SHA-256 verified)
@@ -464,7 +501,7 @@ Migrations are versioned and checksummed (an edited migration is refused) and ea
 The trained model is **not** committed to Git. It is published as a GitHub pre-release and installed with a checksum check:
 
 ```bash
-python scripts/fetch_model.py --tag model-lstm-20261104T041414Z-s13 --registry artifacts/models --promote
+python scripts/fetch_model.py --tag model-lstm-20261110T111537Z-s7 --registry artifacts/models --promote
 ```
 
 This downloads the tarball and its `.sha256`, verifies both, unpacks path-safely, verifies the weights hash, registers and promotes the model, and runs a load check with the production `Predictor`. Restart the server to load it. In Docker, set `ISL_NOVA_MODEL_TAG` and the entrypoint does this at start-up. Rollback: `POST /api/v1/models/rollback` (admin) or *AI Laboratory → Registry*.
@@ -537,7 +574,7 @@ docker compose up --build
 # or the app alone, with the trained model installed at start-up
 docker build -t isl-nova .
 docker run -p 8000:8000 -e ISL_NOVA_ENV=production -e JWT_SECRET=$(openssl rand -hex 32) \
-  -e CORS_ORIGINS=http://localhost:8000 -e ISL_NOVA_MODEL_TAG=model-lstm-20261104T041414Z-s13 isl-nova
+  -e CORS_ORIGINS=http://localhost:8000 -e ISL_NOVA_MODEL_TAG=model-lstm-20261110T111537Z-s7 isl-nova
 ```
 
 The multi-stage [`Dockerfile`](Dockerfile) builds the SPA and the API into one image running as a non-root user. [`scripts/docker-entrypoint.sh`](scripts/docker-entrypoint.sh) applies migrations, installs the model named by `ISL_NOVA_MODEL_TAG` (SHA-256 verified; a failed download is logged and the API reports `model_unavailable`), and serves on `$PORT`.
@@ -670,4 +707,4 @@ Contributions are welcome: read [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md). In
 
 Full BibTeX: [research/REFERENCES.bib](research/REFERENCES.bib).
 
-<div align="center"><sub>ISL NOVA · v0.1.0 · branch <code>feat/isl-nova-platform</code></sub></div>
+<div align="center"><sub>ISL NOVA · v2.0.0-dev · branch <code>feat/isl-nova-v2</code></sub></div>

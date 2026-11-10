@@ -32,7 +32,7 @@
 #>
 [CmdletBinding()]
 param(
-  [string]$ModelTag = "model-lstm-20261104T041414Z-s13",
+  [string]$ModelTag = "model-lstm-20261110T111537Z-s7",
   [switch]$SkipModel,
   [switch]$SkipFrontend,
   [switch]$WithMediaPipeTasks,

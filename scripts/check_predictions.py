@@ -2,7 +2,7 @@
 """Send held-out INCLUDE test landmark sequences to a running ISL NOVA server.
 
     python scripts/check_predictions.py --base http://127.0.0.1:8000 \
-        [--tag model-lstm-20261104T041414Z-s13] [--sample DIR] [--min-correct 0.75]
+        [--tag model-lstm-20261110T111537Z-s7] [--sample DIR] [--min-correct 0.75]
 
 Downloads the 24-sequence held-out test sample attached to the model release
 (unless --sample points at an extracted copy), posts each sequence to
@@ -40,7 +40,7 @@ def _get(url: str) -> bytes:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--base", default="http://127.0.0.1:8000")
-    ap.add_argument("--tag", default="model-lstm-20261104T041414Z-s13")
+    ap.add_argument("--tag", default="model-lstm-20261110T111537Z-s7")
     ap.add_argument("--sample", type=Path, help="directory with an extracted include_test_landmark_sample")
     ap.add_argument("--min-correct", type=float, default=0.75)
     a = ap.parse_args(argv)

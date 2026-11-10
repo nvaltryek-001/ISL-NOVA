@@ -14,7 +14,7 @@
 param(
   [switch]$E2E,
   [switch]$WithModel,
-  [string]$ModelTag = "model-lstm-20261104T041414Z-s13"
+  [string]$ModelTag = "model-lstm-20261110T111537Z-s7"
 )
 
 $ErrorActionPreference = "Stop"

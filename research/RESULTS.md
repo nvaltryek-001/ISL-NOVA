@@ -28,3 +28,27 @@ All values come from `metrics.json` files written by training run [41771084083](
 | Same 73 clips as a virtual webcam through the Live page (browser MediaPipe, CPU delegate ~10 fps) | [41860050670](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41860050670) | 74.0 % top-1, 89.0 % top-5; 45/48 *recognized* correct; 17 uncertain, 8 unknown |
 | Unknown-sign false acceptance / false rejection at τ | 41815223675 | 29.3 % / 12.1 %; unknown-detection precision 89.1 %, recall 70.7 % |
 | New-signer evaluation | — | workflow implemented; **no new-signer data exists, no result** |
+
+## v2 results (2026-11-10)
+
+Same dataset version, split, feature contract and evaluation rules. Released v2
+model: [`model-lstm-20261110T111537Z-s7`](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/model-lstm-20261110T111537Z-s7)
+(LSTM + frame-rate augmentation, seed 7, chosen by validation macro-F1). Details:
+[FPS_ROBUSTNESS.md](FPS_ROBUSTNESS.md), [OPEN_SET_V2.md](OPEN_SET_V2.md).
+
+| Model (test split, 635) | Seeds | Top-1 | Top-5 | Macro-F1 | ECE |
+|---|---:|---:|---:|---:|---:|
+| **LSTM + fps aug (released, s7)** | 1 | **92.0 %** | **98.7 %** | 91.6 % | 0.015 |
+| LSTM + fps aug, mean ± std | 3 | 93.0 ± 0.7 % | — | 92.7 ± 0.8 % | — |
+| LSTM baseline, mean ± std | 3 | 90.6 ± 0.9 % | — | 90.3 ± 1.2 % | — |
+| GRU + fps aug (s13) | 1 | 93.2 % | — | 93.3 % | — |
+
+| Evaluation (v2 model) | Run | Result |
+|---|---|---|
+| Training matrix (6 models) | [42804474143](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42804474143) | table above |
+| Virtual camera, 73 held-out clips through the Live page | [42807661120](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42807661120) | **83.6 % top-1** (v1: 74.0 %), 97.3 % top-5; 49/54 *recognized* correct; offline on the same clips 89.0 % |
+| Unknown signs, all 62 reserve glosses, shipped τ = 0.666 | [42807661840](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42807661840) | AUROC 0.918; **34.0 %** of unknown sequences *recognized* (v1: 29.3 %); known recognized-and-correct 88.5 % |
+| Detector comparison, disjoint unknown glosses | 42807661840 | best: combined, AUROC 0.932; keep-90 %: FRR 10.2 % / FAR 13.7 % |
+| Practice Coach similarity, 120 test recordings vs train references (local) | — | own-sign median 93 vs other-sign median 13; own > other in 88 % of pairs |
+
+**Targets not met:** browser top-1 ≥ 85 % (83.6 %); unknown-sign FAR < 10 % with FRR ≤ 15 % (best 11.5 % / 12.9 %). Still **not signer-independent**; still **no live-person or new-signer result**.
