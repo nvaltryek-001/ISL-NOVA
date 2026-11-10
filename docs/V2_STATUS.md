@@ -96,6 +96,16 @@ Legend: ✅ done and tested · 🟡 partly done · ⏳ pending (reason given) ·
 | E | Privacy: retention job, sign-out-everywhere, 2FA, PWA never caches API data | ✅ |
 | F | Reliability: CI on SQLite + PostgreSQL, a11y scan, installers on 3 OSes | ✅ |
 
+## Install and setup checks on v2
+
+| Check | Result | Run |
+|---|---|---|
+| Windows setup → start → 24 held-out samples → `test_windows.ps1 -E2E -WithModel` (PowerShell 5.1) | ✅ v2 model installed, **24/24**, ruff clean, 75 pytest, 20 unit, E2E pass | [42820004444](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42820004444) |
+| One-command installer, Windows | ✅ | [42819999933](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42819999933) |
+| One-command installer, Ubuntu 24.04 (model + references + dataset + training + 24/24) | ✅ | same run |
+| One-command installer, macOS 14 | ⚠️ **not run**: the macOS job was cancelled by GitHub before it started, twice (no runner assigned); last macOS pass was on v1 ([41977728731](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41977728731)) | same run |
+| CI (lint, pytest on SQLite + PostgreSQL 16, typecheck, unit, build, E2E, axe scan, audit) | ✅ | [latest](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/ci.yml?query=branch%3Afeat%2Fisl-nova-v2) |
+
 ## Human-dependent tasks (still pending)
 
 1. Linguist review of 200 English glosses and 400 Hindi/Kannada drafts.
