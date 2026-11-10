@@ -138,6 +138,7 @@ India has millions of Deaf people and very few ISL interpreters. Software can he
 | 🎯 | **Practice Coach** | Pick a sign, watch a reference animation built from real INCLUDE landmarks, try it on camera, get a 0–100 similarity score, per-part feedback (hands, shape, movement) and what the model read |
 | 🔁 | **Text-to-Sign & Conversation** | Type English or Hindi → the matching signs as reference animations (unknown words flagged); two-way mode: hearing person speaks (speech-to-text), deaf person signs (continuous recognition), each side sees the other's words. Output is a *recognized word sequence*, **not a translation** |
 | 📴 | **Installable & offline** | PWA: install to the home screen; the app shell and MediaPipe assets are cached so it opens offline (recognition still needs the server) |
+| 🏅 | **Streaks and badges** | Daily streak, points, weekly goal and seven badges in *My progress*, derived only from your own quiz and Practice Coach attempts |
 | 🛡️ | **Account security** | Sign out everywhere (token versioning), admin-issued one-time reset codes, optional TOTP two-factor (RFC 6238), audit-logged |
 | ✅ | **Expert verification** | Only the `linguist` role verifies; a documented entry and a three-item checklist are enforced by the API; CSV review sheet for all 200 signs |
 | 🧪 | **Full ML lifecycle** | Versioned feature contract, leakage checks, four model families, calibration, registry with promote/rollback, background training jobs |

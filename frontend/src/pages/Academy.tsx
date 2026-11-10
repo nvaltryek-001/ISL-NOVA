@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { Icon } from '../components/icons';
 import { Badge, Button, Card, Empty, ErrorNote, Loading, Meter, Notice, PageHeader, StatusBadge, Tabs } from '../components/ui';
+import { useT } from '../i18n';
 import { api } from '../lib/api';
 import { useQuery } from '../lib/query';
 import { Link } from '../lib/router';
@@ -90,11 +92,49 @@ function QuizView({ signedIn }: { signedIn: boolean }) {
   );
 }
 
+type Achievements = {
+  attempts: number; correct: number; signs_practised: number; current_streak: number; best_streak: number;
+  points: number; this_week: number; weekly_goal: number; badges: { id: string; title: string; description: string; earned: boolean }[];
+};
+
+function AchievementsCard() {
+  const t = useT();
+  const { data } = useQuery<Achievements>('/learning/achievements');
+  if (!data) return null;
+  const pct = Math.min(100, Math.round((data.this_week / data.weekly_goal) * 100));
+  return (
+    <Card className="md:col-span-3" title="Streaks and badges" subtitle="Earned from your own quiz and Practice Coach attempts">
+      <div className="grid gap-4 sm:grid-cols-4">
+        <div><p className="label">{t('Current streak')}</p><p className="font-display text-2xl font-semibold text-fg">{data.current_streak} <span className="text-sm font-normal text-ink-400">{t('days')}</span></p></div>
+        <div><p className="label">{t('Best streak')}</p><p className="font-display text-2xl font-semibold text-fg">{data.best_streak} <span className="text-sm font-normal text-ink-400">{t('days')}</span></p></div>
+        <div><p className="label">{t('Points')}</p><p className="font-display text-2xl font-semibold text-fg">{data.points}</p></div>
+        <div>
+          <p className="label">{t('This week')}</p>
+          <p className="text-sm text-ink-300">{data.this_week} / {data.weekly_goal} {t('attempts')}</p>
+          <div className="mt-1 h-2 rounded-full bg-ink-700" role="progressbar" aria-label={t('Weekly goal')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
+            <div className="h-2 rounded-full bg-nova-500" style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+      </div>
+      <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {data.badges.map((b) => (
+          <li key={b.id} className={`rounded-lg border p-3 text-sm ${b.earned ? 'border-nova-500/50' : 'border-ink-700 opacity-70'}`}>
+            <p className="flex items-center gap-2 font-medium text-fg"><Icon name={b.earned ? 'check' : 'sparkle'} />{t(b.title)}</p>
+            <p className="mt-1 text-xs text-ink-400">{t(b.description)}</p>
+            <p className="sr-only">{b.earned ? t('Earned') : t('Not earned yet')}</p>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
 function ProgressView() {
   const { data } = useQuery<Progress>('/learning/progress');
   if (!data) return <Loading />;
   return (
     <div className="grid gap-4 md:grid-cols-3">
+      <AchievementsCard />
       <Card title="Summary">
         <dl className="space-y-2 text-sm">
           <div className="flex justify-between"><dt className="text-ink-400">Signs practised</dt><dd>{data.signs_practised}</dd></div>

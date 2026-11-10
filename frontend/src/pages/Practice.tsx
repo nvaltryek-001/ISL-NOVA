@@ -7,7 +7,7 @@ import { useT } from '../i18n';
 import { api } from '../lib/api';
 import type { Frame } from '../lib/features';
 import { useQuery } from '../lib/query';
-import { usePrefs } from '../lib/store';
+import { useAuth, usePrefs } from '../lib/store';
 
 type SignHit = { sign_id: string; canonical_sign_name: string; translations: Record<string, { text: string; status: string }> };
 type Part = { part: string; label: string; ratio: number; status: 'good' | 'check' | 'different' };
@@ -27,6 +27,7 @@ export function PracticePage() {
   const [phase, setPhase] = useState<'idle' | 'countdown' | 'capturing' | 'scoring'>('idle');
   const [count, setCount] = useState(0);
   const [result, setResult] = useState<Score | null>(null);
+  const signedIn = !!useAuth().user;
   const [ready, setReady] = useState(false);
 
   const onFrame = useCallback((f: Frame, a: number) => { capture.current?.push({ f, a }); }, []);
@@ -50,6 +51,10 @@ export function PracticePage() {
         try {
           const r = await api<Score>('/practice/score', { body: { sign_id: sign.sign_id, frames: frames.map((x) => x.f), aspect: frames.at(-1)?.a ?? 4 / 3 } });
           setResult(r);
+          // signed-in learners: count the attempt toward progress, streaks and badges
+          if (signedIn && typeof r.score === 'number') {
+            api('/learning/attempts', { body: { sign_id: sign.sign_id, mode: 'coach', correct: r.score >= 70 } }).catch(() => undefined);
+          }
         } catch (e) {
           setResult({ state: 'error', score: null, parts: [], tips: [(e as Error).message] });
         } finally { setPhase('idle'); }

@@ -36,7 +36,7 @@ class FeedbackPatch(BaseModel):
 
 class AttemptIn(BaseModel):
     sign_id: str
-    mode: str = Field(pattern="^(quiz|practice|review)$")
+    mode: str = Field(pattern="^(quiz|practice|review|coach)$")
     correct: bool
     answer: str | None = Field(default=None, max_length=120)
 
@@ -198,6 +198,53 @@ def progress(ctx: Ctx):
     difficult = [r for r in rows if r["attempts"] >= 2 and r["correct"] / r["attempts"] < 0.6]
     return {"signs_practised": len(rows), "attempts": attempts, "correct": correct,
             "accuracy": round(correct / attempts, 3) if attempts else None, "difficult": difficult, "items": rows}
+
+
+BADGES = [
+    # (id, title, description, test on the stats dict)
+    ("first_step", "First step", "Record your first attempt", lambda s: s["attempts"] >= 1),
+    ("ten_signs", "Ten signs", "Practise 10 different signs", lambda s: s["signs_practised"] >= 10),
+    ("fifty_signs", "Fifty signs", "Practise 50 different signs", lambda s: s["signs_practised"] >= 50),
+    ("sharp_eye", "Sharp eye", "At least 80 % correct over 20 or more attempts",
+     lambda s: s["attempts"] >= 20 and s["correct"] / s["attempts"] >= 0.8),
+    ("streak_3", "Three-day streak", "Practise on 3 days in a row", lambda s: s["best_streak"] >= 3),
+    ("streak_7", "Week streak", "Practise on 7 days in a row", lambda s: s["best_streak"] >= 7),
+    ("coached", "Coached", "Pass 5 Practice Coach attempts (score 70 or more)", lambda s: s["coach_passed"] >= 5),
+]
+WEEKLY_GOAL = 20
+
+
+def _streaks(days: list[str], today: str) -> tuple[int, int]:
+    """Current and best run of consecutive UTC days with at least one attempt."""
+    from datetime import date, timedelta
+    ds = sorted({date.fromisoformat(d) for d in days})
+    best = run = 0
+    prev = None
+    for d in ds:
+        run = run + 1 if prev is not None and d - prev == timedelta(days=1) else 1
+        best = max(best, run)
+        prev = d
+    t = date.fromisoformat(today)
+    current = run if ds and (t - ds[-1]).days <= 1 else 0
+    return current, best
+
+
+@router.get("/learning/achievements", summary="My streaks, points, weekly goal and badges (from my own attempts)")
+def achievements(ctx: Ctx):
+    from datetime import UTC, datetime, timedelta
+    rows = ctx.db.all("SELECT sign_id, mode, correct, created_at FROM learning_attempts WHERE user_id = ?", (ctx.uid,))
+    now = datetime.now(UTC)
+    today = now.strftime("%Y-%m-%d")
+    week_start = (now - timedelta(days=now.weekday())).strftime("%Y-%m-%d")
+    current, best = _streaks([str(r["created_at"])[:10] for r in rows], today)
+    correct = sum(1 for r in rows if r["correct"])
+    stats = {"attempts": len(rows), "correct": correct, "signs_practised": len({r["sign_id"] for r in rows}),
+             "current_streak": current, "best_streak": best,
+             "coach_passed": sum(1 for r in rows if r["mode"] == "coach" and r["correct"]),
+             "points": 10 * correct + 2 * (len(rows) - correct),
+             "this_week": sum(1 for r in rows if str(r["created_at"])[:10] >= week_start)}
+    return {**stats, "weekly_goal": WEEKLY_GOAL,
+            "badges": [{"id": b, "title": t, "description": d, "earned": bool(f(stats))} for b, t, d, f in BADGES]}
 
 
 @router.post("/learning/attempts", summary="Record a practice or quiz attempt", body=AttemptIn, status=201)

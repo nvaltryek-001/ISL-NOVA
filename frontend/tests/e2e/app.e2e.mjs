@@ -133,6 +133,26 @@ describe('authentication and RBAC', () => {
     await page.getByText('email or password is incorrect').waitFor();
     await ctx.close();
   });
+  test('learning progress shows streak, points and earned badges from real attempts', async () => {
+    const creds = await makeUser(srv.base, admin, 'streak1@example.org');
+    const me = await apiAs(srv.base, creds);
+    for (const sid of ['ISL001', 'ISL002', 'ISL003']) {
+      assert.equal((await me('/learning/attempts', { method: 'POST', body: JSON.stringify({ sign_id: sid, mode: 'quiz', correct: true }) })).status, 201);
+    }
+    const { page, errors, ctx } = await newPage(browser, srv.base);
+    await login(page, creds);
+    await page.goto('/academy');
+    await page.getByRole('tab', { name: 'My progress' }).click();
+    await page.getByText('Streaks and badges').waitFor();
+    await page.getByText('30', { exact: true }).waitFor();           // 3 correct x 10 points
+    const first = page.getByRole('listitem').filter({ hasText: 'First step' });
+    assert.equal(await first.getByText('Earned', { exact: true }).count(), 1);
+    const ten = page.getByRole('listitem').filter({ hasText: 'Ten signs' });
+    assert.equal(await ten.getByText('Not earned yet').count(), 1);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  });
+
   test('two-factor sign-in: set up, sign in with a code, turn off', async () => {
     const creds = await makeUser(srv.base, admin, 'tfa1@example.org');
     const { page, errors, ctx } = await newPage(browser, srv.base);
