@@ -508,6 +508,57 @@ def cmd_open_set(a) -> int:
     return 0
 
 
+def cmd_open_set_v2(a) -> int:
+    """Compare unknown-sign detectors with disjoint unknown glosses for tuning and evaluation."""
+    import numpy as np
+
+    from .data import load_landmarks
+    from .features import extract_features
+    from .inference import Predictor
+    from .openset import CentroidScorer, base_scores, evaluate, gloss_half, pooled
+
+    pred = Predictor.from_registry(Path(a.registry))
+    known_ids = {c["sign_id"] for c in pred.classes}
+    cidx = {c["sign_id"]: i for i, c in enumerate(pred.classes)}
+    man = json.loads(Path(a.manifest).read_text())
+
+    def feats(entries):
+        P, Z, keep = [], [], []
+        for e in entries:
+            frames, aspect = load_landmarks(Path(a.data_root) / e["landmarks_path"])
+            fr = extract_features(frames, aspect)
+            if fr.status != "ok":
+                continue
+            F = np.asarray(fr.features, dtype=np.float64)
+            P.append(pred.predict_features(F))
+            Z.append(pooled(F))
+            keep.append(e)
+        return np.array(P), np.array(Z), keep
+
+    by = {sp: [e for e in man["entries"] if e["split"] == sp and e["sign_id"] in known_ids] for sp in ("train", "val", "test")}
+    unk = [e for e in man.get("open_set_entries", []) if e.get("open_set")]
+    halves = {h: [e for e in unk if gloss_half(e["gloss"]) == h] for h in ("A", "B")}
+    _, Ztr, ktr = feats(by["train"])
+    cent = CentroidScorer().fit(Ztr, np.array([cidx[e["sign_id"]] for e in ktr]))
+    parts = {}
+    for name, ents in (("val", by["val"]), ("test", by["test"]), ("unkA", halves["A"]), ("unkB", halves["B"])):
+        P, Z, _ = feats(ents)
+        parts[name] = base_scores(P, cent.score(Z))
+    rep = evaluate({"known": parts["val"], "unknown": parts["unkA"]}, {"known": parts["test"], "unknown": parts["unkB"]})
+    out = {"model_id": pred.info["model_id"],
+           "protocol": "fit: known validation + unknown glosses half A; eval: known test + unknown glosses half B "
+                       "(disjoint glosses); thresholds chosen on the fit set only",
+           "counts": {"train_for_centroids": len(ktr), "val_known": len(parts["val"]["maxprob"]),
+                      "test_known": len(parts["test"]["maxprob"]), "unknown_A": len(parts["unkA"]["maxprob"]),
+                      "unknown_B": len(parts["unkB"]["maxprob"]),
+                      "glosses_A": len({e["gloss"] for e in halves["A"]}), "glosses_B": len({e["gloss"] for e in halves["B"]})},
+           "detectors": rep}
+    Path(a.out).mkdir(parents=True, exist_ok=True)
+    (Path(a.out) / "open_set_v2.json").write_text(json.dumps(out, indent=2))
+    print(json.dumps(out, indent=1))
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -543,6 +594,11 @@ def main(argv=None) -> int:
     p.add_argument("--manifest", required=True)
     p.add_argument("--data-root", required=True)
     p.add_argument("--out", required=True)
+    p = sub.add_parser("open-set-v2")
+    p.add_argument("--registry", required=True)
+    p.add_argument("--manifest", required=True)
+    p.add_argument("--data-root", required=True)
+    p.add_argument("--out", required=True)
     p = sub.add_parser("open-set")
     p.add_argument("--registry", required=True)
     p.add_argument("--manifest", required=True)
@@ -551,7 +607,7 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     return {"preflight": cmd_preflight, "parts": cmd_parts, "extract-part": cmd_extract_part,
             "merge": cmd_merge, "compare": cmd_compare, "verify": cmd_verify,
-            "fetch-test-videos": cmd_fetch_test_videos, "open-set": cmd_open_set}[a.cmd](a)
+            "fetch-test-videos": cmd_fetch_test_videos, "open-set": cmd_open_set, "open-set-v2": cmd_open_set_v2}[a.cmd](a)
 
 
 if __name__ == "__main__":

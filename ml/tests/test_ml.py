@@ -339,3 +339,28 @@ def test_build_tensors_adds_marked_augmented_copies(tmp_path):
     aug = build_tensors(entries, tmp_path, cidx, raw_aug_copies=2, seed=5)
     assert len(aug.y) > len(plain.y)
     assert sum("#aug" not in i for i in aug.ids) == len(plain.ids)
+
+
+def test_open_set_v2_detectors_and_disjoint_protocol(trained, tmp_path):
+    from isl_nova_ml.include_pipeline import main
+    from isl_nova_ml.openset import gloss_half
+
+    root, res = trained
+    reg = Registry(root / "reg")
+    reg.promote(res["model_id"], allow_synthetic=True)
+    m = json.loads((root / "data" / "manifest.json").read_text())
+    splits = ["train", "train", "val", "test"]
+    entries = [dict(e, split=splits[i % 4]) for i, e in enumerate(m["entries"])]
+    names = [f"g{i}" for i in range(8)]
+    unknown = [dict(e, open_set=True, gloss=names[i % 8]) for i, e in enumerate(m["open_set_entries"])]
+    assert {gloss_half(g) for g in names} == {"A", "B"}
+    man = tmp_path / "manifest.json"
+    man.write_text(json.dumps({"entries": entries, "open_set_entries": unknown}))
+    assert main(["open-set-v2", "--registry", str(root / "reg"), "--manifest", str(man),
+                 "--data-root", str(root / "data"), "--out", str(tmp_path / "o")]) == 0
+    rep = json.loads((tmp_path / "o" / "open_set_v2.json").read_text())
+    assert set(rep["detectors"]) == {"maxprob", "margin", "entropy", "centroid", "combined"}
+    for d in rep["detectors"].values():
+        assert 0 <= d["auroc"] <= 1 and 0 <= d["keep90"]["false_acceptance"] <= 1
+    assert rep["counts"]["unknown_A"] > 0 and rep["counts"]["unknown_B"] > 0
+    reg.rollback()

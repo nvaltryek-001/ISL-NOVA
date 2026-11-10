@@ -46,9 +46,13 @@ jobs:
           python -m isl_nova_ml.include_pipeline open-set --registry models --manifest data/manifest.json \
             --data-root data --out report
           python3 -c "import json; print(json.dumps(json.load(open('report/open_set.json')), indent=1))"
+      - name: Detector comparison (disjoint unknown glosses for tuning vs evaluation)
+        run: |
+          python -m isl_nova_ml.include_pipeline open-set-v2 --registry models --manifest data/manifest.json \
+            --data-root data --out report
       - uses: actions/upload-artifact@v4
         with: { name: open-set-report, path: report, retention-days: 90 }
       - name: Attach report to the model pre-release
         if: steps.cfg.outputs.attach == 'true'
         env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
-        run: gh release upload "${{ steps.cfg.outputs.model_tag }}" report/open_set.json report/open_set_rows.csv --clobber -R "$GITHUB_REPOSITORY"
+        run: gh release upload "${{ steps.cfg.outputs.model_tag }}" report/open_set.json report/open_set_rows.csv report/open_set_v2.json --clobber -R "$GITHUB_REPOSITORY"
