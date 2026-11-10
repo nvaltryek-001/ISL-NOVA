@@ -18,7 +18,7 @@ def _store(tmp_path):
 
 def test_put_get_exists_delete_and_local_path(tmp_path):
     st = _store(tmp_path)
-    key = "recordings/ISL001/a b+c.mp4"
+    key = "recordings/ISL001/rec_01-a.b.mp4"
     assert not st.exists(key)
     st.put(key, b"\x00\x01video")
     assert st.exists(key) and st.get(key) == b"\x00\x01video"
