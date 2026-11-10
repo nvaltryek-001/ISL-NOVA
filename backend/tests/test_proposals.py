@@ -3,7 +3,7 @@ A = "/api/v1"
 
 
 def test_proposal_lifecycle_and_duplicates(app_env):
-    c, api, admin, _ = app_env
+    c, api, admin, settings = app_env
     learner = api.user(admin)
     ling = api.user(admin, "linguist")
     assert c.post(f"{A}/vocabulary/proposals", json={"gloss": "Hello", "category": "greetings"}, headers=learner).status_code == 409
@@ -14,7 +14,11 @@ def test_proposal_lifecycle_and_duplicates(app_env):
     assert c.post(f"{A}/vocabulary/proposals", json={"gloss": "water ", "category": "food_daily_needs"}, headers=learner).status_code == 409
     assert c.post(f"{A}/vocabulary/proposals/{pid}/decide", json={"decision": "accept"}, headers=learner).status_code == 403
     mine = c.get(f"{A}/vocabulary/proposals", headers=learner).json()
-    assert [p["id"] for p in mine["items"]] == [pid] and mine["vocabulary_size"] == 200 and mine["target"] == 500
+    assert [p["id"] for p in mine["items"]] == [pid] and mine["vocabulary_size"] == 200
+    assert mine["vocabulary_limit"] == 200 and mine["accepting_new_signs"] is False
+    full = c.post(f"{A}/vocabulary/proposals/{pid}/decide", json={"decision": "accept"}, headers=ling)
+    assert full.status_code == 409 and full.json()["error"]["code"] == "vocabulary_fixed"
+    settings.vocabulary_limit = 0  # growth beyond the fixed 200 is a configuration choice; check the path still works
     d = c.post(f"{A}/vocabulary/proposals/{pid}/decide", json={"decision": "accept"}, headers=ling).json()
     assert d["status"] == "accepted" and d["created_sign_id"] == "ISL201"
     s = c.get(f"{A}/signs/ISL201").json()

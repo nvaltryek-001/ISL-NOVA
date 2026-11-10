@@ -133,6 +133,46 @@ describe('authentication and RBAC', () => {
     await page.getByText('email or password is incorrect').waitFor();
     await ctx.close();
   });
+  test('teacher class: create, learner joins with the code, teacher dashboard; analytics; review queue', async () => {
+    const teacher = await makeUser(srv.base, admin, 'teacher1@example.org', ['teacher']);
+    const learner = await makeUser(srv.base, admin, 'pupil1@example.org');
+    const tp = await newPage(browser, srv.base);
+    await login(tp.page, teacher);
+    await tp.page.goto('/classes');
+    await tp.page.getByLabel('New class name').fill('Class 7B');
+    await tp.page.getByRole('button', { name: 'Create class' }).click();
+    const code = (await tp.page.getByTestId('class-code').first().textContent()).trim();
+    assert.equal(code.length, 8);
+
+    const lp = await newPage(browser, srv.base);
+    await login(lp.page, learner);
+    const me = await apiAs(srv.base, learner);
+    for (const ok of [true, false, false]) await me('/learning/attempts', { method: 'POST', body: JSON.stringify({ sign_id: 'ISL004', mode: 'quiz', correct: ok }) });
+    await lp.page.goto('/classes');
+    await lp.page.getByLabel('Class code').fill(code);
+    await lp.page.getByRole('button', { name: 'Join', exact: true }).click();
+    await lp.page.getByText('Class 7B').waitFor();
+    await lp.page.goto('/academy');
+    await lp.page.getByRole('tab', { name: 'My progress' }).click();
+    await lp.page.getByText('Due for review today').waitFor();
+    await lp.page.getByRole('link', { name: 'Practise' }).first().waitFor();
+
+    await tp.page.reload();
+    await tp.page.getByRole('button', { name: 'Open' }).click();
+    await tp.page.getByText('pupil1').first().waitFor();
+    await tp.page.getByRole('cell', { name: '33%' }).waitFor();
+
+    await tp.page.goto('/analytics');
+    await tp.page.getByText("You don't have access to this area").waitFor();
+    const ap = await newPage(browser, srv.base);
+    await login(ap.page);
+    await ap.page.goto('/analytics');
+    await ap.page.getByText('Activity per day').waitFor();
+    await ap.page.getByText('Most practised signs').waitFor();
+    assert.deepEqual([...tp.errors, ...lp.errors, ...ap.errors], []);
+    for (const x of [tp, lp, ap]) await x.ctx.close();
+  });
+
   test('learning progress shows streak, points and earned badges from real attempts', async () => {
     const creds = await makeUser(srv.base, admin, 'streak1@example.org');
     const me = await apiAs(srv.base, creds);
@@ -144,7 +184,7 @@ describe('authentication and RBAC', () => {
     await page.goto('/academy');
     await page.getByRole('tab', { name: 'My progress' }).click();
     await page.getByText('Streaks and badges').waitFor();
-    await page.getByText('30', { exact: true }).waitFor();           // 3 correct x 10 points
+    await page.getByText(/30 points/).waitFor();                     // 3 correct x 10 points
     const first = page.getByRole('listitem').filter({ hasText: 'First step' });
     assert.equal(await first.getByText('Earned', { exact: true }).count(), 1);
     const ten = page.getByRole('listitem').filter({ hasText: 'Ten signs' });
@@ -229,7 +269,7 @@ describe('vocabulary', () => {
     await ctx.close();
   });
 
-  test('create, edit, retire and restore a sign (CRUD)', async () => {
+  test('vocabulary is fixed at 200; edit, retire and restore a sign (CRUD)', async () => {
     const { page, errors, ctx } = await newPage(browser, srv.base);
     await login(page);
     await page.goto('/signs');
@@ -240,9 +280,9 @@ describe('vocabulary', () => {
     await d.getByLabel('English meaning (draft)').fill('water');
     await d.getByLabel('Hands required').selectOption('one');
     await d.getByRole('button', { name: 'Create sign' }).click();
-    await page.waitForURL(/\/signs\/ISL201$/);
-    await page.getByRole('heading', { name: 'Water' }).waitFor();
-    await page.getByText('Proposed', { exact: true }).first().waitFor();
+    await d.getByText('the vocabulary is fixed at 200 signs').waitFor();
+    await d.getByRole('button', { name: 'Cancel' }).click();
+    await page.goto('/signs/ISL150');
     await page.getByRole('button', { name: 'Edit sign' }).click();
     await page.getByRole('dialog').getByLabel('Annotation notes').fill('Two regional variants observed');
     await page.getByRole('button', { name: 'Save changes' }).click();
@@ -251,8 +291,9 @@ describe('vocabulary', () => {
     await page.getByText('Retired', { exact: true }).waitFor();
     await page.getByRole('button', { name: 'Restore' }).click();
     await page.getByRole('button', { name: 'Retire' }).waitFor();
-    const dup = await admin('/signs', { method: 'POST', body: JSON.stringify({ sign_id: 'ISL201', canonical_sign_name: 'x', category: 'daily_needs' }) });
-    assert.equal(dup.status, 409);
+    const full = await admin('/signs', { method: 'POST', body: JSON.stringify({ sign_id: 'ISL201', canonical_sign_name: 'x', category: 'daily_needs' }) });
+    assert.equal(full.status, 409);
+    assert.equal(full.body.error.code, 'vocabulary_fixed');
     assert.deepEqual(errors, []);
     await ctx.close();
   });
@@ -397,7 +438,7 @@ describe('modules render with real data', () => {
   test('every main route renders one h1 without errors', async () => {
     const { page, errors, ctx } = await newPage(browser, srv.base);
     await login(page);
-    for (const [route, h1] of [['/', /Welcome/], ['/communicate', /Communication/], ['/academy', /Learning Academy/], ['/dataset', /Dataset Lab/], ['/ai', /AI Laboratory/], ['/research', /Research Centre/], ['/viz', /3D Landmark Viewer/], ['/admin', /Administration/], ['/settings', /Settings/], ['/analysis', /Video Analysis/], ['/practice', /Practice Coach/], ['/text-to-sign', /Text to Sign/], ['/conversation', /Conversation/]]) {
+    for (const [route, h1] of [['/', /Welcome/], ['/communicate', /Communication/], ['/academy', /Learning Academy/], ['/dataset', /Dataset Lab/], ['/ai', /AI Laboratory/], ['/research', /Research Centre/], ['/viz', /3D Landmark Viewer/], ['/admin', /Administration/], ['/settings', /Settings/], ['/analysis', /Video Analysis/], ['/practice', /Practice Coach/], ['/text-to-sign', /Text to Sign/], ['/conversation', /Conversation/], ['/classes', /Classes/], ['/analytics', /Analytics/]]) {
       await page.goto(route);
       await page.getByRole('heading', { level: 1, name: h1 }).waitFor();
       assert.equal(await page.getByRole('heading', { level: 1 }).count(), 1, route);
@@ -515,7 +556,7 @@ describe('modules render with real data', () => {
   });
 
   test('accessibility basics and responsive layout on phone, tablet and desktop', async () => {
-    const routes = ['/', '/signs', '/live', '/communicate', '/academy', '/dataset', '/ai', '/research', '/admin', '/settings', '/analysis', '/practice', '/text-to-sign', '/conversation'];
+    const routes = ['/', '/signs', '/live', '/communicate', '/academy', '/dataset', '/ai', '/research', '/admin', '/settings', '/analysis', '/practice', '/text-to-sign', '/conversation', '/classes', '/analytics'];
     // the 360 px pass is repeated with a wide fallback font: CI runners' fonts are wider than local ones
     for (const [viewport, font] of [[{ width: 360, height: 740 }], [{ width: 360, height: 740 }, 'DejaVu Sans'], [{ width: 768, height: 1024 }], [{ width: 1280, height: 800 }]]) {
       const { page, ctx, errors } = await newPage(browser, srv.base, { viewport });

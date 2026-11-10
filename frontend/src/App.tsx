@@ -9,7 +9,9 @@ import { type Lang, LANG_NAMES, useT } from './i18n';
 import { AdminPage } from './pages/Admin';
 import { AILabPage } from './pages/AILab';
 import { AcademyPage } from './pages/Academy';
+import { AnalyticsPage } from './pages/Analytics';
 import { AuthPage, ResetPasswordPage } from './pages/Auth';
+import { ClassesPage } from './pages/Classes';
 import { CommunicatePage } from './pages/Communicate';
 import { DashboardPage } from './pages/Dashboard';
 import { DatasetLabPage } from './pages/DatasetLab';
@@ -38,12 +40,14 @@ const NAV: { group: string; items: Nav[] }[] = [
     { to: '/academy', label: 'Learning Academy', icon: 'cap' },
     { to: '/practice', label: 'Practice Coach', icon: 'hand' },
     { to: '/text-to-sign', label: 'Text to Sign', icon: 'type' },
+    { to: '/classes', label: 'Classes', icon: 'user' },
   ] },
   { group: 'Data & AI', items: [
     { to: '/dataset', label: 'Dataset Lab', icon: 'database' },
     { to: '/ai', label: 'AI Laboratory', icon: 'cpu' },
     { to: '/research', label: 'Research Centre', icon: 'flask' },
     { to: '/viz', label: '3D Visualisation', icon: 'cube' },
+    { to: '/analytics', label: 'Analytics', icon: 'layers', perm: 'analytics:read' },
   ] },
   { group: 'Operate', items: [
     { to: '/admin', label: 'Administration', icon: 'shield', perm: 'admin:users' },
@@ -235,6 +239,8 @@ export function App() {
           { path: '/practice', render: () => <PracticePage /> },
           { path: '/text-to-sign', render: () => <TextToSignPage /> },
           { path: '/conversation', render: () => <ConversationPage /> },
+          { path: '/classes', render: () => <RequireAuth><ClassesPage /></RequireAuth> },
+          { path: '/analytics', render: () => <RequireAuth perm="analytics:read"><AnalyticsPage /></RequireAuth> },
           { path: '/dataset', render: () => <DatasetLabPage /> },
           { path: '/ai', render: () => <AILabPage /> },
           { path: '/research', render: () => <ResearchPage /> },

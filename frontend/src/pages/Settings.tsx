@@ -17,6 +17,7 @@ export function SettingsPage() {
   const bookmarks = useQuery<any[]>('/bookmarks');
   const [setup, setSetup] = useState<{ secret: string; otpauth_uri: string } | null>(null);
   const [otp, setOtp] = useState('');
+  const [goal, setGoal] = useState(String((user?.settings as { daily_goal?: number } | undefined)?.daily_goal ?? 10));
   const refreshMe = () => api<User>('/me').then((u) => auth.setUser(u));
   const startTfa = useMutation(() => api<{ secret: string; otpauth_uri: string }>('/me/2fa/setup', { method: 'POST' }), { onSuccess: (r) => { setSetup(r); setOtp(''); } });
   const enableTfa = useMutation(() => api('/me/2fa/enable', { body: { code: otp } }), { onSuccess: () => { setSetup(null); setOtp(''); toast('Two-factor sign-in is on'); refreshMe(); } });
@@ -41,6 +42,13 @@ export function SettingsPage() {
                 <Field label="Current password">{(id) => <Input id={id} type="password" autoComplete="current-password" value={pw.current_password} onChange={(e) => setPw({ ...pw, current_password: e.target.value })} />}</Field>
                 <Field label="New password" hint="At least 10 characters.">{(id) => <Input id={id} type="password" autoComplete="new-password" value={pw.new_password} onChange={(e) => setPw({ ...pw, new_password: e.target.value })} />}</Field>
                 <Button disabled={pw.new_password.length < 10} onClick={() => profile.mutate(pw)}>Update password</Button>
+              </div>
+            </div>
+            <div className="border-t border-ink-700 pt-4">
+              <p className="label mb-1">Learning</p>
+              <div className="flex items-end gap-2">
+                <div className="flex-1"><Field label="Daily goal (attempts per day)">{(id) => <Input id={id} type="number" min={1} max={200} value={goal} onChange={(e) => setGoal(e.target.value)} />}</Field></div>
+                <Button disabled={!(Number(goal) >= 1 && Number(goal) <= 200)} onClick={() => profile.mutate({ settings: { ...(user?.settings ?? {}), daily_goal: Number(goal) } })}>Save goal</Button>
               </div>
             </div>
             <div className="border-t border-ink-700 pt-4">

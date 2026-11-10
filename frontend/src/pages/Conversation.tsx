@@ -7,6 +7,7 @@ import { Badge, Button, Card, Notice, PageHeader, Select } from '../components/u
 import { LANG_NAMES, type Lang, SPEECH_LANG, useT } from '../i18n';
 import { api } from '../lib/api';
 import { type Frame, windowQuality } from '../lib/features';
+import { type Segment, SignSegmenter } from '../lib/segmenter';
 import { speak } from '../lib/speech';
 import { usePrefs } from '../lib/store';
 import { type Match, textToSigns } from '../lib/textToSign';
@@ -35,37 +36,58 @@ export function ConversationPage() {
   const last = useRef<{ id: string; at: number } | null>(null);
   const rec = useRef<Rec | null>(null);
   const [aspect, setAspect] = useState(4 / 3);
+  const [mode, setMode] = useState<'pauses' | 'window'>('pauses');
+  const seg = useRef(new SignSegmenter());
+  const segments = useRef<Segment[]>([]);
+  const [sequence, setSequence] = useState<string[]>([]);
 
   const onFrame = useCallback((f: Frame, a: number, now: number) => {
     buffer.current.push({ f, t: now });
     while (buffer.current.length && now - buffer.current[0].t > 4000) buffer.current.shift();
+    const done = seg.current.push(f, now);
+    if (done) segments.current.push(done);
     setAspect(a);
   }, []);
 
-  // signer side: classify a sliding window; accept only confident, non-repeated signs
+  const accept = useCallback((r: Pred, at: number, repeatMs: number) => {
+    const top = r.top[0];
+    if (r.state !== 'recognized' || !top || (last.current?.id === top.sign_id && at - last.current.at < repeatMs)) return;
+    last.current = { id: top.sign_id, at };
+    const m = top.meanings?.[lang];
+    const text = m?.text || top.label;
+    setLines((l) => [...l, { who: 'signer', text, draft: m ? m.status !== 'verified' : lang !== 'en' }]);
+    setSequence((q) => [...q, text]);
+    speak(text, lang, p.speechRate);
+  }, [lang, p.speechRate]);
+
+  // signer side: either one prediction per segment split at pauses (default), or a sliding window
   useEffect(() => {
     if (!signing) return;
+    seg.current.reset();
+    segments.current = [];
     let busy = false;
     const iv = setInterval(async () => {
       if (busy) return;
+      if (mode === 'pauses') {
+        const s = segments.current.shift();
+        if (!s || s.frames.length < 8) return;
+        busy = true;
+        try {
+          const r = await api<Pred>('/predict/sequence', { body: { frames: s.frames.map((x) => x.f), aspect, top_k: 3 } });
+          accept(r, s.end, 1500);
+        } catch { /* network hiccup: drop this segment */ } finally { busy = false; }
+        return;
+      }
       const end = performance.now();
       const w = buffer.current.filter((x) => end - x.t <= WINDOW_MS);
       if (w.length < 8 || windowQuality(w.map((x) => x.f)).hands < 0.4) return;
       busy = true;
       try {
-        const r = await api<Pred>('/predict/sequence', { body: { frames: w.map((x) => x.f), aspect, top_k: 3 } });
-        const top = r.top[0];
-        if (r.state === 'recognized' && top && !(last.current?.id === top.sign_id && end - last.current.at < 4000)) {
-          last.current = { id: top.sign_id, at: end };
-          const m = top.meanings?.[lang];
-          const text = m?.text || top.label;
-          setLines((l) => [...l, { who: 'signer', text, draft: m ? m.status !== 'verified' : lang !== 'en' }]);
-          speak(text, lang, p.speechRate);
-        }
+        accept(await api<Pred>('/predict/sequence', { body: { frames: w.map((x) => x.f), aspect, top_k: 3 } }), end, 4000);
       } catch { /* network hiccup: next window */ } finally { busy = false; }
-    }, INTERVAL_MS);
+    }, mode === 'pauses' ? 250 : INTERVAL_MS);
     return () => clearInterval(iv);
-  }, [signing, lang, aspect, p.speechRate]);
+  }, [signing, mode, aspect, accept]);
 
   // speaker side: browser speech recognition
   const toggleListen = () => {
@@ -97,8 +119,18 @@ export function ConversationPage() {
       </PageHeader>
       <div className="mb-5"><Notice tone="warn" title="Word-by-word assistance, not interpretation">{t('Recognition is isolated-sign only and can be wrong. Hindi and Kannada meanings are drafts. For important conversations, use a qualified ISL interpreter.')}</Notice></div>
       <div className="grid gap-5 xl:grid-cols-2">
-        <Card title="Signer" action={<Button variant={signing ? 'danger' : 'primary'} icon={signing ? 'pause' : 'play'} onClick={() => setSigning(!signing)}>{signing ? 'Pause' : 'Start signing'}</Button>}>
+        <Card title="Signer" action={<div className="flex flex-wrap items-center gap-2">
+            <Select aria-label={t('How signs are separated')} value={mode} onChange={(e) => setMode(e.target.value as 'pauses' | 'window')} className="w-auto">
+              <option value="pauses">{t('Split at pauses')}</option><option value="window">{t('Sliding window')}</option>
+            </Select>
+            <Button variant={signing ? 'danger' : 'primary'} icon={signing ? 'pause' : 'play'} onClick={() => setSigning(!signing)}>{signing ? 'Pause' : 'Start signing'}</Button></div>}>
           <CameraStage onFrame={onFrame} large />
+          <div className="mt-3">
+            <p className="label mb-1">{t('Recognized word sequence')}</p>
+            <p className="min-h-8 text-xl text-fg" lang={lang} data-testid="word-sequence">{sequence.join(' · ') || <span className="muted text-base">{t('Pause briefly between signs.')}</span>}</p>
+            <p className="muted text-xs">{t('Signs recognised one by one, in order. This is not a translation: ISL grammar is not modelled.')}</p>
+            {sequence.length > 0 && <Button size="sm" variant="ghost" onClick={() => setSequence([])}>Clear</Button>}
+          </div>
         </Card>
         <Card title="Speaker" action={RecCtor
           ? <Button variant={listening ? 'danger' : 'primary'} icon="mic" onClick={toggleListen}>{listening ? 'Stop listening' : 'Start listening'}</Button>

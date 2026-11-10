@@ -245,9 +245,20 @@ def get_sign(ctx: Ctx):
     return s
 
 
-@router.post("/signs", summary="Create a vocabulary entry", perm="signs:write", body=SignIn, status=201)
+def ensure_vocabulary_room(ctx: Ctx) -> None:
+    """The project vocabulary is fixed (default 200 signs, VOCABULARY_LIMIT); retired signs keep their slot."""
+    limit = ctx.app.settings.vocabulary_limit
+    n = int(ctx.db.one("SELECT COUNT(*) AS n FROM signs")["n"])
+    if limit and n >= limit:
+        raise ApiError(409, "vocabulary_fixed",
+                       f"the vocabulary is fixed at {limit} signs; edit or retire an existing sign instead")
+
+
+@router.post("/signs", summary="Create a vocabulary entry (only below the fixed vocabulary size)", perm="signs:write",
+             body=SignIn, status=201)
 def create_sign(ctx: Ctx):
     b: SignIn = ctx.body
+    ensure_vocabulary_room(ctx)
     if ctx.db.one("SELECT sign_id FROM signs WHERE sign_id = ?", (b.sign_id,)):
         raise ApiError(409, "exists", f"{b.sign_id} already exists; sign ids are stable and never reused")
     from .proposals import key

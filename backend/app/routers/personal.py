@@ -212,6 +212,7 @@ BADGES = [
     ("coached", "Coached", "Pass 5 Practice Coach attempts (score 70 or more)", lambda s: s["coach_passed"] >= 5),
 ]
 WEEKLY_GOAL = 20
+DAILY_GOAL = 10
 
 
 def _streaks(days: list[str], today: str) -> tuple[int, int]:
@@ -242,9 +243,23 @@ def achievements(ctx: Ctx):
              "current_streak": current, "best_streak": best,
              "coach_passed": sum(1 for r in rows if r["mode"] == "coach" and r["correct"]),
              "points": 10 * correct + 2 * (len(rows) - correct),
-             "this_week": sum(1 for r in rows if str(r["created_at"])[:10] >= week_start)}
-    return {**stats, "weekly_goal": WEEKLY_GOAL,
+             "this_week": sum(1 for r in rows if str(r["created_at"])[:10] >= week_start),
+             "today": sum(1 for r in rows if str(r["created_at"])[:10] == today)}
+    try:
+        goal = min(200, max(1, int((jload(ctx.user.get("settings")) or {}).get("daily_goal") or DAILY_GOAL)))
+    except (TypeError, ValueError):
+        goal = DAILY_GOAL
+    return {**stats, "weekly_goal": WEEKLY_GOAL, "daily_goal": goal,
             "badges": [{"id": b, "title": t, "description": d, "earned": bool(f(stats))} for b, t, d, f in BADGES]}
+
+
+REVIEW_INTERVAL_DAYS = [0, 1, 2, 4, 8, 16]  # Leitner boxes 0..5
+
+
+def _due(now_iso: str, box: int) -> str:
+    from datetime import datetime, timedelta
+    t = datetime.strptime(now_iso, "%Y-%m-%dT%H:%M:%SZ") + timedelta(days=REVIEW_INTERVAL_DAYS[box])
+    return t.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 @router.post("/learning/attempts", summary="Record a practice or quiz attempt", body=AttemptIn, status=201)
@@ -255,13 +270,29 @@ def attempt(ctx: Ctx):
     with ctx.db.transaction():
         ctx.db.insert("learning_attempts", {"user_id": ctx.uid, "sign_id": b.sign_id, "mode": b.mode,
                                             "correct": b.correct, "answer": b.answer, "created_at": now})
-        if ctx.db.one("SELECT 1 AS x FROM learning_progress WHERE user_id = ? AND sign_id = ?", (ctx.uid, b.sign_id)):
+        row = ctx.db.one("SELECT review_box FROM learning_progress WHERE user_id = ? AND sign_id = ?", (ctx.uid, b.sign_id))
+        # spaced repetition: a correct answer moves the sign up one box (longer interval), a wrong one back to box 0
+        box = min(int(row["review_box"] or 0) + 1, 5) if (row and b.correct) else (1 if b.correct else 0)
+        if row:
             ctx.db.execute("UPDATE learning_progress SET attempts = attempts + 1, correct = correct + ?, "
-                           "last_seen_at = ? WHERE user_id = ? AND sign_id = ?", (int(b.correct), now, ctx.uid, b.sign_id))
+                           "last_seen_at = ?, review_box = ?, due_at = ? WHERE user_id = ? AND sign_id = ?",
+                           (int(b.correct), now, box, _due(now, box), ctx.uid, b.sign_id))
         else:
             ctx.db.insert("learning_progress", {"user_id": ctx.uid, "sign_id": b.sign_id, "attempts": 1,
-                                                "correct": int(b.correct), "last_seen_at": now}, pk=None)
-    return {"ok": True}
+                                                "correct": int(b.correct), "last_seen_at": now,
+                                                "review_box": box, "due_at": _due(now, box)}, pk=None)
+    return {"ok": True, "review_box": box, "next_review": _due(now, box)}
+
+
+@router.get("/learning/review", summary="Signs due for review today (spaced repetition)")
+def review_queue(ctx: Ctx):
+    now = utcnow()
+    rows = ctx.db.all("SELECT p.sign_id, p.attempts, p.correct, p.review_box, p.due_at, s.canonical_sign_name, s.category "
+                      "FROM learning_progress p JOIN signs s ON s.sign_id = p.sign_id "
+                      "WHERE p.user_id = ? AND p.due_at IS NOT NULL AND p.due_at <= ? ORDER BY p.due_at, p.sign_id",
+                      (ctx.uid, now))
+    upcoming = ctx.db.scalar("SELECT COUNT(*) FROM learning_progress WHERE user_id = ? AND due_at > ?", (ctx.uid, now)) or 0
+    return {"due": rows, "due_count": len(rows), "upcoming": int(upcoming), "intervals_days": REVIEW_INTERVAL_DAYS}
 
 
 # --------------------------------------------------------------------------- phrases

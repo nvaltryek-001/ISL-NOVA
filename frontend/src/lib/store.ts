@@ -71,6 +71,8 @@ export const PERMS: Record<string, string[]> = {
   'feedback:read': ['admin', 'linguist'],
   'phrases:quick': ['admin', 'linguist'],
   'admin:users': ['admin'],
+  'classes:manage': ['admin', 'teacher'],
+  'analytics:read': ['admin', 'researcher'],
 };
 
 /** UI hint only - the server enforces every permission. */

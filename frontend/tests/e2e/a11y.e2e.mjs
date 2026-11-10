@@ -14,7 +14,7 @@ try { axeSource = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8'
 if (!axeSource && process.env.AXE_REQUIRED === '1') throw new Error('axe-core is not installed (npm install)');
 
 const ROUTES = ['/', '/signs', '/signs/ISL012', '/live', '/communicate', '/academy', '/dataset', '/ai', '/research', '/admin',
-  '/settings', '/analysis', '/practice', '/text-to-sign', '/conversation', '/login', '/register', '/reset-password'];
+  '/settings', '/analysis', '/practice', '/text-to-sign', '/conversation', '/classes', '/analytics', '/login', '/register', '/reset-password'];
 
 let srv, browser;
 before(async () => { if (!axeSource) return; srv = await startServer(); browser = await launch(); });

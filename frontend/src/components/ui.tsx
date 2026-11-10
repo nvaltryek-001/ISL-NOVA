@@ -137,7 +137,7 @@ export function Table({ head, children, empty, className, scrollLabel }: { head:
     <div className={clsx('overflow-x-auto rounded-xl border border-ink-700', className)} {...scroll}>
       <table className="w-full text-left text-sm">
         <thead className="bg-ink-800/70 text-xs uppercase tracking-wider text-ink-400">
-          <tr>{head.map((h, i) => <th key={i} scope="col" className="whitespace-nowrap px-3 py-2.5 font-medium">{h}</th>)}</tr>
+          <tr>{head.map((h, i) => <th key={i} scope="col" className="whitespace-nowrap px-3 py-2.5 font-medium">{tr(h, t)}</th>)}</tr>
         </thead>
         <tbody className="divide-y divide-ink-700/70">{children}</tbody>
       </table>

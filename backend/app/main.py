@@ -29,10 +29,11 @@ from .config import Settings
 from .db import Database
 from .metrics import METRICS
 from .migrate import migrate
-from .routers import core, dataset, ml, personal, practice, proposals, signs, translations
+from .routers import analytics, classroom, core, dataset, ml, personal, practice, proposals, signs, translations
 from .services import Jobs, LocalStorage, ModelService, ensure_user, seed_roles, seed_vocabulary
 
-ROUTERS = [core.router, signs.router, translations.router, proposals.router, dataset.router, ml.router, practice.router, personal.router]
+ROUTERS = [core.router, signs.router, translations.router, proposals.router, dataset.router, ml.router, practice.router, personal.router,
+           classroom.router, analytics.router]
 
 
 class JsonFormatter(logging.Formatter):

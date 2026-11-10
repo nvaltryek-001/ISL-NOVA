@@ -16,6 +16,7 @@ ROLES: dict[str, str] = {
     "data_curator": "Manages signers, consent, sessions, recordings and dataset versions",
     "researcher": "Runs experiments and reads evaluation results",
     "learner": "Uses recognition, learning, communication and personal history",
+    "teacher": "Creates classes and sees the learning progress of learners who joined them",
 }
 
 PERMISSIONS: dict[str, set[str]] = {
@@ -33,6 +34,8 @@ PERMISSIONS: dict[str, set[str]] = {
     "phrases:quick": {"admin", "linguist"},
     "admin:users": {"admin"},
     "admin:audit": {"admin"},
+    "classes:manage": {"admin", "teacher"},
+    "analytics:read": {"admin", "researcher"},
 }
 
 MIN_PASSWORD = 10

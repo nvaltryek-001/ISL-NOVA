@@ -106,9 +106,12 @@ def test_rbac_on_sign_writes(app_env):
 
 
 def test_sign_crud_lifecycle(app_env):
-    c, api, admin, _ = app_env
+    c, api, admin, settings = app_env
     body = {"sign_id": "ISL201", "canonical_sign_name": "Water", "category": "daily_needs", "english_meaning": "water",
             "hands_required": "one", "movement_type": "dynamic"}
+    full = c.post(f"{A}/signs", json=body, headers=admin)  # the vocabulary is fixed at 200
+    assert full.status_code == 409 and full.json()["error"]["code"] == "vocabulary_fixed"
+    settings.vocabulary_limit = 0
     r = c.post(f"{A}/signs", json=body, headers=admin)
     assert r.status_code == 201 and r.json()["verification_status"] == "proposed"
     assert c.post(f"{A}/signs", json=body, headers=admin).status_code == 409
@@ -199,7 +202,7 @@ def test_deactivated_user_cannot_use_token(app_env):
 
 def test_migrations_idempotent_and_tamper_detected(tmp_path, monkeypatch):
     db = Database(f"sqlite:///{tmp_path / 'm.db'}")
-    assert migrate(db) == ["0001_core", "0002_translations_v2", "0003_sign_proposals", "0004_token_version", "0005_password_resets", "0006_totp"]
+    assert migrate(db) == ["0001_core", "0002_translations_v2", "0003_sign_proposals", "0004_token_version", "0005_password_resets", "0006_totp", "0007_classes_and_review"]
     assert migrate(db) == []
     assert status(db)["pending"] == []
     with db.connect() as conn:

@@ -4,7 +4,7 @@ import { api, qs } from '../lib/api';
 import { useMutation, useQuery } from '../lib/query';
 import { toast, useAuth } from '../lib/store';
 
-const ROLES = ['admin', 'linguist', 'data_curator', 'researcher', 'learner'];
+const ROLES = ['admin', 'linguist', 'data_curator', 'researcher', 'teacher', 'learner'];
 type U = { id: number; email: string; display_name: string; roles: string[]; is_active: boolean; created_at: string };
 
 export function AdminPage() {

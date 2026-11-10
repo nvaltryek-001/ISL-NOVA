@@ -202,7 +202,8 @@ def update_me(ctx: Ctx):
     if b.preferred_language is not None:
         vals["preferred_language"] = b.preferred_language
     if b.settings is not None:
-        allowed = {"high_contrast", "reduced_motion", "large_text", "speech_rate", "kiosk_language", "camera_id"}
+        allowed = {"high_contrast", "reduced_motion", "large_text", "speech_rate", "kiosk_language", "camera_id",
+                   "daily_goal"}
         vals["settings"] = jdump({k: v for k, v in b.settings.items() if k in allowed})
     if b.new_password:
         row = ctx.db.one("SELECT password_hash FROM users WHERE id = ?", (ctx.uid,))

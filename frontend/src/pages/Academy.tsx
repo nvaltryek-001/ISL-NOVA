@@ -92,7 +92,30 @@ function QuizView({ signedIn }: { signedIn: boolean }) {
   );
 }
 
+type Review = { due: { sign_id: string; canonical_sign_name: string; review_box: number; attempts: number; correct: number }[]; due_count: number; upcoming: number };
+
+function ReviewCard() {
+  const t = useT();
+  const { data } = useQuery<Review>('/learning/review');
+  if (!data) return null;
+  return (
+    <Card title="Due for review today" subtitle="Spaced repetition: correct answers come back after 1, 2, 4, 8 and 16 days; mistakes come back today">
+      {!data.due.length ? <p className="muted text-sm">{data.upcoming ? t('Nothing due now. Signs you practised come back on their review day.') : t('Practise a few signs to start your review schedule.')}</p> : (
+        <ul className="space-y-2 text-sm">{data.due.slice(0, 12).map((d) => (
+          <li key={d.sign_id} className="flex items-center justify-between gap-2">
+            <Link to={`/signs/${d.sign_id}`} className="hover:text-nova-300">{d.canonical_sign_name}</Link>
+            <span className="flex items-center gap-2 text-xs text-ink-400">{d.correct}/{d.attempts}
+              <Link to={`/practice?sign=${d.sign_id}`} className="rounded border border-ink-600 px-2 py-0.5 text-ink-200 hover:border-nova-400">{t('Practise')}</Link></span>
+          </li>))}
+        </ul>
+      )}
+      <p className="muted mt-3 text-xs">{data.due_count} {t('due')} · {data.upcoming} {t('scheduled later')}</p>
+    </Card>
+  );
+}
+
 type Achievements = {
+  today: number; daily_goal: number;
   attempts: number; correct: number; signs_practised: number; current_streak: number; best_streak: number;
   points: number; this_week: number; weekly_goal: number; badges: { id: string; title: string; description: string; earned: boolean }[];
 };
@@ -107,7 +130,8 @@ function AchievementsCard() {
       <div className="grid gap-4 sm:grid-cols-4">
         <div><p className="label">{t('Current streak')}</p><p className="font-display text-2xl font-semibold text-fg">{data.current_streak} <span className="text-sm font-normal text-ink-400">{t('days')}</span></p></div>
         <div><p className="label">{t('Best streak')}</p><p className="font-display text-2xl font-semibold text-fg">{data.best_streak} <span className="text-sm font-normal text-ink-400">{t('days')}</span></p></div>
-        <div><p className="label">{t('Points')}</p><p className="font-display text-2xl font-semibold text-fg">{data.points}</p></div>
+        <div><p className="label">{t('Today')}</p><p className="font-display text-2xl font-semibold text-fg">{data.today} <span className="text-sm font-normal text-ink-400">/ {data.daily_goal}</span></p>
+          <p className="text-xs text-ink-400">{data.today >= data.daily_goal ? t('Daily goal reached') : t('Daily goal')} · {data.points} {t('points')}</p></div>
         <div>
           <p className="label">{t('This week')}</p>
           <p className="text-sm text-ink-300">{data.this_week} / {data.weekly_goal} {t('attempts')}</p>
@@ -135,6 +159,7 @@ function ProgressView() {
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <AchievementsCard />
+      <ReviewCard />
       <Card title="Summary">
         <dl className="space-y-2 text-sm">
           <div className="flex justify-between"><dt className="text-ink-400">Signs practised</dt><dd>{data.signs_practised}</dd></div>

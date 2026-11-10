@@ -1,5 +1,5 @@
 // Practice Coach: copy a reference sign, capture an attempt and get per-part feedback.
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { CameraStage } from '../components/CameraStage';
 import { SignAnimation } from '../components/SignAnimation';
 import { Badge, Button, Card, Empty, Input, Meter, Notice, PageHeader, StatusBadge } from '../components/ui';
@@ -7,6 +7,7 @@ import { useT } from '../i18n';
 import { api } from '../lib/api';
 import type { Frame } from '../lib/features';
 import { useQuery } from '../lib/query';
+import { useLocation } from '../lib/router';
 import { useAuth, usePrefs } from '../lib/store';
 
 type SignHit = { sign_id: string; canonical_sign_name: string; translations: Record<string, { text: string; status: string }> };
@@ -22,6 +23,11 @@ export function PracticePage() {
   const status = useQuery<{ available: boolean; classes: number }>('/practice/status');
   const [q, setQ] = useState('');
   const [sign, setSign] = useState<SignHit | null>(null);
+  const preset = useLocation().search.get('sign');  // e.g. from the review queue or a teacher's hard-sign list
+  useEffect(() => {
+    if (!preset) return;
+    api<SignHit>(`/signs/${encodeURIComponent(preset)}`).then(setSign).catch(() => undefined);
+  }, [preset]);
   const hits = useQuery<{ items: SignHit[] }>(`/signs?size=8&q=${encodeURIComponent(q)}`);
   const capture = useRef<{ f: Frame; a: number }[] | null>(null);
   const [phase, setPhase] = useState<'idle' | 'countdown' | 'capturing' | 'scoring'>('idle');

@@ -1,4 +1,7 @@
-"""Vocabulary growth: anyone signed in can propose a new sign; linguists accept or reject.
+"""Vocabulary proposals: anyone signed in can propose a sign; linguists accept or reject.
+
+The project vocabulary is fixed at 200 signs (VOCABULARY_LIMIT): while it is full,
+proposals are kept for review but accepting one is refused (409 vocabulary_fixed).
 
 Accepting creates the next free stable ID (ISL201, ISL202, ...) with status
 `proposed`; Hindi/Kannada meanings from the proposal are stored as drafts.
@@ -68,7 +71,9 @@ def list_proposals(ctx: Ctx):
     else:
         rows = ctx.db.all("SELECT * FROM sign_proposals WHERE proposer_id = ? ORDER BY id DESC", (ctx.uid,))
     total = ctx.db.scalar("SELECT COUNT(*) FROM signs") or 0
-    return {"items": rows, "vocabulary_size": int(total), "target": 500}
+    limit = ctx.app.settings.vocabulary_limit
+    return {"items": rows, "vocabulary_size": int(total), "vocabulary_limit": limit or None,
+            "accepting_new_signs": not limit or int(total) < limit}
 
 
 def next_sign_id(db) -> str:
@@ -97,6 +102,8 @@ def decide(ctx: Ctx):
                     if key(s["canonical_sign_name"]) == p["gloss_key"]), None)
         if dup:
             raise ApiError(409, "duplicate", f"already exists as {dup}")
+        from .signs import ensure_vocabulary_room
+        ensure_vocabulary_room(ctx)
         with ctx.db.transaction():
             sid = next_sign_id(ctx.db)
             ctx.db.insert("signs", {"sign_id": sid, "canonical_sign_name": p["gloss"], "category": p["category"],
