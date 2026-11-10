@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { after, before, describe, test } from 'node:test';
-import { launch, login, newPage, startServer } from './harness.mjs';
+import { launch, login, startServer } from './harness.mjs';
 
 const require = createRequire(import.meta.url);
 let axeSource = null;
@@ -23,7 +23,9 @@ after(async () => { await browser?.close(); srv?.stop(); });
 describe('axe-core WCAG 2.1 AA scan', { skip: axeSource ? false : 'axe-core not installed' }, () => {
   for (const theme of ['light', 'dark']) {
     test(`no serious or critical violations (${theme} theme)`, { timeout: 240000 }, async () => {
-      const { page, ctx } = await newPage(browser, srv.base);
+      // bypassCSP only lets the test inject axe; the app's own CSP is unchanged
+      const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, baseURL: srv.base, bypassCSP: true });
+      const page = await ctx.newPage();
       await page.addInitScript((t) => localStorage.setItem('isl-nova-prefs', JSON.stringify({ theme: t })), theme);
       await login(page);
       const found = [];
