@@ -97,6 +97,18 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
+function OnlineBadge() {
+  const t = useT();
+  const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
+  useEffect(() => {
+    const on = () => setOnline(true); const off = () => setOnline(false);
+    window.addEventListener('online', on); window.addEventListener('offline', off);
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
+  }, []);
+  if (online) return null;
+  return <span role="status"><Badge tone="warn">{t('Offline')}</Badge></span>;
+}
+
 function LanguageSwitcher() {
   const p = usePrefs();
   const t = useT();
@@ -161,7 +173,7 @@ function Shell({ children }: { children: ReactNode }) {
           <button onClick={() => navigate('/signs')} className="flex h-9 min-w-0 max-w-sm flex-1 items-center gap-2 rounded-lg border border-ink-700 bg-ink-850 px-3 text-sm text-ink-400 shadow-sm hover:border-ink-600">
             <Icon name="search" size={16} /><span className="truncate">Search signs in English, हिन्दी, ಕನ್ನಡ…</span>
           </button>
-          <div className="ml-auto flex shrink-0 items-center gap-2"><ModelPill /><LanguageSwitcher /><ThemeToggle /><UserMenu /></div>
+          <div className="ml-auto flex shrink-0 items-center gap-2"><OnlineBadge /><ModelPill /><LanguageSwitcher /><ThemeToggle /><UserMenu /></div>
         </header>
         <main id="main" className="mx-auto max-w-[1400px] px-4 py-6 md:px-8 md:py-8">{children}</main>
       </div>

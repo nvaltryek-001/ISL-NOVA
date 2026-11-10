@@ -305,7 +305,7 @@ describe('modules render with real data', () => {
   test('every main route renders one h1 without errors', async () => {
     const { page, errors, ctx } = await newPage(browser, srv.base);
     await login(page);
-    for (const [route, h1] of [['/', /Welcome/], ['/communicate', /Communication/], ['/academy', /Learning Academy/], ['/dataset', /Dataset Lab/], ['/ai', /AI Laboratory/], ['/research', /Research Centre/], ['/viz', /3D Landmark Viewer/], ['/admin', /Administration/], ['/settings', /Settings/], ['/analysis', /Video Analysis/]]) {
+    for (const [route, h1] of [['/', /Welcome/], ['/communicate', /Communication/], ['/academy', /Learning Academy/], ['/dataset', /Dataset Lab/], ['/ai', /AI Laboratory/], ['/research', /Research Centre/], ['/viz', /3D Landmark Viewer/], ['/admin', /Administration/], ['/settings', /Settings/], ['/analysis', /Video Analysis/], ['/practice', /Practice Coach/], ['/text-to-sign', /Text to Sign/], ['/conversation', /Conversation/]]) {
       await page.goto(route);
       await page.getByRole('heading', { level: 1, name: h1 }).waitFor();
       assert.equal(await page.getByRole('heading', { level: 1 }).count(), 1, route);
@@ -355,6 +355,56 @@ describe('modules render with real data', () => {
     await ctx.close();
   });
 
+  test('text to sign matches English and Hindi words and flags unknown words', async () => {
+    const { page, ctx, errors } = await newPage(browser, srv.base);
+    await page.goto('/text-to-sign');
+    await page.getByLabel('Text').fill('good morning teacher zebra');
+    await page.getByRole('button', { name: 'Show signs' }).click();
+    const matched = page.getByLabel('Matched words');
+    await matched.getByRole('button', { name: /good morning ISL010/ }).waitFor();
+    await matched.getByRole('button', { name: /teacher ISL150/ }).waitFor();
+    await matched.getByText('zebra: no sign in vocabulary').waitFor();
+    await page.getByLabel('Text').fill('नमस्ते दोस्त');
+    await page.getByRole('button', { name: 'Show signs' }).click();
+    await matched.getByRole('button', { name: /नमस्ते ISL012/ }).waitFor();
+    await matched.getByRole('button', { name: /दोस्त ISL005/ }).waitFor();
+    const refs = await (await fetch(`${srv.base}/api/v1/practice/status`)).json();
+    if (refs.available) await page.getByRole('img', { name: /Reference animation/ }).waitFor();
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  });
+
+  test('practice coach: choose a sign, reference shown, attempt gated on camera', async () => {
+    const { page, ctx, errors } = await newPage(browser, srv.base);
+    await page.goto('/practice');
+    await page.getByRole('heading', { level: 1, name: 'Practice Coach' }).waitFor();
+    await page.getByLabel('Search signs').fill('hello');
+    await page.getByRole('button', { name: /ISL012/ }).first().click();
+    const refs = await (await fetch(`${srv.base}/api/v1/practice/status`)).json();
+    if (refs.available) await page.getByRole('img', { name: /Reference animation: Hello/ }).waitFor();
+    else await page.getByText('Reference animations are not installed on this server.').waitFor();
+    assert.equal(await page.getByRole('button', { name: 'Try it (3-2-1)' }).isDisabled(), true, 'disabled until the camera runs');
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  });
+
+  test('installable PWA: manifest, service worker, offline shell and offline badge', async () => {
+    const { page, ctx, errors } = await newPage(browser, srv.base);
+    const man = await (await fetch(`${srv.base}/manifest.webmanifest`)).json();
+    assert.equal(man.display, 'standalone');
+    assert.ok(man.icons.some((i) => i.sizes === '512x512'));
+    await page.goto('/');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+    await page.reload();
+    await page.getByRole('heading', { level: 1 }).waitFor();
+    await ctx.setOffline(true);
+    await page.goto('/signs').catch(() => {});
+    await page.getByText('Offline', { exact: true }).first().waitFor();
+    await ctx.setOffline(false);
+    assert.deepEqual(errors.filter((e) => !/Failed to fetch|NetworkError|ERR_INTERNET_DISCONNECTED/.test(e)), []);
+    await ctx.close();
+  });
+
   test('light theme is the default and the toggle switches to dark and back', async () => {
     const { page, ctx, errors } = await newPage(browser, srv.base);
     await page.goto('/');
@@ -373,7 +423,7 @@ describe('modules render with real data', () => {
   });
 
   test('accessibility basics and responsive layout on phone, tablet and desktop', async () => {
-    const routes = ['/', '/signs', '/live', '/communicate', '/academy', '/dataset', '/ai', '/research', '/admin', '/settings', '/analysis'];
+    const routes = ['/', '/signs', '/live', '/communicate', '/academy', '/dataset', '/ai', '/research', '/admin', '/settings', '/analysis', '/practice', '/text-to-sign', '/conversation'];
     // the 360 px pass is repeated with a wide fallback font: CI runners' fonts are wider than local ones
     for (const [viewport, font] of [[{ width: 360, height: 740 }], [{ width: 360, height: 740 }, 'DejaVu Sans'], [{ width: 768, height: 1024 }], [{ width: 1280, height: 800 }]]) {
       const { page, ctx, errors } = await newPage(browser, srv.base, { viewport });

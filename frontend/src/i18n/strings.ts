@@ -135,6 +135,7 @@ export const STRINGS: Record<string, [hi: string, kn: string]> = {
   'These metrics come from a synthetic smoke-test model and are not ISL results': ['ये मापदंड कृत्रिम परीक्षण मॉडल से हैं, ISL परिणाम नहीं', 'ಈ ಮಾಪನಗಳು ಕೃತಕ ಪರೀಕ್ಷಾ ಮಾದರಿಯದು, ISL ಫಲಿತಾಂಶಗಳಲ್ಲ'],
   'Consent text v1 (isl-nova-consent-v1)': ['सहमति पाठ v1 (isl-nova-consent-v1)', 'ಸಮ್ಮತಿ ಪಠ್ಯ v1 (isl-nova-consent-v1)'], '3D landmark rendering': ['3D लैंडमार्क चित्रण', '3D ಲ್ಯಾಂಡ್‌ಮಾರ್ಕ್ ಚಿತ್ರಣ'],
   // v2 pages: practice, text to sign, conversation
+  'Offline': ['ऑफ़लाइन', 'ಆಫ್‌ಲೈನ್'],
   '1 · Choose a sign': ['1 · संकेत चुनें', '1 · ಸಂಜ್ಞೆ ಆರಿಸಿ'],
   '2 · Watch the reference': ['2 · संदर्भ देखें', '2 · ಉಲ್ಲೇಖ ನೋಡಿ'],
   '3 · Your turn': ['3 · आपकी बारी', '3 · ನಿಮ್ಮ ಸರದಿ'],

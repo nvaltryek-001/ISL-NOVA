@@ -136,9 +136,11 @@ def create_app(settings: Settings | None = None) -> Starlette:
 
         if (dist / "assets").exists():
             routes.append(Mount("/assets", StaticFiles(directory=dist / "assets"), name="assets"))
-        for static in ("favicon.svg", "manifest.webmanifest"):
+        for static in ("favicon.svg", "manifest.webmanifest", "sw.js", "icon-512.png"):
             if (dist / static).exists():
-                routes.append(Route(f"/{static}", lambda r, p=dist / static: FileResponse(p)))
+                headers = {"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"} if static == "sw.js" else {}
+                media = "application/manifest+json" if static.endswith(".webmanifest") else None
+                routes.append(Route(f"/{static}", lambda r, p=dist / static, h=headers, m=media: FileResponse(p, headers=h, media_type=m)))
         routes.append(Route("/{rest:path}", spa))
 
     @asynccontextmanager

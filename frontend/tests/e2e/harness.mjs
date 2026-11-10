@@ -23,7 +23,7 @@ export async function startServer({ withModel = false } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'isl-nova-e2e-'));
   const env = {
     ...process.env, PYTHONPATH: [path.join(repo, 'backend'), path.join(repo, 'ml')].join(path.delimiter), DATABASE_URL: `sqlite:///${dir}/db.sqlite`,
-    STORAGE_DIR: `${dir}/objects`, MODEL_REGISTRY_DIR: `${dir}/models`, JWT_SECRET: 'e2e-secret-'.padEnd(48, 'x'),
+    STORAGE_DIR: `${dir}/objects`, MODEL_REGISTRY_DIR: `${dir}/models`, REFERENCES_DIR: process.env.E2E_REFERENCES_DIR || path.join(repo, 'dataset', 'references'), JWT_SECRET: 'e2e-secret-'.padEnd(48, 'x'),
     BOOTSTRAP_ADMIN_EMAIL: ADMIN.email, BOOTSTRAP_ADMIN_PASSWORD: ADMIN.password, PBKDF2_ITERATIONS: '1000',
     CORS_ORIGINS: `http://127.0.0.1:${port}`, AUTH_RATE_LIMIT_PER_MINUTE: '1000', RATE_LIMIT_PER_MINUTE: '10000',
   };
