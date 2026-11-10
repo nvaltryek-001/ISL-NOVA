@@ -265,8 +265,8 @@ export function SignDetailPage({ id }: { id: string }) {
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between"><dt className="text-ink-400">External videos (train/val/test)</dt><dd>{s.external_train_videos}/{s.external_val_videos}/{s.external_test_videos}</dd></div>
             {Object.entries(s.recordings).map(([k, v]) => <div key={k} className="flex justify-between"><dt className="text-ink-400">Local · {k.replaceAll('_', ' ')}</dt><dd>{v}</dd></div>)}
-            {!Object.keys(s.recordings).length && <p className="muted text-xs">No local recordings yet.</p>}
           </dl>
+          {!Object.keys(s.recordings).length && <p className="muted mt-2 text-xs">No local recordings yet.</p>}
           <p className="label mb-2 mt-5">Related signs</p>
           <div className="flex flex-wrap gap-1.5">{s.related.map((r) => <Link key={r.sign_id} to={`/signs/${r.sign_id}`} className="rounded-full border border-ink-600 px-2.5 py-1 text-xs text-ink-200 hover:border-nova-400 hover:text-fg">{r.canonical_sign_name}</Link>)}</div>
         </Card>

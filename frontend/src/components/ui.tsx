@@ -129,9 +129,12 @@ export function Dialog({ open, onClose, title, children, footer, wide }: { open:
   );
 }
 
-export function Table({ head, children, empty, className }: { head: ReactNode[]; children: ReactNode; empty?: ReactNode; className?: string }) {
+export function Table({ head, children, empty, className, scrollLabel }: { head: ReactNode[]; children: ReactNode; empty?: ReactNode; className?: string; scrollLabel?: string }) {
+  // a height-capped table scrolls on its own, so it must be reachable by keyboard (WCAG 2.1.1)
+  const t = useT();
+  const scroll = scrollLabel ? { tabIndex: 0, role: 'region', 'aria-label': t(scrollLabel) } : {};
   return (
-    <div className={clsx('overflow-x-auto rounded-xl border border-ink-700', className)}>
+    <div className={clsx('overflow-x-auto rounded-xl border border-ink-700', className)} {...scroll}>
       <table className="w-full text-left text-sm">
         <thead className="bg-ink-800/70 text-xs uppercase tracking-wider text-ink-400">
           <tr>{head.map((h, i) => <th key={i} scope="col" className="whitespace-nowrap px-3 py-2.5 font-medium">{h}</th>)}</tr>

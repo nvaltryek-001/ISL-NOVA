@@ -19,7 +19,7 @@
   --color-ink-800: #f2f3f9;
   --color-ink-700: #e4e7f0;
   --color-ink-600: #d0d5e3;
-  --color-ink-500: #8a93ad;
+  --color-ink-500: #636c88; /* >= 4.5:1 as text on every light surface (axe) */
   --color-ink-400: #5b6482;
   --color-ink-300: #434b66;
   --color-ink-200: #2b3250;
@@ -58,7 +58,7 @@
   --color-ink-800: #151b2d;
   --color-ink-700: #1f2740;
   --color-ink-600: #2c3657;
-  --color-ink-500: #4a5578;
+  --color-ink-500: #7782a4; /* >= 4.5:1 as text on dark surfaces (axe) */
   --color-ink-400: #7b86a8;
   --color-ink-300: #a7b0cc;
   --color-ink-200: #cdd3e6;
@@ -67,8 +67,8 @@
   --color-on-accent: #05121a;
   --color-nova-300: #c4b5fd;
   --color-nova-400: #a78bfa;
-  --color-nova-500: #8b5cf6;
-  --color-nova-600: #7c3aed;
+  --color-nova-500: #7c3aed; /* white text on primary buttons: 5.7:1 */
+  --color-nova-600: #6d28d9;
   --color-indigo-glow: #6366f1;
   --color-signal: #22d3ee;
   --color-focus: #22d3ee;

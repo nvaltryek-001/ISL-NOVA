@@ -236,4 +236,5 @@ export const STRINGS: Record<string, [hi: string, kn: string]> = {
   'On. Sign-in asks for a code from your authenticator app.': ['चालू। साइन-इन पर आपके ऑथेंटिकेटर ऐप का कोड माँगा जाता है।', 'ಆನ್. ಸೈನ್-ಇನ್ ವೇಳೆ ನಿಮ್ಮ ದೃಢೀಕರಣ ಆ್ಯಪ್‌ನ ಕೋಡ್ ಕೇಳಲಾಗುತ್ತದೆ.'],
   'Off. Add a second step to sign-in with any authenticator app.': ['बंद। किसी भी ऑथेंटिकेटर ऐप से साइन-इन में दूसरा चरण जोड़ें।', 'ಆಫ್. ಯಾವುದೇ ದೃಢೀಕರಣ ಆ್ಯಪ್ ಬಳಸಿ ಸೈನ್-ಇನ್‌ಗೆ ಎರಡನೇ ಹಂತ ಸೇರಿಸಿ.'],
   'Add this key to an authenticator app (time-based, 6 digits, 30 s), then enter the code it shows.': ['यह कुंजी किसी ऑथेंटिकेटर ऐप में जोड़ें (समय-आधारित, 6 अंक, 30 सेकंड), फिर दिखाया गया कोड दर्ज करें।', 'ಈ ಕೀಲಿಯನ್ನು ದೃಢೀಕರಣ ಆ್ಯಪ್‌ಗೆ ಸೇರಿಸಿ (ಸಮಯ-ಆಧಾರಿತ, 6 ಅಂಕಿ, 30 ಸೆ), ನಂತರ ತೋರಿಸಿದ ಕೋಡ್ ನಮೂದಿಸಿ.'],
+  'Per-sign readiness table': ['प्रति-संकेत तैयारी तालिका', 'ಪ್ರತಿ-ಚಿಹ್ನೆ ಸಿದ್ಧತೆ ಕೋಷ್ಟಕ'],
 };

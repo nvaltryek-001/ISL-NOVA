@@ -84,7 +84,7 @@ function Overview() {
             {Object.keys(s.readiness).map((k) => <option key={k} value={k}>{k.replaceAll('_', ' ')} ({s.readiness[k]})</option>)}
           </Select>}>
           {rows.loading ? <Loading /> : (
-            <Table head={['ID', 'Sign', 'Verification', 'Readiness', 'Approved', 'Pending', 'Signers', 'External']} className="max-h-[520px]">
+            <Table head={['ID', 'Sign', 'Verification', 'Readiness', 'Approved', 'Pending', 'Signers', 'External']} className="max-h-[520px]" scrollLabel="Per-sign readiness table">
               {shown.map((r) => (
                 <tr key={r.sign_id}>
                   <td className="px-3 py-2 font-mono text-xs text-ink-400">{r.sign_id}</td>
