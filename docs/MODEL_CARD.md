@@ -1,4 +1,56 @@
-# Model card: `lstm-20261110T111537Z-s7` (ISL NOVA v2, default)
+# Model card: `bilstm_attn-20261110T162800Z-s7` (ISL NOVA v3, default)
+
+| Field | Value |
+|---|---|
+| Model | Bidirectional LSTM (96 units per direction) with additive attention pooling + mean pooling → softmax over 200 signs; NumPy implementation with gradient-checked backward pass (`ml/isl_nova_ml/deep.py`) |
+| Weights | [release `model-bilstm_attn-20261110T162800Z-s7`](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/model-bilstm_attn-20261110T162800Z-s7), tarball SHA-256 `584bbf6e3eaf4313d6edd02d7bfd1bf08cd2729ce5e9a174f61f95cfa92fd786`; 2.57 MB |
+| Trained by | GitHub Actions run [42851786127](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42851786127), config `ml/configs/bilstm-attn_fps_aug.json`, seed 7, 671 s on a 4-vCPU runner |
+| Training data | INCLUDE (Sridhar et al., ACM MM 2020, doi:10.1145/3394171.3413528), CC BY 4.0; official split 2,448 / 271 / 635; frame-rate / crop / missed-detection augmentation (4 variants per training sequence) |
+| Selection | best **validation** macro-F1 among 21 candidates (98.1 %; exact tie with two ensembles, broken in favour of the smaller model) |
+| Calibration | temperature 0.975; max-probability τ 0.80 (fallback rule) |
+| Decision rule | **unknown-sign detector** stored in `model.json`: logistic on max-probability, margin and entropy, fitted on validation + out-of-vocabulary part A2; recognized ≥ 0.92, uncertain ≥ −2.46 |
+
+## Held-out test results (635 sequences, evaluated once)
+
+| Metric | v3 (this model) | v2 | v1 |
+|---|---:|---:|---:|
+| Top-1 accuracy | **95.1 %** | 92.0 % | 91.7 % |
+| Top-5 accuracy | **99.4 %** | 98.7 % | 98.3 % |
+| Macro precision / recall | 94.9 % / 95.0 % | 92.9 % / 92.6 % | 93.0 % / 92.4 % |
+| Macro-F1 / weighted-F1 | **94.1 %** / 94.9 % | 91.6 % / 91.6 % | 91.7 % / 91.5 % |
+| Expected calibration error | **0.013** | 0.015 | 0.027 |
+| `Predictor` end-to-end, all 635 | 95.12 % top-1 (median 18 ms per request) | 91.97 % | 91.65 % |
+| Decision states on test (detector) | 551 recognized · 61 uncertain · 23 unknown | | |
+
+## Unknown signs (31 out-of-vocabulary glosses never used for any choice)
+
+| Rule | False acceptance | False rejection | Known recognized and correct |
+|---|---:|---:|---:|
+| **Shipped detector** | **8.8 %** (target < 10 %: met) | **13.2 %** (target ≤ 15 %: met) | 85.2 % |
+| Max probability alone | 19.6 % | 8.0 % | 89.9 % |
+
+Details: [research/V3_MODELS.md](../research/V3_MODELS.md).
+
+## On-device
+
+The same model and detector run in the browser (`frontend/src/lib/webModel.ts`) for offline use;
+probabilities match the server to 1e-8 and decisions agreed on 24/24 held-out samples.
+
+## Browser pipeline (virtual camera)
+
+Pending: live-pipeline run on the 73 held-out clips (see V2_STATUS / README for the result when it completes).
+
+## Intended use, limitations
+As for earlier models: isolated signs only; **not signer-independent**; one school in Chennai;
+no facial features; vocabulary and Hindi/Kannada meanings not linguist-verified; no live-person
+or new-signer evaluation. **Not** for high-stakes interpretation.
+
+## Install
+`python scripts/fetch_model.py --tag model-bilstm_attn-20261110T162800Z-s7 --registry artifacts/models --promote` (default in the setup scripts).
+
+---
+
+## Previous model (v2): `lstm-20261110T111537Z-s7`
 
 | Field | Value |
 |---|---|
@@ -12,7 +64,7 @@
 | Features | contract `isl-nova-fc-1.0.0` (32 × 204) |
 | Calibration | temperature 0.975 (validation); rejection τ = 0.666 (keeps 95 % of correct validation predictions); margin 0.10 |
 
-## Held-out test results (INCLUDE official test split, evaluated once)
+### Held-out test results (INCLUDE official test split, evaluated once)
 
 | Metric | v2 (this model) | v1 |
 |---|---:|---:|
@@ -30,11 +82,11 @@ Three-seed means (s7, s13, s21): fps-augmented LSTM **93.0 ± 0.7 %** top-1, bas
 
 Weakest classes on test (F1, support): Store or Shop 0.00 (3), Thursday 0.00 (1), Bad 0.40 (4), Slow 0.40 (4), Friend 0.50 (4), Computer 0.57 (3), Clothing 0.57 (4). With 1–4 test videos per class these figures are noisy.
 
-## Browser pipeline (virtual camera, 73 held-out clips)
+### Browser pipeline (virtual camera, 73 held-out clips)
 
 [Run 42807661120](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42807661120): **83.6 % top-1** (v1: 74.0 %), 97.3 % top-5; 54 recognized (49 correct), 14 uncertain, 5 unknown; median 9 fps on the CPU delegate; offline Python on the same clips 89.0 %. The v2 target of ≥ 85 % is **not met**. Not a live-person test.
 
-## Unknown signs (open set)
+### Unknown signs (open set)
 
 [Run 42807661840](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42807661840), 887 sequences of 62 out-of-vocabulary INCLUDE glosses:
 
@@ -50,10 +102,10 @@ v2 separates known from unknown better, but its validation-chosen τ is looser, 
 always shows the decision state and top-5 alternatives; never act on a single
 prediction. Details: [OPEN_SET_V2.md](../research/OPEN_SET_V2.md).
 
-## Intended use
+### Intended use
 Isolated-sign recognition for practice, look-up and research in ISL NOVA. **Not** for interpretation in medical, legal, emergency or other high-stakes settings.
 
-## Limitations
+### Limitations
 * **Not signer-independent** (INCLUDE has no signer IDs): no estimate for new people.
 * **Narrow population**: one school in Chennai, studio conditions.
 * **Weak unknown-sign rejection** (see above).
@@ -61,7 +113,7 @@ Isolated-sign recognition for practice, look-up and research in ISL NOVA. **Not*
 * **Isolated signs only**; no facial (non-manual) features.
 * **No live-person or new-signer evaluation** has been run.
 
-## Install
+### Install
 `python scripts/fetch_model.py --tag model-lstm-20261110T111537Z-s7 --registry artifacts/models --promote` (the setup scripts do this by default).
 
 ---

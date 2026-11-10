@@ -321,11 +321,12 @@ def cmd_compare(a) -> int:
     if not rows:
         print("no models found")
         return 1
-    best = max((r for r in rows if not r["synthetic"]), key=lambda r: r["val_macro_f1"])  # selection on VALIDATION
+    # selection on VALIDATION; exact ties go to the smaller model (cheaper, runs on-device)
+    best = max((r for r in rows if not r["synthetic"]), key=lambda r: (r["val_macro_f1"], -r["size_bytes"]))
     reg.promote(best["model_id"], actor="include-train workflow")
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
-    (out / "comparison.json").write_text(json.dumps({"selected_by": "validation macro-F1", "best": best["model_id"],
+    (out / "comparison.json").write_text(json.dumps({"selected_by": "validation macro-F1 (ties: smaller model)", "best": best["model_id"],
                                                      "models": rows}, indent=2))
     pct = lambda x: f"{100 * x:.1f}%"  # noqa: E731
     lines = ["| Model | Classes | Train/Val/Test | Val macro-F1 | Test top-1 | Test top-5 | Precision (macro) | "

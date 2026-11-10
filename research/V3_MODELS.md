@@ -38,8 +38,10 @@ Three-seed spread (test top-1): Transformer 95.1–96.2 %, TCN 95.6–96.5 %, Bi
 94.2–95.1 %, LSTM + fps 93.7–94.8 %. Full table: `comparison.md` on the
 [model release](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/model-bilstm_attn-20261110T162800Z-s7).
 
-**Reading.** Validation macro-F1 tied at 98.1 % (271 validation sequences: one sequence ≈ 0.4
-points) between the BiLSTM-attention model and two ensembles; the rule picked the single model.
+**Reading.** Validation macro-F1 was an **exact tie** (0.98093, 271 validation sequences) between
+the BiLSTM-attention model and two ensembles. In this run the comparison step kept the first in name
+order, which happened to be the single model; the rule now breaks ties explicitly in favour of the
+smaller model (3× smaller than the ensembles and able to run on-device), which gives the same choice.
 The ensembles scored 1.8–2.1 points higher on test, but choosing them now *because* of the test
 score would leak the test split into the selection, so the release stays with the validation
 choice. With 1–4 test videos per class, differences of about 1 point are within noise.
