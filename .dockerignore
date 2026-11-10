@@ -1,0 +1,17 @@
+.git
+**/node_modules
+frontend/dist
+**/__pycache__
+**/.pytest_cache
+.ruff_cache
+storage
+artifacts
+data
+.env
+.env.*
+docs/screenshots
+*.npz
+*.task
+*.mp4
+*.mov
+*.webm

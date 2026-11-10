@@ -1,0 +1,601 @@
+sign_id,language,text,transliteration,status,translator,reviewer,source,notes
+ISL001,en,Alright,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL001,hi,ठीक है,theek hai,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL001,kn,ಸರಿ,sari,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL002,en,Bad,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL002,hi,बुरा,bura,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL002,kn,ಕೆಟ್ಟ,ketta,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL003,en,Blind,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL003,hi,अंधा,andha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL003,kn,ಕುರುಡ,kuruda,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL004,en,Deaf,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL004,hi,बधिर,badhir,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL004,kn,ಕಿವುಡ,kivuda,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL005,en,Friend,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL005,hi,दोस्त,dost,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL005,kn,ಸ್ನೇಹಿತ,snehita,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL006,en,Gift,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL006,hi,उपहार,upahaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL006,kn,ಉಡುಗೊರೆ,udugore,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL007,en,Good,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL007,hi,अच्छा,achchha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL007,kn,ಒಳ್ಳೆಯ,olleya,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL008,en,Good afternoon,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL008,hi,शुभ दोपहर,shubh dopahar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL008,kn,ಶುಭ ಮಧ್ಯಾಹ್ನ,shubha madhyahna,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL009,en,Good evening,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL009,hi,शुभ संध्या,shubh sandhya,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL009,kn,ಶುಭ ಸಂಜೆ,shubha sanje,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL010,en,Good Morning,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL010,hi,सुप्रभात,suprabhaat,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL010,kn,ಶುಭೋದಯ,shubhodaya,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL011,en,Good night,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL011,hi,शुभ रात्रि,shubh ratri,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL011,kn,ಶುಭ ರಾತ್ರಿ,shubha ratri,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL012,en,Hello,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL012,hi,नमस्ते,namaste,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL012,kn,ನಮಸ್ಕಾರ,namaskara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL013,en,How are you,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL013,hi,आप कैसे हैं,aap kaise hain,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL013,kn,ನೀವು ಹೇಗಿದ್ದೀರಿ,neevu hegiddiri,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL014,en,Marriage,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL014,hi,विवाह,vivaah,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL014,kn,ಮದುವೆ,maduve,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL015,en,Neighbour,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL015,hi,पड़ोसी,padosi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL015,kn,ನೆರೆಹೊರೆಯವರು,nerehoreyavaru,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL016,en,Nice,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL016,hi,बढ़िया,badhiya,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL016,kn,ಚೆನ್ನಾಗಿದೆ,chennagide,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL017,en,Pleased,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL017,hi,प्रसन्न,prasann,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL017,kn,ಸಂತೋಷವಾಯಿತು,santoshavayitu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL018,en,Sign,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL018,hi,संकेत,sanket,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL018,kn,ಸಂಜ್ಞೆ,sanjne,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL019,en,Thank you,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL019,hi,धन्यवाद,dhanyavaad,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL019,kn,ಧನ್ಯವಾದ,dhanyavada,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL020,en,Baby,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL020,hi,शिशु,shishu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL020,kn,ಮಗು,magu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL021,en,Boy,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL021,hi,लड़का,ladka,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL021,kn,ಹುಡುಗ,huduga,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL022,en,Brother,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL022,hi,भाई,bhai,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL022,kn,ಸಹೋದರ,sahodara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL023,en,Child,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL023,hi,बच्चा,bachcha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL023,kn,ಮಗು,magu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL024,en,Daughter,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL024,hi,बेटी,beti,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL024,kn,ಮಗಳು,magalu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL025,en,Family,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL025,hi,परिवार,parivaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL025,kn,ಕುಟುಂಬ,kutumba,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL026,en,Father,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL026,hi,पिता,pita,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL026,kn,ತಂದೆ,tande,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL027,en,Girl,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL027,hi,लड़की,ladki,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL027,kn,ಹುಡುಗಿ,hudugi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL028,en,Grandfather,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL028,hi,दादा,dada,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL028,kn,ಅಜ್ಜ,ajja,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL029,en,Grandmother,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL029,hi,दादी,dadi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL029,kn,ಅಜ್ಜಿ,ajji,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL030,en,Husband,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL030,hi,पति,pati,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL030,kn,ಗಂಡ,ganda,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL031,en,Man,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL031,hi,आदमी,aadmi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL031,kn,ಗಂಡಸು,gandasu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL032,en,Mother,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL032,hi,माँ,maan,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL032,kn,ತಾಯಿ,tayi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL033,en,Old,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL033,hi,बूढ़ा,boodha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL033,kn,ಮುದುಕ,muduka,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL034,en,Parent,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL034,hi,माता-पिता,mata-pita,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL034,kn,ಪೋಷಕರು,poshakaru,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL035,en,Sister,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL035,hi,बहन,bahan,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL035,kn,ಸಹೋದರಿ,sahodari,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL036,en,Son,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL036,hi,बेटा,beta,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL036,kn,ಮಗ,maga,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL037,en,Wife,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL037,hi,पत्नी,patni,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL037,kn,ಹೆಂಡತಿ,hendati,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL038,en,Woman,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL038,hi,औरत,aurat,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL038,kn,ಹೆಂಗಸು,hengasu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL039,en,Young,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL039,hi,युवा,yuva,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL039,kn,ಯುವ,yuva,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL040,en,Exercise,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL040,hi,व्यायाम,vyayaam,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL040,kn,ವ್ಯಾಯಾಮ,vyayama,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL041,en,Sport,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL041,hi,खेल,khel,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL041,kn,ಕ್ರೀಡೆ,kride,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL042,en,Bag,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL042,hi,थैला,thaila,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL042,kn,ಚೀಲ,cheela,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL043,en,Ball,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL043,hi,गेंद,gend,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL043,kn,ಚೆಂಡು,chendu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL044,en,Bank,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL044,hi,बैंक,bank,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL044,kn,ಬ್ಯಾಂಕ್,byank,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL045,en,Bathroom,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL045,hi,स्नानघर,snaanghar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL045,kn,ಸ್ನಾನಗೃಹ,snanagriha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL046,en,Bed,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL046,hi,बिस्तर,bistar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL046,kn,ಹಾಸಿಗೆ,hasige,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL047,en,Bedroom,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL047,hi,शयनकक्ष,shayankaksh,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL047,kn,ಮಲಗುವ ಕೋಣೆ,malaguva kone,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL048,en,Camera,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL048,hi,कैमरा,camera,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL048,kn,ಕ್ಯಾಮೆರಾ,kyamera,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL049,en,Chair,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL049,hi,कुर्सी,kursi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL049,kn,ಕುರ್ಚಿ,kurchi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL050,en,City,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL050,hi,शहर,shahar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL050,kn,ನಗರ,nagara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL051,en,Clock,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL051,hi,घड़ी,ghadi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL051,kn,ಗಡಿಯಾರ,gadiyara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL052,en,Computer,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL052,hi,कंप्यूटर,computer,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL052,kn,ಕಂಪ್ಯೂಟರ್,kampyutar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL053,en,Door,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL053,hi,दरवाज़ा,darvaaza,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL053,kn,ಬಾಗಿಲು,bagilu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL054,en,Fan,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL054,hi,पंखा,pankha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL054,kn,ಫ್ಯಾನ್,fyan,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL055,en,House,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL055,hi,घर,ghar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL055,kn,ಮನೆ,mane,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL056,en,India,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL056,hi,भारत,Bharat,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL056,kn,ಭಾರತ,Bharata,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL057,en,Key,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL057,hi,चाबी,chaabi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL057,kn,ಕೀಲಿ,keeli,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL058,en,Kitchen,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL058,hi,रसोई,rasoi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL058,kn,ಅಡುಗೆಮನೆ,adugemane,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL059,en,Laptop,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL059,hi,लैपटॉप,laptop,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL059,kn,ಲ್ಯಾಪ್‌ಟಾಪ್,lyaptap,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL060,en,Lock,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL060,hi,ताला,taala,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL060,kn,ಬೀಗ,beega,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL061,en,Market,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL061,hi,बाज़ार,baazaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL061,kn,ಮಾರುಕಟ್ಟೆ,marukatte,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL062,en,Office,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL062,hi,कार्यालय,karyaalay,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL062,kn,ಕಚೇರಿ,kacheri,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL063,en,Park,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL063,hi,पार्क,park,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL063,kn,ಉದ್ಯಾನ,udyana,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL064,en,Photograph,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL064,hi,फ़ोटो,photo,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL064,kn,ಛಾಯಾಚಿತ್ರ,chayachitra,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL065,en,Restaurant,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL065,hi,रेस्टोरेंट,restaurant,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL065,kn,ಉಪಾಹಾರ ಗೃಹ,upahara griha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL066,en,Store or Shop,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL066,hi,दुकान,dukaan,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL066,kn,ಅಂಗಡಿ,angadi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL067,en,Table,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL067,hi,मेज़,mez,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL067,kn,ಮೇಜು,meju,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL068,en,Window,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL068,hi,खिड़की,khidki,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL068,kn,ಕಿಟಕಿ,kitaki,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL069,en,Bill,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL069,hi,बिल,bill,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL069,kn,ಬಿಲ್,bil,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL070,en,Cheap,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL070,hi,सस्ता,sasta,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL070,kn,ಅಗ್ಗ,agga,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL071,en,Clothing,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL071,hi,कपड़े,kapde,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL071,kn,ಬಟ್ಟೆ,batte,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL072,en,Dress,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL072,hi,पोशाक,poshaak,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL072,kn,ಉಡುಪು,udupu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL073,en,Expensive,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL073,hi,महँगा,mahanga,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL073,kn,ದುಬಾರಿ,dubari,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL074,en,Hat,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL074,hi,टोपी,topi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL074,kn,ಟೋಪಿ,topi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL075,en,Medicine,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL075,hi,दवा,dava,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL075,kn,ಔಷಧಿ,aushadhi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL076,en,Money,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL076,hi,पैसा,paisa,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL076,kn,ಹಣ,hana,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL077,en,Pant,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL077,hi,पतलून,patloon,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL077,kn,ಪ್ಯಾಂಟ್,pyant,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL078,en,Poor,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL078,hi,गरीब,gareeb,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL078,kn,ಬಡವ,badava,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL079,en,Price,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL079,hi,कीमत,keemat,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL079,kn,ಬೆಲೆ,bele,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL080,en,Rich,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL080,hi,अमीर,ameer,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL080,kn,ಶ್ರೀಮಂತ,shrimanta,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL081,en,Shirt,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL081,hi,कमीज़,kameez,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL081,kn,ಅಂಗಿ,angi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL082,en,Shoes,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL082,hi,जूते,joote,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL082,kn,ಬೂಟುಗಳು,bootugalu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL083,en,Soap,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL083,hi,साबुन,saabun,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL083,kn,ಸಾಬೂನು,saboonu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL084,en,T-Shirt,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL084,hi,टी-शर्ट,T-shirt,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL084,kn,ಟಿ-ಶರ್ಟ್,ti-shart,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL085,en,Afternoon,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL085,hi,दोपहर,dopahar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL085,kn,ಮಧ್ಯಾಹ್ನ,madhyahna,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL086,en,Evening,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL086,hi,शाम,shaam,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL086,kn,ಸಂಜೆ,sanje,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL087,en,Friday,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL087,hi,शुक्रवार,shukravaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL087,kn,ಶುಕ್ರವಾರ,shukravara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL088,en,Hour,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL088,hi,घंटा,ghanta,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL088,kn,ಗಂಟೆ,gante,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL089,en,Minute,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL089,hi,मिनट,minat,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL089,kn,ನಿಮಿಷ,nimisha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL090,en,Monday,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL090,hi,सोमवार,somvaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL090,kn,ಸೋಮವಾರ,somavara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL091,en,Month,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL091,hi,महीना,maheena,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL091,kn,ತಿಂಗಳು,tingalu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL092,en,Morning,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL092,hi,सुबह,subah,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL092,kn,ಬೆಳಿಗ್ಗೆ,beligge,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL093,en,Night,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL093,hi,रात,raat,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL093,kn,ರಾತ್ರಿ,ratri,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL094,en,Saturday,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL094,hi,शनिवार,shanivaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL094,kn,ಶನಿವಾರ,shanivara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL095,en,Season,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL095,hi,ऋतु,ritu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL095,kn,ಋತು,ritu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL096,en,Second,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL096,hi,सेकंड,second,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL096,kn,ಸೆಕೆಂಡ್,sekend,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL097,en,Spring,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL097,hi,वसंत,vasant,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL097,kn,ವಸಂತ,vasanta,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL098,en,Summer,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL098,hi,गर्मी,garmi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL098,kn,ಬೇಸಿಗೆ,besige,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL099,en,Sunday,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL099,hi,रविवार,ravivaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL099,kn,ಭಾನುವಾರ,bhanuvara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL100,en,Thursday,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL100,hi,गुरुवार,guruvaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL100,kn,ಗುರುವಾರ,guruvara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL101,en,Time,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL101,hi,समय,samay,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL101,kn,ಸಮಯ,samaya,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL102,en,Today,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL102,hi,आज,aaj,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL102,kn,ಇಂದು,indu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL103,en,Tomorrow,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL103,hi,कल (आने वाला),kal (aane vala),draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL103,kn,ನಾಳೆ,nale,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL104,en,Tuesday,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL104,hi,मंगलवार,mangalvaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL104,kn,ಮಂಗಳವಾರ,mangalavara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL105,en,Wednesday,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL105,hi,बुधवार,budhvaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL105,kn,ಬುಧವಾರ,budhavara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL106,en,Week,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL106,hi,सप्ताह,saptaah,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL106,kn,ವಾರ,vara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL107,en,Winter,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL107,hi,सर्दी,sardi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL107,kn,ಚಳಿಗಾಲ,chaligala,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL108,en,Year,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL108,hi,साल,saal,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL108,kn,ವರ್ಷ,varsha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL109,en,Yesterday,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL109,hi,कल (बीता हुआ),kal (beeta hua),draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL109,kn,ನಿನ್ನೆ,ninne,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL110,en,Beautiful,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL110,hi,सुंदर,sundar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL110,kn,ಸುಂದರ,sundara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL111,en,Cold,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL111,hi,ठंडा,thanda,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL111,kn,ತಣ್ಣಗೆ,tannage,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL112,en,Dead,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL112,hi,मृत,mrit,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL112,kn,ಸತ್ತ,satta,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL113,en,Happy,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL113,hi,खुश,khush,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL113,kn,ಸಂತೋಷ,santosha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL114,en,Healthy,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL114,hi,स्वस्थ,swasth,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL114,kn,ಆರೋಗ್ಯವಂತ,arogyavanta,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL115,en,Hot,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL115,hi,गरम,garam,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL115,kn,ಬಿಸಿ,bisi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL116,en,Loud,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL116,hi,ऊँची आवाज़,oonchi aavaaz,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL116,kn,ಜೋರು,joru,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL117,en,Quiet,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL117,hi,शांत,shaant,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL117,kn,ಶಾಂತ,shanta,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL118,en,Sad,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL118,hi,उदास,udaas,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL118,kn,ದುಃಖ,duhkha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL119,en,Sick,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL119,hi,बीमार,beemaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL119,kn,ಅಸ್ವಸ್ಥ,asvastha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL120,en,Strong,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL120,hi,मज़बूत,mazboot,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL120,kn,ಬಲಶಾಲಿ,balashali,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL121,en,Ugly,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL121,hi,बदसूरत,badsoorat,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL121,kn,ಕುರೂಪ,kurupa,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL122,en,Warm,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL122,hi,गुनगुना,gungunaa,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL122,kn,ಬೆಚ್ಚಗೆ,bechchage,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL123,en,Weak,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL123,hi,कमज़ोर,kamzor,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL123,kn,ದುರ್ಬಲ,durbala,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL124,en,Cell phone,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL124,hi,मोबाइल फ़ोन,mobile phone,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL124,kn,ಮೊಬೈಲ್ ಫೋನ್,mobail phon,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL125,en,He,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL125,hi,वह (पुरुष),vah (purush),draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL125,kn,ಅವನು,avanu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL126,en,I,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL126,hi,मैं,main,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL126,kn,ನಾನು,nanu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL127,en,It,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL127,hi,यह,yah,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL127,kn,ಅದು,adu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL128,en,Letter,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL128,hi,पत्र,patra,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL128,kn,ಪತ್ರ,patra,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL129,en,Newspaper,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL129,hi,अख़बार,akhbaar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL129,kn,ದಿನಪತ್ರಿಕೆ,dinapatrike,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL130,en,Radio,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL130,hi,रेडियो,radio,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL130,kn,ರೇಡಿಯೋ,rediyo,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL131,en,She,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL131,hi,वह (स्त्री),vah (stri),draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL131,kn,ಅವಳು,avalu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL132,en,Telephone,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL132,hi,टेलीफ़ोन,telephone,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL132,kn,ದೂರವಾಣಿ,duravani,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL133,en,Television,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL133,hi,टेलीविज़न,television,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL133,kn,ದೂರದರ್ಶನ,duradarshana,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL134,en,They,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL134,hi,वे,ve,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL134,kn,ಅವರು,avaru,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL135,en,We,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL135,hi,हम,ham,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL135,kn,ನಾವು,navu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL136,en,You,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL136,hi,तुम,tum,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL136,kn,ನೀನು,neenu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL137,en,You (plural),,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL137,hi,आप सब,aap sab,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL137,kn,ನೀವೆಲ್ಲರೂ,neevellaru,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL138,en,Book,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL138,hi,किताब,kitaab,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL138,kn,ಪುಸ್ತಕ,pustaka,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL139,en,Doctor,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL139,hi,डॉक्टर,doctor,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL139,kn,ವೈದ್ಯ,vaidya,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL140,en,Job,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL140,hi,नौकरी,naukri,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL140,kn,ಕೆಲಸ,kelasa,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL141,en,Lawyer,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL141,hi,वकील,vakeel,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL141,kn,ವಕೀಲ,vakila,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL142,en,Library,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL142,hi,पुस्तकालय,pustakaalay,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL142,kn,ಗ್ರಂಥಾಲಯ,granthalaya,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL143,en,Manager,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL143,hi,प्रबंधक,prabandhak,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL143,kn,ವ್ಯವಸ್ಥಾಪಕ,vyavasthapaka,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL144,en,Paper,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL144,hi,काग़ज़,kaagaz,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL144,kn,ಕಾಗದ,kagada,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL145,en,Patient,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL145,hi,मरीज़,mareez,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL145,kn,ರೋಗಿ,rogi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL146,en,Pen,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL146,hi,कलम,kalam,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL146,kn,ಲೇಖನಿ,lekhani,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL147,en,Pencil,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL147,hi,पेंसिल,pencil,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL147,kn,ಪೆನ್ಸಿಲ್,pensil,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL148,en,School,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL148,hi,विद्यालय,vidyaalay,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL148,kn,ಶಾಲೆ,shale,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL149,en,Student,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL149,hi,छात्र,chhaatra,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL149,kn,ವಿದ್ಯಾರ್ಥಿ,vidyarthi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL150,en,Teacher,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL150,hi,शिक्षक,shikshak,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL150,kn,ಶಿಕ್ಷಕ,shikshaka,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL151,en,University,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL151,hi,विश्वविद्यालय,vishvavidyaalay,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL151,kn,ವಿಶ್ವವಿದ್ಯಾಲಯ,vishvavidyalaya,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL152,en,Waiter,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL152,hi,वेटर,waiter,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL152,kn,ಮಾಣಿ,mani,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL153,en,Bicycle,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL153,hi,साइकिल,cycle,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL153,kn,ಸೈಕಲ್,saikal,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL154,en,Boat,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL154,hi,नाव,naav,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL154,kn,ದೋಣಿ,doni,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL155,en,Bus,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL155,hi,बस,bus,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL155,kn,ಬಸ್,bas,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL156,en,Car,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL156,hi,कार,car,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL156,kn,ಕಾರು,karu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL157,en,Hospital,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL157,hi,अस्पताल,aspataal,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL157,kn,ಆಸ್ಪತ್ರೆ,aspatre,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL158,en,Location,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL158,hi,स्थान,sthaan,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL158,kn,ಸ್ಥಳ,sthala,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL159,en,Plane,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL159,hi,हवाई जहाज़,havaai jahaaz,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL159,kn,ವಿಮಾನ,vimana,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL160,en,Police,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL160,hi,पुलिस,police,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL160,kn,ಪೊಲೀಸ್,polis,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL161,en,Street or Road,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL161,hi,सड़क,sadak,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL161,kn,ರಸ್ತೆ,raste,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL162,en,Train,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL162,hi,रेलगाड़ी,relgaadi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL162,kn,ರೈಲು,railu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL163,en,Train Station,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL163,hi,रेलवे स्टेशन,railway station,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL163,kn,ರೈಲು ನಿಲ್ದಾಣ,railu nildana,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL164,en,Train ticket,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL164,hi,रेल टिकट,rail ticket,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL164,kn,ರೈಲು ಟಿಕೆಟ್,railu tiket,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL165,en,Transportation,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL165,hi,परिवहन,parivahan,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL165,kn,ಸಾರಿಗೆ,sarige,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL166,en,Truck,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL166,hi,ट्रक,truck,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL166,kn,ಲಾರಿ,lari,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL167,en,Big large,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL167,hi,बड़ा,bada,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL167,kn,ದೊಡ್ಡ,dodda,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL168,en,Black,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL168,hi,काला,kaala,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL168,kn,ಕಪ್ಪು,kappu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL169,en,Blue,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL169,hi,नीला,neela,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL169,kn,ನೀಲಿ,neeli,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL170,en,Brown,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL170,hi,भूरा,bhoora,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL170,kn,ಕಂದು,kandu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL171,en,Clean,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL171,hi,साफ़,saaf,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL171,kn,ಸ್ವಚ್ಛ,svachchha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL172,en,Dirty,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL172,hi,गंदा,ganda,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL172,kn,ಕೊಳಕು,kolaku,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL173,en,Dry,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL173,hi,सूखा,sookha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL173,kn,ಒಣ,ona,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL174,en,Fast,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL174,hi,तेज़,tez,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL174,kn,ವೇಗ,vega,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL175,en,Green,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL175,hi,हरा,hara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL175,kn,ಹಸಿರು,hasiru,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL176,en,Grey,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL176,hi,स्लेटी,sleti,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL176,kn,ಬೂದು,boodu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL177,en,Hard,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL177,hi,कठोर,kathor,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL177,kn,ಗಟ್ಟಿ,gatti,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL178,en,Heavy,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL178,hi,भारी,bhaari,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL178,kn,ಭಾರ,bhara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL179,en,High,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL179,hi,ऊँचा,ooncha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL179,kn,ಎತ್ತರ,ettara,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL180,en,Long,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL180,hi,लंबा,lamba,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL180,kn,ಉದ್ದ,udda,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL181,en,Low,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL181,hi,नीचा,neecha,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL181,kn,ಕಡಿಮೆ,kadime,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL182,en,New,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL182,hi,नया,naya,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL182,kn,ಹೊಸ,hosa,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL183,en,Orange,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL183,hi,नारंगी,naarangi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL183,kn,ಕಿತ್ತಳೆ ಬಣ್ಣ,kittale banna,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL184,en,Pink,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL184,hi,गुलाबी,gulaabi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL184,kn,ಗುಲಾಬಿ,gulabi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL185,en,Red,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL185,hi,लाल,laal,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL185,kn,ಕೆಂಪು,kempu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL186,en,Short,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL186,hi,छोटा (लंबाई),chhota (lambai),draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL186,kn,ಚಿಕ್ಕ,chikka,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL187,en,Slow,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL187,hi,धीमा,dheema,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL187,kn,ನಿಧಾನ,nidhana,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL188,en,Small little,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL188,hi,छोटा,chhota,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL188,kn,ಸಣ್ಣ,sanna,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL189,en,Soft,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL189,hi,मुलायम,mulaayam,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL189,kn,ಮೃದು,mridu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL190,en,Tall,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL190,hi,लंबा (क़द),lamba (qad),draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL190,kn,ಎತ್ತರದ,ettarada,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL191,en,Wet,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL191,hi,गीला,geela,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL191,kn,ಒದ್ದೆ,odde,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL192,en,White,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL192,hi,सफ़ेद,safed,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL192,kn,ಬಿಳಿ,bili,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL193,en,Yellow,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL193,hi,पीला,peela,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL193,kn,ಹಳದಿ,haladi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL194,en,Animal,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL194,hi,जानवर,jaanvar,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL194,kn,ಪ್ರಾಣಿ,prani,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL195,en,Bird,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL195,hi,पक्षी,pakshi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL195,kn,ಹಕ್ಕಿ,hakki,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL196,en,Cat,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL196,hi,बिल्ली,billi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL196,kn,ಬೆಕ್ಕು,bekku,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL197,en,Cow,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL197,hi,गाय,gaay,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL197,kn,ಹಸು,hasu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL198,en,Dog,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL198,hi,कुत्ता,kutta,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL198,kn,ನಾಯಿ,nayi,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL199,en,Fish,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL199,hi,मछली,machhli,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL199,kn,ಮೀನು,meenu,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL200,en,Horse,,source_gloss,,,INCLUDE folder name,English gloss from source; not a verified ISL translation
+ISL200,hi,घोड़ा,ghoda,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval
+ISL200,kn,ಕುದುರೆ,kudure,draft,machine,,machine draft (ISL NOVA v2),Machine-drafted word meaning; needs native-speaker review and linguist approval

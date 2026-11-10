@@ -1,0 +1,14 @@
+{
+  "data_run_id": 41764539272,
+  "epochs": 60,
+  "publish_release": true,
+  "purpose": "v2: frame-rate / crop / missed-detection raw augmentation (raw_aug_copies=4) for LSTM and GRU, three seeds each, on include-official-v1",
+  "models": [
+    {"name": "lstm_fps_s13", "config": "ml/configs/lstm_fps_aug.json", "seed": 13},
+    {"name": "lstm_fps_s7", "config": "ml/configs/lstm_fps_aug.json", "seed": 7},
+    {"name": "lstm_fps_s21", "config": "ml/configs/lstm_fps_aug.json", "seed": 21},
+    {"name": "gru_fps_s13", "config": "ml/configs/gru_fps_aug.json", "seed": 13},
+    {"name": "lstm_base_s7", "config": "ml/configs/lstm_baseline.json", "seed": 7},
+    {"name": "lstm_base_s21", "config": "ml/configs/lstm_baseline.json", "seed": 21}
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "dataset_name": "isl-nova-vocabulary",
+  "version": "0.1.0",
+  "created_utc": "2026-11-03T15:45:21Z",
+  "status": "vocabulary_only",
+  "description": "200 class slots derived from the INCLUDE label map. No local recordings; not approved for training.",
+  "source": {
+    "name": "INCLUDE",
+    "commit": "df348f4a640060d4d39f02556d9f96851e8c46c7",
+    "doi": "10.1145/3394171.3413528",
+    "zenodo": "https://zenodo.org/records/4010759",
+    "license": "CC BY 4.0 (dataset videos); MIT (label map / split files)"
+  },
+  "summary": {
+    "class_slots": 200,
+    "verified": 0,
+    "reference_found": 200,
+    "classes_with_local_recordings": 0,
+    "approved_for_training": 0,
+    "local_recordings": 0,
+    "external_videos_listed": 3392
+  }
+}

@@ -1,0 +1,1009 @@
+{
+  "schema_version": 1,
+  "dataset_version": "0.1.0",
+  "feature_contract": "isl-nova-fc-1.0.0",
+  "classes": [
+    {
+      "sign_id": "ISL001",
+      "gloss": "alright",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL002",
+      "gloss": "bad",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL003",
+      "gloss": "blind",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL004",
+      "gloss": "deaf",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL005",
+      "gloss": "friend",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL006",
+      "gloss": "gift",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL007",
+      "gloss": "good",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL008",
+      "gloss": "goodafternoon",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL009",
+      "gloss": "goodevening",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL010",
+      "gloss": "goodmorning",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL011",
+      "gloss": "goodnight",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL012",
+      "gloss": "hello",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL013",
+      "gloss": "howareyou",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL014",
+      "gloss": "marriage",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL015",
+      "gloss": "neighbour",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL016",
+      "gloss": "nice",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL017",
+      "gloss": "pleased",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL018",
+      "gloss": "sign",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL019",
+      "gloss": "thankyou",
+      "category": "greetings_social"
+    },
+    {
+      "sign_id": "ISL020",
+      "gloss": "baby",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL021",
+      "gloss": "boy",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL022",
+      "gloss": "brother",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL023",
+      "gloss": "child",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL024",
+      "gloss": "daughter",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL025",
+      "gloss": "family",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL026",
+      "gloss": "father",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL027",
+      "gloss": "girl",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL028",
+      "gloss": "grandfather",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL029",
+      "gloss": "grandmother",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL030",
+      "gloss": "husband",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL031",
+      "gloss": "man",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL032",
+      "gloss": "mother",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL033",
+      "gloss": "old",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL034",
+      "gloss": "parent",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL035",
+      "gloss": "sister",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL036",
+      "gloss": "son",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL037",
+      "gloss": "wife",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL038",
+      "gloss": "woman",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL039",
+      "gloss": "young",
+      "category": "people_family"
+    },
+    {
+      "sign_id": "ISL040",
+      "gloss": "exercise",
+      "category": "everyday_actions"
+    },
+    {
+      "sign_id": "ISL041",
+      "gloss": "sport",
+      "category": "everyday_actions"
+    },
+    {
+      "sign_id": "ISL042",
+      "gloss": "bag",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL043",
+      "gloss": "ball",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL044",
+      "gloss": "bank",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL045",
+      "gloss": "bathroom",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL046",
+      "gloss": "bed",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL047",
+      "gloss": "bedroom",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL048",
+      "gloss": "camera",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL049",
+      "gloss": "chair",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL050",
+      "gloss": "city",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL051",
+      "gloss": "clock",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL052",
+      "gloss": "computer",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL053",
+      "gloss": "door",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL054",
+      "gloss": "fan",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL055",
+      "gloss": "house",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL056",
+      "gloss": "india",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL057",
+      "gloss": "key",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL058",
+      "gloss": "kitchen",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL059",
+      "gloss": "laptop",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL060",
+      "gloss": "lock",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL061",
+      "gloss": "market",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL062",
+      "gloss": "office",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL063",
+      "gloss": "park",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL064",
+      "gloss": "photograph",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL065",
+      "gloss": "restaurant",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL066",
+      "gloss": "storeorshop",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL067",
+      "gloss": "table",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL068",
+      "gloss": "window",
+      "category": "objects_places"
+    },
+    {
+      "sign_id": "ISL069",
+      "gloss": "bill",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL070",
+      "gloss": "cheap",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL071",
+      "gloss": "clothing",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL072",
+      "gloss": "dress",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL073",
+      "gloss": "expensive",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL074",
+      "gloss": "hat",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL075",
+      "gloss": "medicine",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL076",
+      "gloss": "money",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL077",
+      "gloss": "pant",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL078",
+      "gloss": "poor",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL079",
+      "gloss": "price",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL080",
+      "gloss": "rich",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL081",
+      "gloss": "shirt",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL082",
+      "gloss": "shoes",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL083",
+      "gloss": "soap",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL084",
+      "gloss": "tshirt",
+      "category": "daily_needs"
+    },
+    {
+      "sign_id": "ISL085",
+      "gloss": "afternoon",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL086",
+      "gloss": "evening",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL087",
+      "gloss": "friday",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL088",
+      "gloss": "hour",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL089",
+      "gloss": "minute",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL090",
+      "gloss": "monday",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL091",
+      "gloss": "month",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL092",
+      "gloss": "morning",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL093",
+      "gloss": "night",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL094",
+      "gloss": "saturday",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL095",
+      "gloss": "season",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL096",
+      "gloss": "second",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL097",
+      "gloss": "spring",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL098",
+      "gloss": "summer",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL099",
+      "gloss": "sunday",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL100",
+      "gloss": "thursday",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL101",
+      "gloss": "time",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL102",
+      "gloss": "today",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL103",
+      "gloss": "tomorrow",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL104",
+      "gloss": "tuesday",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL105",
+      "gloss": "wednesday",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL106",
+      "gloss": "week",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL107",
+      "gloss": "winter",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL108",
+      "gloss": "year",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL109",
+      "gloss": "yesterday",
+      "category": "numbers_time"
+    },
+    {
+      "sign_id": "ISL110",
+      "gloss": "beautiful",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL111",
+      "gloss": "cold",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL112",
+      "gloss": "dead",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL113",
+      "gloss": "happy",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL114",
+      "gloss": "healthy",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL115",
+      "gloss": "hot",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL116",
+      "gloss": "loud",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL117",
+      "gloss": "quiet",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL118",
+      "gloss": "sad",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL119",
+      "gloss": "sick",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL120",
+      "gloss": "strong",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL121",
+      "gloss": "ugly",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL122",
+      "gloss": "warm",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL123",
+      "gloss": "weak",
+      "category": "emotions_states"
+    },
+    {
+      "sign_id": "ISL124",
+      "gloss": "cellphone",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL125",
+      "gloss": "he",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL126",
+      "gloss": "i",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL127",
+      "gloss": "it",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL128",
+      "gloss": "letter",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL129",
+      "gloss": "newspaper",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL130",
+      "gloss": "radio",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL131",
+      "gloss": "she",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL132",
+      "gloss": "telephone",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL133",
+      "gloss": "television",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL134",
+      "gloss": "they",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL135",
+      "gloss": "we",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL136",
+      "gloss": "you",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL137",
+      "gloss": "youplural",
+      "category": "communication"
+    },
+    {
+      "sign_id": "ISL138",
+      "gloss": "book",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL139",
+      "gloss": "doctor",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL140",
+      "gloss": "job",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL141",
+      "gloss": "lawyer",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL142",
+      "gloss": "library",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL143",
+      "gloss": "manager",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL144",
+      "gloss": "paper",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL145",
+      "gloss": "patient",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL146",
+      "gloss": "pen",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL147",
+      "gloss": "pencil",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL148",
+      "gloss": "school",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL149",
+      "gloss": "student",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL150",
+      "gloss": "teacher",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL151",
+      "gloss": "university",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL152",
+      "gloss": "waiter",
+      "category": "education_work"
+    },
+    {
+      "sign_id": "ISL153",
+      "gloss": "bicycle",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL154",
+      "gloss": "boat",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL155",
+      "gloss": "bus",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL156",
+      "gloss": "car",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL157",
+      "gloss": "hospital",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL158",
+      "gloss": "location",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL159",
+      "gloss": "plane",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL160",
+      "gloss": "police",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL161",
+      "gloss": "streetorroad",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL162",
+      "gloss": "train",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL163",
+      "gloss": "trainstation",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL164",
+      "gloss": "trainticket",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL165",
+      "gloss": "transportation",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL166",
+      "gloss": "truck",
+      "category": "travel_emergency"
+    },
+    {
+      "sign_id": "ISL167",
+      "gloss": "biglarge",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL168",
+      "gloss": "black",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL169",
+      "gloss": "blue",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL170",
+      "gloss": "brown",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL171",
+      "gloss": "clean",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL172",
+      "gloss": "dirty",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL173",
+      "gloss": "dry",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL174",
+      "gloss": "fast",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL175",
+      "gloss": "green",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL176",
+      "gloss": "grey",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL177",
+      "gloss": "hard",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL178",
+      "gloss": "heavy",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL179",
+      "gloss": "high",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL180",
+      "gloss": "long",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL181",
+      "gloss": "low",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL182",
+      "gloss": "new",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL183",
+      "gloss": "orange",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL184",
+      "gloss": "pink",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL185",
+      "gloss": "red",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL186",
+      "gloss": "short",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL187",
+      "gloss": "slow",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL188",
+      "gloss": "smalllittle",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL189",
+      "gloss": "soft",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL190",
+      "gloss": "tall",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL191",
+      "gloss": "wet",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL192",
+      "gloss": "white",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL193",
+      "gloss": "yellow",
+      "category": "descriptions_colours"
+    },
+    {
+      "sign_id": "ISL194",
+      "gloss": "animal",
+      "category": "animals_nature"
+    },
+    {
+      "sign_id": "ISL195",
+      "gloss": "bird",
+      "category": "animals_nature"
+    },
+    {
+      "sign_id": "ISL196",
+      "gloss": "cat",
+      "category": "animals_nature"
+    },
+    {
+      "sign_id": "ISL197",
+      "gloss": "cow",
+      "category": "animals_nature"
+    },
+    {
+      "sign_id": "ISL198",
+      "gloss": "dog",
+      "category": "animals_nature"
+    },
+    {
+      "sign_id": "ISL199",
+      "gloss": "fish",
+      "category": "animals_nature"
+    },
+    {
+      "sign_id": "ISL200",
+      "gloss": "horse",
+      "category": "animals_nature"
+    }
+  ],
+  "entries": [],
+  "notes": "entries[] lists approved local or imported recordings; it is empty because none exist yet."
+}

@@ -1,0 +1,37 @@
+# Builds per-sign reference data (Practice Coach, Text-to-Sign) from the INCLUDE
+# training-split landmarks and publishes it as pre-release references-v1.
+# Manual: push run/publish-references.
+name: Publish sign references
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["run/publish-references"]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env: { TAG: references-v1 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: pip install -r backend/requirements.txt
+      - name: Download the landmark dataset (SHA-256 verified)
+        run: python scripts/train_local.py --download-only --data data/include-landmarks-v1
+      - name: Build references from the training split
+        run: |
+          python dataset/scripts/build_references.py --data data/include-landmarks-v1
+          cd dataset/references && sha256sum references_v1.npz | tee references_v1.npz.sha256
+      - name: Publish pre-release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create "$TAG" -R "$GITHUB_REPOSITORY" --prerelease --target "$GITHUB_SHA" \
+              --title "Sign references v1 (Practice Coach, Text-to-Sign)" \
+              --notes "Per-sign reference data for the 200 ISL NOVA classes, derived from the INCLUDE training split (Sridhar et al., ACM MM 2020, CC BY 4.0): mean feature-contract template (32x204), one medoid recording's landmarks (12.5 fps, no video) and per-class distance calibration. Built by dataset/scripts/build_references.py."
+          gh release upload "$TAG" dataset/references/references_v1.npz dataset/references/references_v1.npz.sha256 dataset/references/references_v1.json --clobber -R "$GITHUB_REPOSITORY"

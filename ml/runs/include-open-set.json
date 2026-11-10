@@ -1,0 +1,7 @@
+{
+  "data_run_id": 41773683352,
+  "artifact": "landmarks-include-official-v2",
+  "model_tag": "model-lstm-20261110T111537Z-s7",
+  "attach_to_release": true,
+  "purpose": "v2: unknown-sign detection for the frame-rate-augmented LSTM"
+}

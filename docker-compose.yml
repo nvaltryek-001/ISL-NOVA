@@ -1,0 +1,37 @@
+# Local production-like stack: PostgreSQL 16 + ISL NOVA.
+#   cp .env.example .env   # then set JWT_SECRET, POSTGRES_PASSWORD, admin bootstrap
+#   docker compose up --build
+services:
+  db:
+    image: postgres:16.6-alpine
+    environment:
+      POSTGRES_DB: islnova
+      POSTGRES_USER: islnova
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U islnova -d islnova"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://islnova:${POSTGRES_PASSWORD}@db:5432/islnova
+      ISL_NOVA_ENV: production
+    ports:
+      - "8000:8000"
+    volumes:
+      - appdata:/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  appdata:

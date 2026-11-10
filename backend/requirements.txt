@@ -1,0 +1,12 @@
+# Runtime dependencies (pinned). Versions match the ones the test suite was run
+# against in the build sandbox; psycopg is required only for PostgreSQL.
+starlette==1.7.0
+pydantic==2.13.5
+uvicorn==0.54.0
+python-multipart==0.0.32
+PyJWT==2.15.0
+numpy==2.5.3
+scikit-learn==1.9.1
+opencv-python-headless==5.0.0.93
+mediapipe==0.10.32
+psycopg[binary]==3.3.7
