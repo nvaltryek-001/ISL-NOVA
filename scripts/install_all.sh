@@ -14,7 +14,7 @@
 set -euo pipefail
 
 TRAIN=""; START=0; SKIP_DATASET=0; PORT=8000
-MODEL_TAG="model-lstm-20261110T111537Z-s7"
+MODEL_TAG="model-bilstm_attn-20261110T162800Z-s7"
 while [ $# -gt 0 ]; do
   case "$1" in
     --train) TRAIN="$2"; shift 2 ;;

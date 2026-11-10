@@ -86,7 +86,7 @@ jobs:
         run: python scripts/fetch_references.py
       - working-directory: frontend
         env:
-          E2E_MODEL_TAG: model-lstm-20261110T111537Z-s7
+          E2E_MODEL_TAG: model-bilstm_attn-20261110T162800Z-s7
           AXE_REQUIRED: "1"
         run: npm run e2e
 

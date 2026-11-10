@@ -17,9 +17,10 @@ from pathlib import Path
 
 import numpy as np
 
+from .deep import BiLSTMAttnClassifier
 from .models import GRUClassifier, LSTMClassifier, load_model
 
-WEB_KINDS = ("lstm", "gru")
+WEB_KINDS = ("lstm", "gru", "bilstm_attn")
 WEB_FORMAT = "isl-nova-web-1"
 
 
@@ -53,7 +54,7 @@ def write_parity_fixture(path: Path, seed: int = 0) -> None:
     """Tiny random LSTM and GRU + inputs + reference probabilities for the TypeScript test."""
     rng = np.random.default_rng(seed)
     cases = []
-    for cls in (LSTMClassifier, GRUClassifier):
+    for cls in (LSTMClassifier, GRUClassifier, BiLSTMAttnClassifier):
         m = cls(6, 4, 5, seed)
         for k in m.p:
             m.p[k] = rng.normal(0, 0.5, m.p[k].shape)

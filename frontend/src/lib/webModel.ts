@@ -3,7 +3,7 @@
 // on-device recognition. Same maths as the Python models (float32 weights);
 // verified against Python probabilities in tests/webModel.test.ts.
 export type WebHeader = {
-  format: string; model_id: string; kind: 'lstm' | 'gru'; D: number; C: number; H: number; temperature: number;
+  format: string; model_id: string; kind: 'lstm' | 'gru' | 'bilstm_attn'; D: number; C: number; H: number; temperature: number;
   tau: number; margin: number; contract: string; classes: { index: number; sign_id: string; label: string }[];
   tensors: { name: string; shape: number[]; offset: number; length: number }[]; synthetic: boolean;
   open_set_detector?: Detector | null;
@@ -23,6 +23,16 @@ type Tensors = Record<string, Float32Array>;
 
 const sig = (x: number) => 0.5 * (1 + Math.tanh(0.5 * x));
 
+function softmaxT(z: Float64Array, temperature: number): Float64Array {
+  const out = new Float64Array(z.length);
+  let mx = -Infinity;
+  for (let j = 0; j < z.length; j++) { out[j] = z[j] / temperature; mx = Math.max(mx, out[j]); }
+  let tot = 0;
+  for (let j = 0; j < z.length; j++) { out[j] = Math.exp(out[j] - mx); tot += out[j]; }
+  for (let j = 0; j < z.length; j++) out[j] /= tot;
+  return out;
+}
+
 export class WebModel {
   constructor(public header: WebHeader, private t: Tensors) {}
 
@@ -40,9 +50,69 @@ export class WebModel {
     return new WebModel({ ...header, tensors: [] } as WebHeader, t);
   }
 
+  /** One LSTM direction over normalised inputs: returns h_t for every step. */
+  private lstm(xs: Float64Array[], Wx: Float32Array, Wh: Float32Array, b: Float32Array): Float64Array[] {
+    const { D, H } = this.header;
+    let h = new Float64Array(H);
+    let c = new Float64Array(H);
+    const out: Float64Array[] = [];
+    for (const x of xs) {
+      const hn = new Float64Array(H);
+      const cn = new Float64Array(H);
+      const z = new Float64Array(4 * H);
+      for (let j = 0; j < 4 * H; j++) {
+        let s = b[j];
+        for (let d = 0; d < D; d++) s += x[d] * Wx[d * 4 * H + j];
+        for (let k = 0; k < H; k++) s += h[k] * Wh[k * 4 * H + j];
+        z[j] = s;
+      }
+      for (let k = 0; k < H; k++) {
+        const i = sig(z[k]), f = sig(z[H + k]), o = sig(z[2 * H + k]), g = Math.tanh(z[3 * H + k]);
+        cn[k] = f * c[k] + i * g;
+        hn[k] = o * Math.tanh(cn[k]);
+      }
+      h = hn; c = cn;
+      out.push(h);
+    }
+    return out;
+  }
+
+  private bilstmAttnLogits(X: number[][]): Float64Array {
+    const { D, H, C } = this.header;
+    const t = this.t;
+    const xs = X.map((row) => Float64Array.from({ length: D }, (_, d) => (row[d] - t.norm_mean[d]) / t.norm_std[d]));
+    const hf = this.lstm(xs, t.Wfx, t.Wfh, t.bf);
+    const hr = this.lstm([...xs].reverse(), t.Wrx, t.Wrh, t.br).reverse();
+    const T = xs.length || 1;
+    const A = t.batt.length;
+    const hs = hf.map((f, i) => { const v = new Float64Array(2 * H); v.set(f, 0); v.set(hr[i], H); return v; });
+    const e = hs.map((v) => {
+      let s = 0;
+      for (let a = 0; a < A; a++) {
+        let u = t.batt[a];
+        for (let k = 0; k < 2 * H; k++) u += v[k] * t.Watt[k * A + a];
+        s += Math.tanh(u) * t.vatt[a];
+      }
+      return s;
+    });
+    const mx = Math.max(...e);
+    const w = e.map((x) => Math.exp(x - mx));
+    const ws = w.reduce((a, b2) => a + b2, 0);
+    const pooled = new Float64Array(4 * H);
+    hs.forEach((v, i) => { for (let k = 0; k < 2 * H; k++) { pooled[k] += (w[i] / ws) * v[k]; pooled[2 * H + k] += v[k] / T; } });
+    const logits = new Float64Array(C);
+    for (let j = 0; j < C; j++) {
+      let s = t.bhead[j];
+      for (let k = 0; k < 4 * H; k++) s += pooled[k] * t.Whead[k * C + j];
+      logits[j] = s;
+    }
+    return logits;
+  }
+
   /** X: [T][D] features (one sequence) -> calibrated class probabilities. */
   predictProba(X: number[][]): Float64Array {
     const { D, H, C, kind, temperature } = this.header;
+    if (kind === 'bilstm_attn') return softmaxT(this.bilstmAttnLogits(X), temperature);
     const { Wx, Wh, b, Wo, bo, norm_mean: mu, norm_std: sd } = this.t;
     const G = kind === 'lstm' ? 4 : 3;
     let h = new Float64Array(H);

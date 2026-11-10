@@ -58,7 +58,7 @@ def main(argv=None) -> int:
     ap.add_argument("--base", default="http://127.0.0.1:8000")
     ap.add_argument("--users", type=int, default=8)
     ap.add_argument("--seconds", type=float, default=60)
-    ap.add_argument("--tag", default="model-lstm-20261110T111537Z-s7")
+    ap.add_argument("--tag", default="model-bilstm_attn-20261110T162800Z-s7")
     ap.add_argument("--sample", type=Path)
     ap.add_argument("--out", type=Path)
     a = ap.parse_args(argv)

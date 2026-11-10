@@ -146,9 +146,9 @@ def create_app(settings: Settings | None = None) -> Starlette:
                         media_type="text/plain; version=0.0.4")
 
     def _web_export():
-        """The active model in the on-device format (LSTM/GRU only), exported once per model."""
+        """The active model in the on-device format (LSTM, GRU, BiLSTM-attention), exported once per model."""
         pred = state.models.predictor
-        if pred is None or pred.info.get("kind") not in ("lstm", "gru"):
+        if pred is None or pred.info.get("kind") not in ("lstm", "gru", "bilstm_attn"):
             return None
         out = settings.storage_dir / "web-export" / pred.info["model_id"]
         if not (out / "weights.bin").exists():
