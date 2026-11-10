@@ -1,4 +1,4 @@
-"""S3-compatible storage against a real server (MinIO in CI). Skipped unless S3_TEST_ENDPOINT is set."""
+"""S3-compatible storage against a real server (SeaweedFS with signature checks in CI). Skipped unless S3_TEST_ENDPOINT is set."""
 import os
 import uuid
 

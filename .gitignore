@@ -37,3 +37,4 @@ playwright-report/
 dataset/references/*.npz
 dataset/references/*.sha256
 monitoring/metrics_token
+monitoring/s3.json

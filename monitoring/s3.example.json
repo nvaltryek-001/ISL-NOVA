@@ -1,0 +1,9 @@
+{
+  "identities": [
+    {
+      "name": "isl-nova",
+      "credentials": [{"accessKey": "CHANGE-ME-ACCESS-KEY", "secretKey": "CHANGE-ME-SECRET-KEY-AT-LEAST-32-CHARS"}],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}
