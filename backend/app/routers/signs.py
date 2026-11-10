@@ -250,6 +250,11 @@ def create_sign(ctx: Ctx):
     b: SignIn = ctx.body
     if ctx.db.one("SELECT sign_id FROM signs WHERE sign_id = ?", (b.sign_id,)):
         raise ApiError(409, "exists", f"{b.sign_id} already exists; sign ids are stable and never reused")
+    from .proposals import key
+    dup = next((s["sign_id"] for s in ctx.db.all("SELECT sign_id, canonical_sign_name FROM signs")
+                if key(s["canonical_sign_name"]) == key(b.canonical_sign_name)), None)
+    if dup:
+        raise ApiError(409, "duplicate", f"a sign named '{b.canonical_sign_name}' already exists as {dup}")
     now = utcnow()
     with ctx.db.transaction():
         vals = {k: getattr(b, k) for k in EDITABLE}

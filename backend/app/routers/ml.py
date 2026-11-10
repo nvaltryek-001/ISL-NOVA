@@ -120,6 +120,8 @@ def _predict(ctx: Ctx) -> dict:
         return {"state": "model_unavailable", "top": [], "reasons": [ctx.app.models.error or "no active model"]}
     frames = [f.model_dump() for f in b.frames]
     out = p.predict(frames, b.aspect, b.top_k)
+    from ..metrics import METRICS
+    METRICS.prediction(out["state"])
     # attach verified meanings only; unverified glosses are labelled as such
     from .signs import translations_for
 

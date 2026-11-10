@@ -199,7 +199,7 @@ def test_deactivated_user_cannot_use_token(app_env):
 
 def test_migrations_idempotent_and_tamper_detected(tmp_path, monkeypatch):
     db = Database(f"sqlite:///{tmp_path / 'm.db'}")
-    assert migrate(db) == ["0001_core", "0002_translations_v2"]
+    assert migrate(db) == ["0001_core", "0002_translations_v2", "0003_sign_proposals"]
     assert migrate(db) == []
     assert status(db)["pending"] == []
     with db.connect() as conn:
@@ -237,3 +237,15 @@ def test_review_sheet_export(app_env):
     lines = r.text.strip().splitlines()
     assert len(lines) == 201 and lines[0].startswith("sign_id,name,category,status")
     assert lines[1].startswith("ISL001,")
+
+
+def test_prometheus_metrics(app_env, monkeypatch):
+    c, *_ = app_env
+    c.get(f"{A}/health")
+    c.post(f"{A}/predict/sequence", json={"frames": []})
+    r = c.get("/metrics")
+    assert r.status_code == 200 and r.headers["content-type"].startswith("text/plain")
+    body = r.text
+    assert 'isl_nova_http_requests_total{method="GET",route="/api/v1/health",status="2xx"}' in body
+    assert "isl_nova_http_request_seconds_bucket" in body and "isl_nova_vocabulary_signs 200" in body
+    assert "isl_nova_model_available 0" in body

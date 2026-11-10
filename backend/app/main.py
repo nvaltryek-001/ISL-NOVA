@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 import time
 import uuid
@@ -25,11 +26,12 @@ from starlette.staticfiles import StaticFiles
 from .api import RateLimiter, build_routes, error_response, openapi
 from .config import Settings
 from .db import Database
+from .metrics import METRICS
 from .migrate import migrate
-from .routers import core, dataset, ml, personal, practice, signs, translations
+from .routers import core, dataset, ml, personal, practice, proposals, signs, translations
 from .services import Jobs, LocalStorage, ModelService, ensure_user, seed_roles, seed_vocabulary
 
-ROUTERS = [core.router, signs.router, translations.router, dataset.router, ml.router, practice.router, personal.router]
+ROUTERS = [core.router, signs.router, translations.router, proposals.router, dataset.router, ml.router, practice.router, personal.router]
 
 
 class JsonFormatter(logging.Formatter):
@@ -122,11 +124,24 @@ def create_app(settings: Settings | None = None) -> Starlette:
         return Response("SwaggerUIBundle({url:'/api/v1/openapi.json',dom_id:'#ui'});",
                         media_type="application/javascript")
 
+    async def metrics(request: Request):
+        tok = os.environ.get("METRICS_TOKEN", "")
+        host = request.client.host if request.client else ""
+        auth_ok = bool(tok) and request.headers.get("authorization", "") == f"Bearer {tok}"
+        if not auth_ok and host not in ("127.0.0.1", "::1", "localhost", "testclient"):
+            return error_response(403, "forbidden", "metrics are available from localhost or with METRICS_TOKEN")
+        with state.db.connect() as c:
+            signs = c.scalar("SELECT COUNT(*) FROM signs") or 0
+            verified = c.scalar("SELECT COUNT(*) FROM signs WHERE verification_status = 'verified'") or 0
+        return Response(METRICS.render({"isl_nova_model_available": int(state.models.predictor is not None),
+                                        "isl_nova_vocabulary_signs": int(signs), "isl_nova_vocabulary_verified": int(verified)}),
+                        media_type="text/plain; version=0.0.4")
+
     async def api_404(request: Request):
         return error_response(404, "not_found", "no such API route")
 
     routes = build_routes(state, ROUTERS)
-    routes += [Route("/api/v1/openapi.json", openapi_json), Route("/api/docs", docs), Route("/api/docs/init.js", docs_init),
+    routes += [Route("/api/v1/openapi.json", openapi_json), Route("/api/docs", docs), Route("/metrics", metrics), Route("/api/docs/init.js", docs_init),
                Route("/api/{rest:path}", api_404, methods=["GET", "POST", "PUT", "PATCH", "DELETE"])]
 
     dist = Path(settings.frontend_dist)
@@ -163,6 +178,7 @@ def create_app(settings: Settings | None = None) -> Starlette:
             response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
         response.headers["X-Request-ID"] = rid
         if request.url.path.startswith("/api/"):
+            METRICS.observe(request.method, request.url.path, response.status_code, time.perf_counter() - t0)
             log.info("request", extra={"request_id": rid, "method": request.method, "path": request.url.path,
                                        "status": response.status_code,
                                        "ms": round((time.perf_counter() - t0) * 1000, 1)})
