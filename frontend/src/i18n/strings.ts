@@ -373,4 +373,8 @@ export const STRINGS: Record<string, [hi: string, kn: string]> = {
   'File': ['फ़ाइल', 'ಫೈಲ್'],
   'Expires': ['समाप्ति', 'ಅವಧಿ ಮುಕ್ತಾಯ'],
   'Frames': ['फ़्रेम', 'ಫ್ರೇಮ್‌ಗಳು'],
+  'On the server': ['सर्वर पर', 'ಸರ್ವರ್‌ನಲ್ಲಿ'],
+  'On this device (offline)': ['इस डिवाइस पर (ऑफ़लाइन)', 'ಈ ಸಾಧನದಲ್ಲಿ (ಆಫ್‌ಲೈನ್)'],
+  'Where recognition runs': ['पहचान कहाँ चलती है', 'ಗುರುತಿಸುವಿಕೆ ಎಲ್ಲಿ ನಡೆಯುತ್ತದೆ'],
+  'Server unreachable: recognised on this device': ['सर्वर उपलब्ध नहीं: इस डिवाइस पर पहचाना गया', 'ಸರ್ವರ್ ಲಭ್ಯವಿಲ್ಲ: ಈ ಸಾಧನದಲ್ಲಿ ಗುರುತಿಸಲಾಗಿದೆ'],
 };

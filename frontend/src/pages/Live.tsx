@@ -5,7 +5,10 @@ import { Icon } from '../components/icons';
 import { Badge, Button, Card, Dialog, Empty, Field, Input, Notice, PageHeader, Select, StatusBadge, Tabs } from '../components/ui';
 import { api, qs } from '../lib/api';
 import type { Frame } from '../lib/features';
-import { windowQuality } from '../lib/features';
+import { extractFeatures, windowQuality } from '../lib/features';
+import { ApiError } from '../lib/api';
+import { loadWebModel } from '../lib/webModel';
+import { useT } from '../i18n';
 import type { CameraState } from '../lib/landmarks';
 import { useQuery } from '../lib/query';
 import { Link } from '../lib/router';
@@ -23,6 +26,7 @@ type Mode = 'capture' | 'continuous';
 export function LivePage() {
   const { user } = useAuth();
   const prefs = usePrefs();
+  const t = useT();
   const model = useQuery<ModelInfo>('/model/info');
   const buffer = useRef<{ f: Frame; a: number; t: number }[]>([]);
   const [captureSec, setCaptureSec] = useState(2.5);
@@ -39,6 +43,18 @@ export function LivePage() {
   const [session, setSession] = useState<(Prediction & { at: string })[]>([]);
   const [correcting, setCorrecting] = useState(false);
   const inflight = useRef(false);
+  const [where, setWhere] = useState<'server' | 'device'>('server');
+
+  /** Recognition on this device with the exported model (works offline once loaded). */
+  const predictOnDevice = useCallback(async (frames: { f: Frame; a: number }[]): Promise<Prediction> => {
+    const m = await loadWebModel();
+    const fr = extractFeatures(frames.map((x) => x.f), frames[frames.length - 1].a);
+    if (fr.status !== 'ok') return { state: 'insufficient_input', top: [], reasons: fr.reasons, model_id: m.header.model_id };
+    const t0 = performance.now();
+    const d = m.decide(m.predictProba(fr.features), 5);
+    return { state: d.state as Prediction['state'], top: d.top, reasons: [], model_id: m.header.model_id,
+      synthetic: m.header.synthetic, latency_ms: Math.round((performance.now() - t0) * 10) / 10 };
+  }, []);
 
   const onFrame = useCallback((f: Frame, a: number, t: number) => {
     buffer.current.push({ f, a, t });
@@ -56,7 +72,17 @@ export function LivePage() {
     }
     inflight.current = true;
     try {
-      const r = await api<Prediction>('/predict/sequence', { body: { frames: frames.map((x) => x.f), aspect: frames[frames.length - 1].a, top_k: 5 } });
+      let r: Prediction;
+      if (where === 'device') r = await predictOnDevice(frames);
+      else {
+        try {
+          r = await api<Prediction>('/predict/sequence', { body: { frames: frames.map((x) => x.f), aspect: frames[frames.length - 1].a, top_k: 5 } });
+        } catch (e) {
+          if (!(e instanceof ApiError && e.code === 'offline')) throw e;
+          r = await predictOnDevice(frames);  // server unreachable: fall back to the on-device model
+          toast(t('Server unreachable: recognised on this device'), 'info');
+        }
+      }
       setPred(r);
       // exponential smoothing of probabilities across successive windows (display only)
       const m = ema.current;
@@ -69,7 +95,7 @@ export function LivePage() {
     } finally {
       inflight.current = false;
     }
-  }, [mode]);
+  }, [mode, where, predictOnDevice, t]);
 
   // continuous mode: classify a sliding window
   useEffect(() => {
@@ -153,6 +179,10 @@ export function LivePage() {
             {mode === 'capture' && (
               <label className="flex items-center gap-2 text-sm text-ink-300"><input type="checkbox" className="accent-nova-500" checked={useCountdown} onChange={(e) => setUseCountdown(e.target.checked)} />3-second countdown</label>
             )}
+            <Select aria-label="Where recognition runs" value={where} onChange={(e) => setWhere(e.target.value as 'server' | 'device')} className="h-9 w-auto py-0 text-sm">
+              <option value="server">{t('On the server')}</option>
+              <option value="device">{t('On this device (offline)')}</option>
+            </Select>
           </div>
         </div>
 

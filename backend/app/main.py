@@ -145,11 +145,31 @@ def create_app(settings: Settings | None = None) -> Starlette:
                                         "isl_nova_vocabulary_signs": int(signs), "isl_nova_vocabulary_verified": int(verified)}),
                         media_type="text/plain; version=0.0.4")
 
+    def _web_export():
+        """The active model in the on-device format (LSTM/GRU only), exported once per model."""
+        pred = state.models.predictor
+        if pred is None or pred.info.get("kind") not in ("lstm", "gru"):
+            return None
+        out = settings.storage_dir / "web-export" / pred.info["model_id"]
+        if not (out / "weights.bin").exists():
+            from isl_nova_ml.export_web import export_web
+            export_web(pred.dir, out)
+        return out
+
+    async def model_web(request: Request):
+        out = _web_export()
+        name = request.path_params["name"]
+        if out is None or name not in ("model.json", "weights.bin"):
+            return error_response(404, "not_found", "no on-device model for the active model")
+        media = "application/json" if name == "model.json" else "application/octet-stream"
+        return FileResponse(out / name, media_type=media, headers={"Cache-Control": "no-cache"})
+
     async def api_404(request: Request):
         return error_response(404, "not_found", "no such API route")
 
     routes = build_routes(state, ROUTERS)
     routes += [Route("/api/v1/openapi.json", openapi_json), Route("/api/docs", docs), Route("/metrics", metrics), Route("/api/docs/init.js", docs_init),
+               Route("/model-web/{name}", model_web),
                Route("/api/{rest:path}", api_404, methods=["GET", "POST", "PUT", "PATCH", "DELETE"])]
 
     dist = Path(settings.frontend_dist)

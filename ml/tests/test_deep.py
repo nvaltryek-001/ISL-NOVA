@@ -72,3 +72,49 @@ def test_ensemble_saves_one_file_and_matches(tmp_path):
     save_model(e, tmp_path / "e")
     assert sorted(p.name for p in (tmp_path / "e").iterdir()) == ["architecture.json", "weights.npz"]
     np.testing.assert_allclose(load_model(tmp_path / "e").predict_proba(X), P, rtol=1e-6)
+
+
+def test_onnx_export_matches_numpy(tmp_path):
+    pytest.importorskip("onnx")
+    ort = pytest.importorskip("onnxruntime")
+    from isl_nova_ml.export_web import export_onnx
+    from isl_nova_ml.models import LSTMClassifier
+
+    rng = np.random.default_rng(7)
+    m = LSTMClassifier(6, 5, 4, 3)
+    for k in m.p:
+        m.p[k] = rng.normal(0, 0.5, m.p[k].shape)
+    X = rng.normal(size=(4, 9, 6))
+    m.norm.fit(X)
+    m.temperature = 1.4
+    save_model(m, tmp_path / "m")
+    import json as _json
+    (tmp_path / "m" / "model.json").write_text(_json.dumps({"model_id": "t", "classes": [], "contract": {"name": "x"}}))
+    export_onnx(tmp_path / "m", tmp_path / "m.onnx")
+    sess = ort.InferenceSession(str(tmp_path / "m.onnx"))
+    P = sess.run(None, {"x": X.astype(np.float32)})[0]
+    np.testing.assert_allclose(P, m.predict_proba(X), atol=2e-5)
+
+
+def test_web_export_roundtrip(tmp_path):
+    import json as _json
+
+    from isl_nova_ml.export_web import export_web
+    from isl_nova_ml.models import GRUClassifier
+    m = GRUClassifier(6, 3, 4, 1)
+    m.norm.fit(np.random.default_rng(1).normal(size=(2, 5, 6)))
+    save_model(m, tmp_path / "g")
+    (tmp_path / "g" / "model.json").write_text(_json.dumps({"model_id": "g", "classes": [{"index": i, "sign_id": f"S{i}", "label": "x"} for i in range(3)],
+                                                            "contract": {"name": "isl-nova-fc-1.0.0"}, "thresholds": {"tau": 0.6}}))
+    h = export_web(tmp_path / "g", tmp_path / "web")
+    blob = np.frombuffer((tmp_path / "web" / "weights.bin").read_bytes(), "<f4")
+    assert h["weights_bytes"] == blob.size * 4 and h["kind"] == "gru" and h["tau"] == 0.6
+    t = {x["name"]: x for x in h["tensors"]}
+    np.testing.assert_allclose(blob[t["Wx"]["offset"]: t["Wx"]["offset"] + t["Wx"]["length"]], m.p["Wx"].reshape(-1), rtol=1e-6)
+    with pytest.raises(ValueError):
+        from isl_nova_ml.deep import TCNClassifier
+        tc = TCNClassifier(6, 3, 4, 1)
+        tc.norm.fit(np.zeros((1, 2, 6)) + 1)
+        save_model(tc, tmp_path / "t")
+        (tmp_path / "t" / "model.json").write_text((tmp_path / "g" / "model.json").read_text())
+        export_web(tmp_path / "t", tmp_path / "w2")

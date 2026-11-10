@@ -49,6 +49,36 @@ f,a = load_landmarks(sys.argv[1]); print(json.dumps({"frames": f, "aspect": a}))
     assert.ok(correct >= man.entries.length * 0.75, `only ${correct}/${man.entries.length} correct`);
   });
 
+  test('on-device model: served for offline use and agrees with the server', async () => {
+    const info = await (await fetch(`${srv.base}/api/v1/model/info`)).json();
+    const hr = await fetch(`${srv.base}/model-web/model.json`);
+    assert.equal(hr.status, 200);
+    const header = await hr.json();
+    assert.equal(header.model_id, info.model_id);
+    const wbuf = Buffer.from(await (await fetch(`${srv.base}/model-web/weights.bin`)).arrayBuffer());
+    assert.equal(wbuf.length, header.weights_bytes);
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'isl-device-'));
+    fs.writeFileSync(path.join(dir, 'model.json'), JSON.stringify(header));
+    fs.writeFileSync(path.join(dir, 'weights.bin'), wbuf);
+    const man = JSON.parse(fs.readFileSync(path.join(sample, 'manifest.json'), 'utf8'));
+    const py = `import json,sys; sys.path.insert(0, "ml"); from isl_nova_ml.data import load_landmarks
+f,a = load_landmarks(sys.argv[1]); print(json.dumps({"frames": f, "aspect": a}))`;
+    const files = [], server = [];
+    for (const [i, e] of man.entries.entries()) {
+      const body = execFileSync(PYTHON, ['-c', py, path.join(sample, e.landmarks_path)], { cwd: repo, maxBuffer: 1 << 26 }).toString();
+      const f = path.join(dir, `s${i}.json`);
+      fs.writeFileSync(f, body);
+      files.push(f);
+      server.push(await (await fetch(`${srv.base}/api/v1/predict/sequence`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })).json());
+    }
+    const device = JSON.parse(execFileSync(process.execPath, ['--import', 'tsx', 'tests/e2e/device_predict.ts', path.join(dir, 'model.json'), path.join(dir, 'weights.bin'), ...files],
+      { cwd: path.join(repo, 'frontend'), maxBuffer: 1 << 26 }).toString());
+    let agree = 0;
+    device.forEach((d, i) => { if (d.top[0]?.sign_id === server[i].top[0]?.sign_id && d.state === server[i].state) agree++; });
+    console.log(`on-device vs server agreement: ${agree}/${device.length}`);
+    assert.equal(agree, device.length);
+  });
+
   test('live studio with a real model: camera runs and capture is offered', async () => {
     const { page, errors, ctx } = await newPage(browser, srv.base);
     await page.goto('/live');
