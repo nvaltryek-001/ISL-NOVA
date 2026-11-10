@@ -286,7 +286,8 @@ def _train_job(state, eid: int) -> None:
             mpath = state.settings.storage_dir / "manifests" / f"experiment-{eid}.json"
             mpath.parent.mkdir(parents=True, exist_ok=True)
             mpath.write_text(json.dumps(manifest))
-            res = run(jload(e["config"]), mpath, state.settings.storage_dir, state.settings.model_registry_dir,
+            data_root = state.storage.materialize([x["landmarks_path"] for x in manifest["entries"] if x.get("landmarks_path")])
+            res = run(jload(e["config"]), mpath, data_root, state.settings.model_registry_dir,
                       state.settings.vocab_csv, manifest["dataset_version"], log=log_lines.append)
             for k, v in res["summary"].items():
                 conn.insert("experiment_metrics", {"experiment_id": eid, "split": k.split("_")[0], "name": k,
@@ -353,7 +354,7 @@ def _eval_job(state, rid: int, vid: int) -> None:
                 raise RuntimeError("no active model")
             fake = type("C", (), {"db": conn, "app": state})()
             m = _manifest_for_version(fake, vid)
-            rep = evaluate_entries(p, m["entries"], state.settings.storage_dir)
+            rep = evaluate_entries(p, m["entries"], state.storage.materialize([x["landmarks_path"] for x in m["entries"] if x.get("landmarks_path")]))
             rep.update(status="completed", dataset_version=m["dataset_version"], finished_at=utcnow())
         except Exception as exc:  # noqa: BLE001 - stored on the run
             rep = {"status": "failed", "error": str(exc)[:500], "finished_at": utcnow()}

@@ -16,7 +16,7 @@ from .config import Settings
 from .db import Database
 from .migrate import migrate
 from .security import MIN_PASSWORD, ROLES
-from .services import LocalStorage, ensure_user, seed_roles, seed_vocabulary
+from .services import ensure_user, make_storage, seed_roles, seed_vocabulary
 
 
 def main(argv=None) -> int:
@@ -37,7 +37,7 @@ def main(argv=None) -> int:
         seed_roles(c)
         if a.cmd == "retention":
             from .retention import run_retention
-            print(json.dumps(run_retention(c, s, LocalStorage(s.storage_dir), apply=a.apply), indent=1))
+            print(json.dumps(run_retention(c, s, make_storage(s), apply=a.apply), indent=1))
             return 0
         if a.cmd == "seed":
             print({"vocabulary_added": seed_vocabulary(c, s.vocab_dir)})

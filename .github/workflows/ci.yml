@@ -21,6 +21,11 @@ jobs:
         ports: ["5432:5432"]
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,8 +39,15 @@ jobs:
         run: ruff check backend ml dataset/scripts scripts
       - name: Vocabulary is reproducible
         run: python dataset/scripts/build_vocabulary.py && python dataset/scripts/draft_translations.py && git diff --exit-code -- dataset/vocabulary ':!dataset/vocabulary/verification_log.csv'
-      - name: Tests (SQLite)
-        run: pytest -q
+      - name: MinIO (S3-compatible storage for the S3 adapter tests)
+        run: |
+          docker run -d --name minio -p 9000:9000 -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin minio/minio:latest server /data
+          for i in $(seq 1 30); do curl -sf http://localhost:9000/minio/health/live && break; sleep 2; done
+      - name: Tests (SQLite, real Redis and MinIO)
+        env:
+          REDIS_TEST_URL: redis://localhost:6379/0
+          S3_TEST_ENDPOINT: http://localhost:9000
+        run: pytest -q -rs
       - name: Tests (PostgreSQL)
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/islnova_test

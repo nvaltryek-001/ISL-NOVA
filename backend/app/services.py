@@ -20,6 +20,19 @@ log = logging.getLogger("isl_nova")
 
 # --------------------------------------------------------------------------- storage
 
+
+def make_storage(settings):
+    """LocalStorage (default) or S3Storage (STORAGE_BACKEND=s3) from settings."""
+    if settings.storage_backend == "s3":
+        from .storage_s3 import S3Storage
+        st = S3Storage(settings.s3_endpoint, settings.s3_bucket, settings.s3_access_key, settings.s3_secret_key,
+                       settings.s3_region, settings.storage_dir / "s3-cache")
+        st.ensure_bucket()
+        return st
+    if settings.storage_backend != "local":
+        raise ValueError(f"unknown STORAGE_BACKEND {settings.storage_backend!r} (local | s3)")
+    return LocalStorage(settings.storage_dir)
+
 _KEY_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_\-./]{0,200}$")
 
 
@@ -28,7 +41,7 @@ class LocalStorage:
 
     Keys are validated and resolved inside the root so a crafted key can never
     escape it (no absolute paths, no ``..``). A cloud adapter only needs the
-    same four methods.
+    same methods (see storage_s3.S3Storage).
     """
 
     def __init__(self, root: Path):
@@ -68,6 +81,13 @@ class LocalStorage:
 
     def local_path(self, key: str) -> Path:
         return self._path(key)
+
+    def sync(self, key: str) -> None:
+        """After writing to local_path(key): nothing to upload for local storage."""
+
+    def materialize(self, keys) -> Path:
+        """A local directory in which every key is readable as a file (here: the storage root)."""
+        return self.root
 
 
 # --------------------------------------------------------------------------- uploads

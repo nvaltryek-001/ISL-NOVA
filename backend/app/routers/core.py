@@ -120,7 +120,8 @@ def health(ctx: Ctx):
             "model": {"available": ms.predictor is not None, "reason": ms.error},
             "feature_contract": CONTRACT_NAME,
             "landmark_extractor": {"server_side_available": bool(ctx.app.settings.hand_model_path)},
-            "time": utcnow(), "version": "0.1.0"}
+            "storage": type(ctx.app.storage).__name__, "rate_limiter": type(ctx.app.limiter).__name__,
+            "job_queue": type(ctx.app.jobs).__name__, "time": utcnow(), "version": "2.0.0"}
 
 
 @router.post("/auth/register", summary="Create an account (learner role)", auth="none", body=RegisterIn,

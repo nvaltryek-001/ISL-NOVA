@@ -30,7 +30,7 @@ from .db import Database
 from .metrics import METRICS
 from .migrate import migrate
 from .routers import analytics, classroom, core, dataset, ml, personal, practice, proposals, signs, translations
-from .services import Jobs, LocalStorage, ModelService, ensure_user, seed_roles, seed_vocabulary
+from .services import Jobs, ModelService, ensure_user, make_storage, seed_roles, seed_vocabulary
 
 ROUTERS = [core.router, signs.router, translations.router, proposals.router, dataset.router, ml.router, practice.router, personal.router,
            classroom.router, analytics.router]
@@ -62,10 +62,16 @@ class AppState:
     def __init__(self, settings: Settings):
         self.settings = settings
         self.db = Database(settings.database_url)
-        self.storage = LocalStorage(settings.storage_dir)
+        self.storage = make_storage(settings)
         self.models = ModelService(settings.model_registry_dir, settings.allow_synthetic_model)
-        self.jobs = Jobs()
-        self.limiter = RateLimiter()
+        if settings.redis_url:  # shared limiter + job queue for several API processes / workers
+            from .redis_lite import Redis, RedisJobs, RedisRateLimiter
+            r = Redis(settings.redis_url)
+            self.limiter = RedisRateLimiter(r)
+            self.jobs = RedisJobs(r)
+        else:
+            self.jobs = Jobs()
+            self.limiter = RateLimiter()
 
     def startup(self) -> None:
         log = logging.getLogger("isl_nova")

@@ -37,6 +37,13 @@ class Settings:
     bootstrap_admin_email: str | None = None
     bootstrap_admin_password: str | None = None
     analysis_retention_hours: int = 24
+    storage_backend: str = "local"  # local | s3
+    s3_endpoint: str | None = None
+    s3_bucket: str | None = None
+    s3_access_key: str | None = None
+    s3_secret_key: str | None = None
+    s3_region: str = "us-east-1"
+    redis_url: str | None = None
     vocabulary_limit: int = 200  # the project is fixed at 200 signs; 0 = no limit
     history_retention_days: int = 0  # 0 = keep until the user deletes it
     notification_retention_days: int = 180
@@ -67,6 +74,11 @@ class Settings:
             bootstrap_admin_password=e.get("BOOTSTRAP_ADMIN_PASSWORD") or None,
             analysis_retention_hours=int(e.get("ANALYSIS_RETENTION_HOURS", "24")),
             vocabulary_limit=int(e.get("VOCABULARY_LIMIT", "200")),
+            storage_backend=e.get("STORAGE_BACKEND", "local"),
+            s3_endpoint=e.get("S3_ENDPOINT") or None, s3_bucket=e.get("S3_BUCKET") or None,
+            s3_access_key=e.get("S3_ACCESS_KEY") or None, s3_secret_key=e.get("S3_SECRET_KEY") or None,
+            s3_region=e.get("S3_REGION", "us-east-1"),
+            redis_url=e.get("REDIS_URL") or None,
             history_retention_days=int(e.get("HISTORY_RETENTION_DAYS", "0")),
             notification_retention_days=int(e.get("NOTIFICATION_RETENTION_DAYS", "180")),
             retention_interval_hours=float(e.get("RETENTION_INTERVAL_HOURS", "24")),

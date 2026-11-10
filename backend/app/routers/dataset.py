@@ -363,6 +363,7 @@ def _store_landmarks(ctx: Ctx, code: str, sign_id: str, text: str) -> tuple[str,
         raise ApiError(422, "invalid_landmarks", f"landmarks JSON rejected: {exc}") from exc
     key = f"landmarks/{sign_id}/{code}.npz"
     save_landmarks(ctx.app.storage.local_path(key), frames, aspect)
+    ctx.app.storage.sync(key)
     return key, {"status": fr.status, "reasons": fr.reasons, "hand_frame_ratio": round(fr.hand_frame_ratio, 3),
                  "raw_frames": fr.raw_frames}
 
