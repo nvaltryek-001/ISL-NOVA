@@ -9,6 +9,7 @@ from datetime import UTC, datetime, timedelta
 
 from pydantic import BaseModel, Field, field_validator
 
+from .. import totp
 from ..api import ApiError, Ctx, Router, not_found
 from ..db import jdump, jload, utcnow
 from ..security import DUMMY_HASH, MIN_PASSWORD, ROLES, create_token, hash_password, verify_password
@@ -35,6 +36,11 @@ class RegisterIn(BaseModel):
 class LoginIn(BaseModel):
     email: str = Field(max_length=254)
     password: str = Field(max_length=200)
+    otp: str | None = Field(default=None, max_length=12)
+
+
+class OtpIn(BaseModel):
+    code: str = Field(min_length=6, max_length=12)
 
 
 class TokenOut(BaseModel):
@@ -72,7 +78,8 @@ def user_out(ctx_or_conn, user: dict, roles: set[str] | None = None) -> dict:
         roles = {r["role_name"] for r in conn.all("SELECT role_name FROM user_roles WHERE user_id = ?", (user["id"],))}
     return {"id": user["id"], "email": user["email"], "display_name": user["display_name"],
             "preferred_language": user.get("preferred_language", "en"), "is_active": bool(user.get("is_active", True)),
-            "settings": jload(user.get("settings")) or {}, "roles": sorted(roles), "created_at": user.get("created_at")}
+            "settings": jload(user.get("settings")) or {}, "roles": sorted(roles), "created_at": user.get("created_at"),
+            "two_factor": bool(user.get("totp_enabled"))}
 
 
 @router.get("/health", summary="Service health", auth="none", rate=None)
@@ -119,6 +126,14 @@ def login(ctx: Ctx):
     if not user or not ok or not user["is_active"]:
         audit(ctx.db, user["id"] if user else None, "auth.login_failed", None, None, ctx.ip)
         raise ApiError(401, "invalid_credentials", "email or password is incorrect")
+    if user.get("totp_enabled"):
+        if not b.otp:
+            raise ApiError(401, "otp_required", "enter the 6-digit code from your authenticator app")
+        step = totp.verify(user["totp_secret"], b.otp)
+        if step is None or (user.get("totp_last_step") is not None and step <= int(user["totp_last_step"])):
+            audit(ctx.db, user["id"], "auth.otp_failed", f"user:{user['id']}", ip=ctx.ip)
+            raise ApiError(401, "invalid_otp", "the authenticator code is wrong or was already used")
+        ctx.db.update("users", {"totp_last_step": step}, "id = ?", (user["id"],))
     ctx.db.update("users", {"last_login_at": utcnow()}, "id = ?", (user["id"],))
     audit(ctx.db, user["id"], "auth.login", f"user:{user['id']}", ip=ctx.ip)
     tok, exp = create_token(user["id"], ctx.app.settings.jwt_secret, ctx.app.settings.jwt_ttl_minutes,
@@ -133,6 +148,44 @@ def logout_all(ctx: Ctx):
         ctx.db.execute("UPDATE users SET token_version = COALESCE(token_version, 0) + 1 WHERE id = ?", (ctx.uid,))
         audit(ctx.db, ctx.uid, "auth.logout_all", f"user:{ctx.uid}", ip=ctx.ip)
     return {"ok": True}
+
+
+@router.post("/me/2fa/setup", summary="Start two-factor setup: a new TOTP secret (not active until confirmed)")
+def totp_setup(ctx: Ctx):
+    row = ctx.db.one("SELECT totp_enabled FROM users WHERE id = ?", (ctx.uid,))
+    if row["totp_enabled"]:
+        raise ApiError(409, "two_factor_enabled", "two-factor sign-in is already on; turn it off first")
+    secret = totp.new_secret()
+    ctx.db.update("users", {"totp_secret": secret}, "id = ?", (ctx.uid,))
+    return {"secret": secret, "otpauth_uri": totp.otpauth_uri(secret, ctx.user["email"])}
+
+
+@router.post("/me/2fa/enable", summary="Confirm a code from the authenticator app and turn two-factor on", body=OtpIn)
+def totp_enable(ctx: Ctx):
+    row = ctx.db.one("SELECT totp_secret, totp_enabled FROM users WHERE id = ?", (ctx.uid,))
+    if row["totp_enabled"] or not row["totp_secret"]:
+        raise ApiError(409, "two_factor_state", "start setup first")
+    step = totp.verify(row["totp_secret"], ctx.body.code)
+    if step is None:
+        raise ApiError(400, "invalid_otp", "the code does not match; check the time on your phone")
+    with ctx.db.transaction():
+        ctx.db.update("users", {"totp_enabled": True, "totp_last_step": step}, "id = ?", (ctx.uid,))
+        audit(ctx.db, ctx.uid, "auth.2fa_enabled", f"user:{ctx.uid}", ip=ctx.ip)
+    return {"two_factor": True}
+
+
+@router.post("/me/2fa/disable", summary="Turn two-factor off (needs a current code)", body=OtpIn)
+def totp_disable(ctx: Ctx):
+    row = ctx.db.one("SELECT totp_secret, totp_enabled FROM users WHERE id = ?", (ctx.uid,))
+    if not row["totp_enabled"]:
+        raise ApiError(409, "two_factor_state", "two-factor sign-in is not on")
+    if totp.verify(row["totp_secret"], ctx.body.code) is None:
+        raise ApiError(400, "invalid_otp", "the code does not match")
+    with ctx.db.transaction():
+        ctx.db.update("users", {"totp_enabled": False, "totp_secret": None, "totp_last_step": None},
+                      "id = ?", (ctx.uid,))
+        audit(ctx.db, ctx.uid, "auth.2fa_disabled", f"user:{ctx.uid}", ip=ctx.ip)
+    return {"two_factor": False}
 
 
 @router.get("/me", summary="Current user profile")
@@ -250,10 +303,11 @@ def reset_password(ctx: Ctx):
         raise ApiError(400, "invalid_reset_code", "the reset code is invalid, used or expired")
     with ctx.db.transaction():
         ctx.db.update("password_resets", {"used_at": utcnow()}, "id = ?", (row["id"],))
-        # new password + sign out everywhere
-        ctx.db.execute("UPDATE users SET password_hash = ?, token_version = COALESCE(token_version, 0) + 1 "
-                       "WHERE id = ?", (hash_password(b.new_password, ctx.app.settings.pbkdf2_iterations),
-                                        row["user_id"]))
+        # new password + sign out everywhere; an admin-issued reset is also the recovery path
+        # for a lost authenticator, so two-factor is turned off and must be set up again
+        ctx.db.execute("UPDATE users SET password_hash = ?, token_version = COALESCE(token_version, 0) + 1, "
+                       "totp_enabled = ?, totp_secret = NULL, totp_last_step = NULL WHERE id = ?", (hash_password(b.new_password, ctx.app.settings.pbkdf2_iterations),
+                                        False, row["user_id"]))
         audit(ctx.db, row["user_id"], "auth.password_reset", f"user:{row['user_id']}", ip=ctx.ip)
     return {"ok": True}
 

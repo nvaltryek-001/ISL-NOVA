@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import { after, before, describe, test } from 'node:test';
 import { ADMIN, apiAs, launch, login, makeUser, newPage, shotsDir, startServer } from './harness.mjs';
@@ -13,6 +14,19 @@ before(async () => {
   if (SHOTS) fs.mkdirSync(shotsDir, { recursive: true });
 });
 after(async () => { await browser?.close(); srv?.stop(); });
+
+// RFC 6238 TOTP for the two-factor E2E (SHA-1, 6 digits, 30 s)
+function totpCode(secret, offset = 0) {
+  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits = '';
+  for (const ch of secret.replace(/=+$/, '')) bits += alpha.indexOf(ch).toString(2).padStart(5, '0');
+  const key = Buffer.from(bits.match(/.{8}/g).map((b) => parseInt(b, 2)));
+  const buf = Buffer.alloc(8);
+  buf.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 1000 / 30) + offset));
+  const mac = crypto.createHmac('sha1', key).update(buf).digest();
+  const o = mac[mac.length - 1] & 15;
+  return String((mac.readUInt32BE(o) & 0x7fffffff) % 1e6).padStart(6, '0');
+}
 
 const shot = async (page, name) => { if (SHOTS) await page.screenshot({ path: `${shotsDir}/${name}.png` }); };
 
@@ -119,6 +133,34 @@ describe('authentication and RBAC', () => {
     await page.getByText('email or password is incorrect').waitFor();
     await ctx.close();
   });
+  test('two-factor sign-in: set up, sign in with a code, turn off', async () => {
+    const creds = await makeUser(srv.base, admin, 'tfa1@example.org');
+    const { page, errors, ctx } = await newPage(browser, srv.base);
+    await login(page, creds);
+    await page.goto('/settings');
+    await page.getByRole('button', { name: 'Set up two-factor' }).click();
+    const secret = (await page.getByTestId('totp-secret').textContent()).trim();
+    await page.getByLabel('Code from the app').fill(totpCode(secret, -1));
+    await page.getByRole('button', { name: 'Turn on two-factor' }).click();
+    await page.getByText('On. Sign-in asks for a code from your authenticator app.').waitFor();
+    await ctx.close();
+
+    const u = await newPage(browser, srv.base);
+    await u.page.goto('/login');
+    await u.page.getByLabel('Email').fill(creds.email);
+    await u.page.getByLabel('Password').fill(creds.password);
+    await u.page.getByRole('button', { name: 'Sign in' }).click();
+    await u.page.getByLabel('Authenticator code').fill(totpCode(secret));
+    await u.page.getByRole('button', { name: 'Sign in' }).click();
+    await u.page.waitForURL((x) => !x.pathname.startsWith('/login'));
+    await u.page.goto('/settings');
+    await u.page.getByLabel('Current code').fill(totpCode(secret, 1));
+    await u.page.getByRole('button', { name: 'Turn off two-factor' }).click();
+    await u.page.getByText('Off. Add a second step to sign-in with any authenticator app.').waitFor();
+    assert.deepEqual(errors.concat(u.errors), []);
+    await u.ctx.close();
+  });
+
   test('admin reset code, reset page, sign out everywhere', async () => {
     const creds = await makeUser(srv.base, admin, 'reset1@example.org');
     const { page, errors, ctx } = await newPage(browser, srv.base);

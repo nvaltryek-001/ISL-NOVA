@@ -15,6 +15,12 @@ export function SettingsPage() {
   const read = useMutation((id: number) => api(`/notifications/${id}/read`, { method: 'POST' }), { invalidates: ['/notifications'] });
   const history = useQuery<any[]>('/history');
   const bookmarks = useQuery<any[]>('/bookmarks');
+  const [setup, setSetup] = useState<{ secret: string; otpauth_uri: string } | null>(null);
+  const [otp, setOtp] = useState('');
+  const refreshMe = () => api<User>('/me').then((u) => auth.setUser(u));
+  const startTfa = useMutation(() => api<{ secret: string; otpauth_uri: string }>('/me/2fa/setup', { method: 'POST' }), { onSuccess: (r) => { setSetup(r); setOtp(''); } });
+  const enableTfa = useMutation(() => api('/me/2fa/enable', { body: { code: otp } }), { onSuccess: () => { setSetup(null); setOtp(''); toast('Two-factor sign-in is on'); refreshMe(); } });
+  const disableTfa = useMutation(() => api('/me/2fa/disable', { body: { code: otp } }), { onSuccess: () => { setOtp(''); toast('Two-factor sign-in is off'); refreshMe(); } });
   const logoutAll = useMutation(() => api('/auth/logout-all', { method: 'POST' }), { onSuccess: () => { toast('Signed out on every device'); auth.logout(); } });
   const clear = useMutation(() => api('/history', { method: 'DELETE' }), { invalidates: ['/history', '/dashboard'], onSuccess: () => toast('History cleared') });
   const delOne = useMutation((id: number) => api(`/history/${id}`, { method: 'DELETE' }), { invalidates: ['/history'] });
@@ -36,6 +42,30 @@ export function SettingsPage() {
                 <Field label="New password" hint="At least 10 characters.">{(id) => <Input id={id} type="password" autoComplete="new-password" value={pw.new_password} onChange={(e) => setPw({ ...pw, new_password: e.target.value })} />}</Field>
                 <Button disabled={pw.new_password.length < 10} onClick={() => profile.mutate(pw)}>Update password</Button>
               </div>
+            </div>
+            <div className="border-t border-ink-700 pt-4">
+              <p className="label mb-1">Two-factor sign-in</p>
+              <ErrorNote error={startTfa.error ?? enableTfa.error ?? disableTfa.error} />
+              {user?.two_factor ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-ink-400">On. Sign-in asks for a code from your authenticator app.</p>
+                  <Field label="Current code">{(id) => <Input id={id} inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} />}</Field>
+                  <Button variant="ghost" disabled={otp.length !== 6} loading={disableTfa.pending} onClick={() => disableTfa.mutate(undefined)}>Turn off two-factor</Button>
+                </div>
+              ) : setup ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-ink-400">Add this key to an authenticator app (time-based, 6 digits, 30 s), then enter the code it shows.</p>
+                  <p><code className="break-all rounded bg-ink-900 px-2 py-1" data-testid="totp-secret">{setup.secret}</code></p>
+                  <p className="text-xs"><a className="text-nova-300 hover:underline" href={setup.otpauth_uri}>Open in authenticator app</a></p>
+                  <Field label="Code from the app">{(id) => <Input id={id} inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} />}</Field>
+                  <Button disabled={otp.length !== 6} loading={enableTfa.pending} onClick={() => enableTfa.mutate(undefined)}>Turn on two-factor</Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-sm text-ink-400">Off. Add a second step to sign-in with any authenticator app.</p>
+                  <Button loading={startTfa.pending} onClick={() => startTfa.mutate(undefined)}>Set up two-factor</Button>
+                </div>
+              )}
             </div>
             <div className="border-t border-ink-700 pt-4">
               <p className="label mb-1">Sessions</p>

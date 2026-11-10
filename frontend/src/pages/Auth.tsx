@@ -21,7 +21,8 @@ export function validateRegistration(f: { display_name: string; email: string; p
 export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   const { search } = useLocation();
   const next = search.get('next') || '/';
-  const [form, setForm] = useState({ email: '', password: '', display_name: '' });
+  const [form, setForm] = useState({ email: '', password: '', display_name: '', otp: '' });
+  const [needOtp, setNeedOtp] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<ApiError | null>(null);
   const [busy, setBusy] = useState(false);
@@ -36,13 +37,15 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
     setErrors({});
     setBusy(true);
     try {
-      const body = mode === 'login' ? { email: form.email, password: form.password } : form;
+      const body = mode === 'login' ? { email: form.email, password: form.password, ...(needOtp ? { otp: form.otp } : {}) }
+        : { email: form.email, password: form.password, display_name: form.display_name };
       const res = await api<{ access_token: string; user: User }>(`/auth/${mode}`, { body });
       clearCache();
       auth.login(res.access_token, res.user);
       navigate(next.startsWith('/') && !next.startsWith('//') ? next : '/', true);
     } catch (err) {
-      setError(err as ApiError);
+      const e2 = err as ApiError;
+      if (e2.code === 'otp_required') { setNeedOtp(true); setError(null); } else setError(e2);
     } finally {
       setBusy(false);
     }
@@ -83,6 +86,9 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
           <Field label="Password" error={errors.password} hint={mode === 'register' ? 'At least 10 characters.' : undefined}>
             {(id) => <Input id={id} type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />}
           </Field>
+          {mode === 'login' && needOtp && (
+            <Field label="Authenticator code" hint="6 digits from your authenticator app.">{(id) => <Input id={id} inputMode="numeric" autoComplete="one-time-code" autoFocus maxLength={6} value={form.otp} onChange={(e) => setForm({ ...form, otp: e.target.value.replace(/\D/g, '') })} />}</Field>
+          )}
           <Button variant="primary" className="w-full" loading={busy} type="submit">{mode === 'login' ? 'Sign in' : 'Create account'}</Button>
           <p className="text-center text-sm text-ink-400">
             {mode === 'login' ? <>No account? <Link to={`/register?next=${encodeURIComponent(next)}`} className="text-nova-300 hover:underline">Create one</Link></>

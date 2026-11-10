@@ -234,7 +234,7 @@ def _authenticate(state, conn: Conn, request: Request) -> tuple[dict | None, set
         raise ApiError(401, "invalid_token", "token is invalid or expired")
     uid, tv = decoded
     user = conn.one("SELECT id, email, display_name, is_active, preferred_language, settings, created_at, "
-                    "token_version FROM users WHERE id = ?", (uid,))
+                    "token_version, totp_enabled FROM users WHERE id = ?", (uid,))
     if user is None or not user["is_active"]:
         raise ApiError(401, "invalid_token", "account disabled or missing")
     if int(user["token_version"] or 0) != tv:

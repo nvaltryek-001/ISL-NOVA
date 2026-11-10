@@ -24,7 +24,7 @@ export function useStore<T, S>(store: ReturnType<typeof createStore<T>>, sel: (s
 
 export type User = {
   id: number; email: string; display_name: string; roles: string[]; preferred_language: 'en' | 'hi' | 'kn';
-  settings: Record<string, unknown>;
+  settings: Record<string, unknown>; two_factor?: boolean;
 };
 
 const KEY = 'isl-nova-session';

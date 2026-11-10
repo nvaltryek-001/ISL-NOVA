@@ -42,3 +42,45 @@ def test_admin_issued_password_reset(app_env):
     assert c.get(f"{A}/me", headers=h).status_code == 401
     assert c.post(f"{A}/auth/login", json={"email": me["email"], "password": "password-123!"}).status_code == 401
     assert api.login(me["email"], "new-password-77")
+
+
+def test_totp_rfc6238_vectors():
+    import hashlib
+
+    from app import totp
+    key = b"12345678901234567890"
+    for t, want in [(59, "94287082"), (1111111109, "07081804"), (1234567890, "89005924"), (20000000000, "65353130")]:
+        assert totp.hotp(key, t // 30, digits=8, digest=hashlib.sha1) == want
+
+
+def test_two_factor_setup_login_and_disable(app_env):
+    import time
+
+    from app import totp
+    c, api, admin, _ = app_env
+    h = api.user(admin)
+    me = c.get(f"{A}/me", headers=h).json()
+    assert me["two_factor"] is False
+    s = c.post(f"{A}/me/2fa/setup", headers=h).json()
+    assert s["otpauth_uri"].startswith("otpauth://totp/ISL%20NOVA:")
+    now = time.time()
+    valid = {totp.totp(s["secret"], now + d) for d in (-60, -30, 0, 30, 60)}
+    wrong = next(x for x in ("000000", "111111", "222222", "333333") if x not in valid)
+    assert c.post(f"{A}/me/2fa/enable", json={"code": wrong}, headers=h).status_code == 400
+    # use the previous step so the login below can use the current one (replay protection)
+    r = c.post(f"{A}/me/2fa/enable", json={"code": totp.totp(s["secret"], now - 30)}, headers=h)
+    assert r.status_code == 200, r.text
+    assert c.get(f"{A}/me", headers=h).json()["two_factor"] is True
+
+    creds = {"email": me["email"], "password": "password-123!"}
+    r = c.post(f"{A}/auth/login", json=creds)
+    assert r.status_code == 401 and r.json()["error"]["code"] == "otp_required"
+    assert c.post(f"{A}/auth/login", json={**creds, "otp": "123"}).status_code == 401
+    code = totp.totp(s["secret"], now)
+    assert c.post(f"{A}/auth/login", json={**creds, "otp": code}).status_code == 200
+    r = c.post(f"{A}/auth/login", json={**creds, "otp": code})  # same code again: replay refused
+    assert r.status_code == 401 and r.json()["error"]["code"] == "invalid_otp"
+
+    assert c.post(f"{A}/me/2fa/disable", json={"code": wrong}, headers=h).status_code == 400
+    assert c.post(f"{A}/me/2fa/disable", json={"code": totp.totp(s["secret"])}, headers=h).status_code == 200
+    assert c.post(f"{A}/auth/login", json=creds).status_code == 200
