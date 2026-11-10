@@ -1,8 +1,14 @@
-# Publishes a GitHub release when a version tag (v*) is pushed. Notes come from
-# docs/releases/<tag>.md. Model weights stay on their own model-* releases.
+# Publishes a GitHub release (and its tag) for a version. Notes come from
+# docs/releases/<version>.md. Start from the Actions tab (Run workflow) or by
+# pushing a v* tag. Model weights stay on their own model-* releases.
 name: Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version tag to create, e.g. v2.0.0"
+        required: true
   push:
     tags: ["v*"]
 
@@ -15,8 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Create the release
-        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version || github.ref_name }}
         run: |
-          notes="docs/releases/${GITHUB_REF_NAME}.md"
+          notes="docs/releases/${VERSION}.md"
           test -f "$notes" || { echo "missing $notes"; exit 1; }
-          gh release create "$GITHUB_REF_NAME" --title "ISL NOVA $GITHUB_REF_NAME" --notes-file "$notes" --verify-tag
+          if gh release view "$VERSION" >/dev/null 2>&1; then echo "release $VERSION exists"; exit 0; fi
+          gh release create "$VERSION" --target "$GITHUB_SHA" --title "ISL NOVA $VERSION" --notes-file "$notes" --latest
