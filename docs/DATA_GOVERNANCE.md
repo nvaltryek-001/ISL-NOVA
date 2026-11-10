@@ -21,6 +21,7 @@
 
 ## Retention
 * Analysis uploads (Video Analysis) are deleted after `ANALYSIS_RETENTION_HOURS` (default 24) or on demand.
+* **Retention job** (`backend/app/retention.py`): runs at start-up and every `RETENTION_INTERVAL_HOURS` (default 24; 0 disables), and on demand with `python -m app.manage retention [--apply]` (dry run by default) or `POST /api/v1/admin/retention`. It deletes used/expired password-reset codes, read notifications older than `NOTIFICATION_RETENTION_DAYS` (180), recognition history older than `HISTORY_RETENTION_DAYS` (0 = never) and expired analysis files. **Dataset recordings are never deleted automatically**: recordings past their consent retention date are listed under `needs_review` for a data curator, who deletes them through the erasure workflow.
 * Recordings follow the signer's `retention_until` (validation should flag expired consent; automated purge is on the roadmap).
 * Audit logs are kept for accountability; they contain actions and identifiers, not media.
 

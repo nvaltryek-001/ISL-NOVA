@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -158,10 +159,23 @@ def create_app(settings: Settings | None = None) -> Starlette:
                 routes.append(Route(f"/{static}", lambda r, p=dist / static, h=headers, m=media: FileResponse(p, headers=h, media_type=m)))
         routes.append(Route("/{rest:path}", spa))
 
+    async def retention_loop():
+        from .retention import run_retention
+        while True:
+            try:
+                with state.db.connect() as c:
+                    run_retention(c, settings, state.storage, apply=True)
+            except Exception:  # noqa: BLE001 - never let the job take the server down
+                logging.getLogger("isl_nova.retention").exception("retention run failed")
+            await asyncio.sleep(settings.retention_interval_hours * 3600)
+
     @asynccontextmanager
     async def lifespan(app):
         state.startup()
+        task = asyncio.create_task(retention_loop()) if settings.retention_interval_hours > 0 else None
         yield
+        if task:
+            task.cancel()
         state.jobs.shutdown()
 
     class HeadersAndLogging(BaseHTTPMiddleware):

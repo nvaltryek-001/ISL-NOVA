@@ -596,6 +596,8 @@ Copy [`.env.example`](.env.example) to `.env` (the Windows setup does this for y
 | `BOOTSTRAP_ADMIN_EMAIL` / `_PASSWORD` | ensure an admin exists at start-up | - |
 | `ALLOW_OPEN_REGISTRATION` | allow self sign-up as learner | `true` |
 | `MAX_UPLOAD_MB`, `ANALYSIS_RETENTION_HOURS` | upload limit, analysis retention | 50, 24 |
+| `RETENTION_INTERVAL_HOURS`, `HISTORY_RETENTION_DAYS`, `NOTIFICATION_RETENTION_DAYS` | retention job interval (0 = off); history age limit (0 = keep); read-notification age limit | 24, 0, 180 |
+| `METRICS_TOKEN` | bearer token for `/metrics` from outside localhost | unset |
 | `RATE_LIMIT_PER_MINUTE`, `AUTH_RATE_LIMIT_PER_MINUTE` | per-IP limits | 120, 10 |
 | `PBKDF2_ITERATIONS` | password hashing cost | 600000 |
 | `ISL_NOVA_HAND_MODEL`, `ISL_NOVA_POSE_MODEL` | MediaPipe `.task` files for server-side video analysis | - |

@@ -84,3 +84,21 @@ def test_two_factor_setup_login_and_disable(app_env):
     assert c.post(f"{A}/me/2fa/disable", json={"code": wrong}, headers=h).status_code == 400
     assert c.post(f"{A}/me/2fa/disable", json={"code": totp.totp(s["secret"])}, headers=h).status_code == 200
     assert c.post(f"{A}/auth/login", json=creds).status_code == 200
+
+
+def test_retention_job_dry_run_then_apply(app_env):
+    c, api, admin, _ = app_env
+    h = api.user(admin)
+    me = c.get(f"{A}/me", headers=h).json()
+    # an issued-and-redeemed reset code is eligible for deletion
+    code = c.post(f"{A}/admin/users/{me['id']}/password-reset", headers=admin).json()["code"]
+    assert c.post(f"{A}/auth/reset-password", json={"code": code, "new_password": "another-pass-1"}).status_code == 200
+    learner = api.user(admin)
+    assert c.post(f"{A}/admin/retention", json={}, headers=learner).status_code == 403
+    dry = c.post(f"{A}/admin/retention", json={}, headers=admin).json()
+    assert dry["applied"] is False and dry["would_delete"]["password_resets_expired_or_used"] >= 1
+    assert "recordings_past_consent_retention" in dry["needs_review"]
+    done = c.post(f"{A}/admin/retention", json={"apply": True}, headers=admin).json()
+    assert done["deleted"]["password_resets_expired_or_used"] >= 1
+    again = c.post(f"{A}/admin/retention", json={}, headers=admin).json()
+    assert again["would_delete"]["password_resets_expired_or_used"] == 0

@@ -312,6 +312,20 @@ def reset_password(ctx: Ctx):
     return {"ok": True}
 
 
+class RetentionIn(BaseModel):
+    apply: bool = False
+
+
+@router.post("/admin/retention", summary="Run the data-retention job (dry run unless apply=true)",
+             perm="admin:users", body=RetentionIn)
+def admin_retention(ctx: Ctx):
+    from ..retention import run_retention
+    out = run_retention(ctx.db, ctx.app.settings, ctx.app.storage, apply=ctx.body.apply)
+    if ctx.body.apply:
+        audit(ctx.db, ctx.uid, "admin.retention_run", None, out.get("deleted"), ctx.ip)
+    return out
+
+
 @router.get("/admin/audit", summary="Audit log", perm="admin:audit", query=AuditQuery)
 def audit_log(ctx: Ctx):
     q = ctx.query

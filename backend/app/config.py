@@ -36,6 +36,9 @@ class Settings:
     bootstrap_admin_email: str | None = None
     bootstrap_admin_password: str | None = None
     analysis_retention_hours: int = 24
+    history_retention_days: int = 0  # 0 = keep until the user deletes it
+    notification_retention_days: int = 180
+    retention_interval_hours: float = 24
     rate_limit_per_minute: int = 120
     auth_rate_limit_per_minute: int = 10
     hand_model_path: str | None = None
@@ -60,6 +63,9 @@ class Settings:
             bootstrap_admin_email=e.get("BOOTSTRAP_ADMIN_EMAIL") or None,
             bootstrap_admin_password=e.get("BOOTSTRAP_ADMIN_PASSWORD") or None,
             analysis_retention_hours=int(e.get("ANALYSIS_RETENTION_HOURS", "24")),
+            history_retention_days=int(e.get("HISTORY_RETENTION_DAYS", "0")),
+            notification_retention_days=int(e.get("NOTIFICATION_RETENTION_DAYS", "180")),
+            retention_interval_hours=float(e.get("RETENTION_INTERVAL_HOURS", "24")),
             rate_limit_per_minute=int(e.get("RATE_LIMIT_PER_MINUTE", "120")),
             auth_rate_limit_per_minute=int(e.get("AUTH_RATE_LIMIT_PER_MINUTE", "10")),
             hand_model_path=e.get("ISL_NOVA_HAND_MODEL") or None,
