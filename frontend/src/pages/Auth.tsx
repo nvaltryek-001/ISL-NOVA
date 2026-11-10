@@ -88,9 +88,51 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
             {mode === 'login' ? <>No account? <Link to={`/register?next=${encodeURIComponent(next)}`} className="text-nova-300 hover:underline">Create one</Link></>
               : <>Already registered? <Link to={`/login?next=${encodeURIComponent(next)}`} className="text-nova-300 hover:underline">Sign in</Link></>}
           </p>
+          {mode === 'login' && <p className="text-center text-sm"><Link to="/reset-password" className="text-ink-400 hover:underline">Have a reset code?</Link></p>}
           <p className="text-center"><Link to="/" className="text-xs text-ink-500 hover:text-ink-300">Continue without an account</Link></p>
         </form>
       </div>
+    </div>
+  );
+}
+
+export function ResetPasswordPage() {
+  const [form, setForm] = useState({ code: '', new_password: '' });
+  const [error, setError] = useState<ApiError | null>(null);
+  const [done, setDone] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setBusy(true);
+    try {
+      await api('/auth/reset-password', { body: { code: form.code.trim(), new_password: form.new_password } });
+      setDone(true);
+    } catch (err) {
+      setError(err as ApiError);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="flex min-h-dvh items-center justify-center p-6">
+      <form onSubmit={submit} className="w-full max-w-sm space-y-5" noValidate>
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-fg">Reset your password</h1>
+          <p className="muted mt-1 text-sm">Enter the one-time code an administrator gave you. It expires 30 minutes after it was issued.</p>
+        </div>
+        <ErrorNote error={error} />
+        {done ? (
+          <p role="status" className="text-sm">Password changed and all earlier sessions signed out. <Link to="/login" className="text-nova-300 hover:underline">Sign in</Link></p>
+        ) : (
+          <>
+            <Field label="Reset code">{(id) => <Input id={id} autoComplete="one-time-code" required value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} />}</Field>
+            <Field label="New password" hint="At least 10 characters.">{(id) => <Input id={id} type="password" autoComplete="new-password" required value={form.new_password} onChange={(e) => setForm({ ...form, new_password: e.target.value })} />}</Field>
+            <Button variant="primary" className="w-full" loading={busy} disabled={form.new_password.length < 10 || form.code.trim().length < 10} type="submit">Set new password</Button>
+          </>
+        )}
+        <p className="text-center"><Link to="/login" className="text-xs text-ink-500 hover:text-ink-300">Back to sign in</Link></p>
+      </form>
     </div>
   );
 }

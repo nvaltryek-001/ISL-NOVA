@@ -119,6 +119,36 @@ describe('authentication and RBAC', () => {
     await page.getByText('email or password is incorrect').waitFor();
     await ctx.close();
   });
+  test('admin reset code, reset page, sign out everywhere', async () => {
+    const creds = await makeUser(srv.base, admin, 'reset1@example.org');
+    const { page, errors, ctx } = await newPage(browser, srv.base);
+    await login(page);
+    await page.goto('/admin');
+    await page.getByLabel('Search users').fill('reset1');
+    const row = page.getByRole('row').filter({ hasText: creds.email });
+    await row.getByRole('button', { name: 'Reset code' }).click();
+    const code = (await page.getByTestId('reset-code').textContent()).trim();
+    assert.ok(code.length >= 20);
+    await ctx.close();
+
+    const u = await newPage(browser, srv.base);
+    await u.page.goto('/login');
+    await u.page.getByRole('link', { name: 'Have a reset code?' }).click();
+    await u.page.getByRole('heading', { name: 'Reset your password' }).waitFor();
+    await u.page.getByLabel('Reset code').fill(code);
+    await u.page.getByLabel('New password').fill('fresh-password-9');
+    await u.page.getByRole('button', { name: 'Set new password' }).click();
+    await u.page.getByText('Password changed and all earlier sessions signed out.').waitFor();
+    await login(u.page, { email: creds.email, password: 'fresh-password-9' });
+    await u.page.goto('/settings');
+    u.page.once('dialog', (d) => d.accept());
+    await u.page.getByRole('button', { name: 'Sign out everywhere' }).click();
+    await u.page.getByRole('button', { name: 'Sign in' }).first().waitFor();
+    const r = await fetch(`${srv.base}/api/v1/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: creds.email, password: 'fresh-password-9' }) });
+    assert.equal(r.status, 200);
+    assert.deepEqual(errors.concat(u.errors), []);
+    await u.ctx.close();
+  });
 });
 
 describe('vocabulary', () => {

@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import re
+import secrets
+from datetime import UTC, datetime, timedelta
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -205,6 +208,54 @@ def admin_update_user(ctx: Ctx):
             ctx.db.update("users", {"is_active": b.is_active}, "id = ?", (uid,))
         audit(ctx.db, ctx.uid, "admin.user_updated", f"user:{uid}", b.model_dump(exclude_none=True), ctx.ip)
     return user_out(ctx, ctx.db.one("SELECT * FROM users WHERE id = ?", (uid,)))
+
+
+RESET_MINUTES = 30
+
+
+def _reset_hash(code: str) -> str:
+    return hashlib.sha256(code.strip().encode()).hexdigest()
+
+
+@router.post("/admin/users/{uid}/password-reset", summary="Issue a one-time password reset code (30 min)",
+             perm="admin:users", status=201)
+def admin_issue_reset(ctx: Ctx):
+    uid = int(ctx.params["uid"])
+    if not ctx.db.one("SELECT id FROM users WHERE id = ?", (uid,)):
+        raise not_found("user")
+    code = secrets.token_urlsafe(24)
+    expires = (datetime.now(UTC) + timedelta(minutes=RESET_MINUTES)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    with ctx.db.transaction():
+        # a new code replaces any unused earlier one
+        ctx.db.execute("DELETE FROM password_resets WHERE user_id = ? AND used_at IS NULL", (uid,))
+        ctx.db.insert("password_resets", {"user_id": uid, "token_hash": _reset_hash(code), "issued_by": ctx.uid,
+                                          "expires_at": expires, "created_at": utcnow()})
+        audit(ctx.db, ctx.uid, "admin.password_reset_issued", f"user:{uid}", ip=ctx.ip)
+    # the code is shown once; hand it to the user through a trusted channel
+    return {"code": code, "expires_at": expires}
+
+
+class ResetIn(BaseModel):
+    code: str = Field(min_length=10, max_length=200)
+    new_password: str = Field(min_length=MIN_PASSWORD, max_length=200)
+
+
+@router.post("/auth/reset-password", summary="Set a new password with a one-time reset code", auth="none",
+             body=ResetIn, rate="auth")
+def reset_password(ctx: Ctx):
+    b: ResetIn = ctx.body
+    row = ctx.db.one("SELECT * FROM password_resets WHERE token_hash = ?", (_reset_hash(b.code),))
+    if not row or row["used_at"] or str(row["expires_at"]) < utcnow():
+        audit(ctx.db, None, "auth.password_reset_failed", None, None, ctx.ip)
+        raise ApiError(400, "invalid_reset_code", "the reset code is invalid, used or expired")
+    with ctx.db.transaction():
+        ctx.db.update("password_resets", {"used_at": utcnow()}, "id = ?", (row["id"],))
+        # new password + sign out everywhere
+        ctx.db.execute("UPDATE users SET password_hash = ?, token_version = COALESCE(token_version, 0) + 1 "
+                       "WHERE id = ?", (hash_password(b.new_password, ctx.app.settings.pbkdf2_iterations),
+                                        row["user_id"]))
+        audit(ctx.db, row["user_id"], "auth.password_reset", f"user:{row['user_id']}", ip=ctx.ip)
+    return {"ok": True}
 
 
 @router.get("/admin/audit", summary="Audit log", perm="admin:audit", query=AuditQuery)

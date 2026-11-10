@@ -9,7 +9,7 @@ import { type Lang, LANG_NAMES, useT } from './i18n';
 import { AdminPage } from './pages/Admin';
 import { AILabPage } from './pages/AILab';
 import { AcademyPage } from './pages/Academy';
-import { AuthPage } from './pages/Auth';
+import { AuthPage, ResetPasswordPage } from './pages/Auth';
 import { CommunicatePage } from './pages/Communicate';
 import { DashboardPage } from './pages/Dashboard';
 import { DatasetLabPage } from './pages/DatasetLab';
@@ -219,6 +219,7 @@ export function RequireAuth({ children, perm }: { children: ReactNode; perm?: st
 export function App() {
   const { pathname } = useLocation();
   if (pathname === '/kiosk') return <><KioskPage /><Toasts /></>;
+  if (pathname === '/reset-password') return <><ResetPasswordPage /><Toasts /></>;
   if (pathname === '/login' || pathname === '/register') return <><AuthPage mode={pathname === '/login' ? 'login' : 'register'} /><Toasts /></>;
   return (
     <Shell>
