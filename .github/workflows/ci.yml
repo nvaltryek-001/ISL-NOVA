@@ -45,6 +45,7 @@ jobs:
           mkdir -p /tmp/minio-data
           MINIO_ROOT_USER=minioadmin MINIO_ROOT_PASSWORD=minioadmin nohup /tmp/minio server /tmp/minio-data --address :9000 > /tmp/minio.log 2>&1 &
           for i in $(seq 1 30); do curl -sf http://localhost:9000/minio/health/live && break; sleep 2; done
+          curl -sf http://localhost:9000/minio/health/live || { echo "MinIO did not start:"; cat /tmp/minio.log; /tmp/minio --version; exit 1; }
       - name: Tests (SQLite, real Redis and MinIO)
         env:
           REDIS_TEST_URL: redis://localhost:6379/0

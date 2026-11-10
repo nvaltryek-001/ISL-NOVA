@@ -101,7 +101,7 @@ def export_onnx(model_dir: Path, path: Path) -> None:
         helper.make_node("Squeeze", ["Y", "ax1"], ["Ys"]),                       # [T, N, H]
         helper.make_node("Slice", ["Ys", "last", "end"], ["Ylast"]),             # [1, N, H]
         helper.make_node("Squeeze", ["Ylast", "zero"], ["hlast"]),
-        helper.make_node("ReduceMean", ["Ys", "zero"], ["hmean"], keepdims=0),
+        helper.make_node("ReduceMean", ["Ys"], ["hmean"], axes=[0], keepdims=0),
         helper.make_node("Concat", ["hlast", "hmean"], ["pooled"], axis=1),
         helper.make_node("MatMul", ["pooled", "Wo"], ["z0"]),
         helper.make_node("Add", ["z0", "bo"], ["z1"]),
