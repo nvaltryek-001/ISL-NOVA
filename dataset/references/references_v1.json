@@ -1,0 +1,1808 @@
+{
+ "version": "references-v1",
+ "feature_contract": "1.0.0",
+ "source": "INCLUDE training split (Sridhar et al., ACM MM 2020), CC BY 4.0; landmarks only, no video",
+ "classes": 200,
+ "signs": [
+  {
+   "sign_id": "ISL001",
+   "gloss": "alright",
+   "recording_id": "include:alright:MVI_9964",
+   "aspect": 1.7777777777777777,
+   "frames": 43,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL002",
+   "gloss": "bad",
+   "recording_id": "include:bad:MVI_5242",
+   "aspect": 1.7777777777777777,
+   "frames": 27,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL003",
+   "gloss": "blind",
+   "recording_id": "include:blind:MVI_9586",
+   "aspect": 1.7777777777777777,
+   "frames": 26,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL004",
+   "gloss": "deaf",
+   "recording_id": "include:deaf:MVI_9583",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL005",
+   "gloss": "friend",
+   "recording_id": "include:friend:MVI_4122",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL006",
+   "gloss": "gift",
+   "recording_id": "include:gift:MVI_9079",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL007",
+   "gloss": "good",
+   "recording_id": "include:good:MVI_9431",
+   "aspect": 1.7777777777777777,
+   "frames": 30,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL008",
+   "gloss": "goodafternoon",
+   "recording_id": "include:goodafternoon:MVI_0046",
+   "aspect": 1.7777777777777777,
+   "frames": 46,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL009",
+   "gloss": "goodevening",
+   "recording_id": "include:goodevening:MVI_9942",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 13
+  },
+  {
+   "sign_id": "ISL010",
+   "gloss": "goodmorning",
+   "recording_id": "include:goodmorning:MVI_0045",
+   "aspect": 1.7777777777777777,
+   "frames": 45,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL011",
+   "gloss": "goodnight",
+   "recording_id": "include:goodnight:MVI_9944",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL012",
+   "gloss": "hello",
+   "recording_id": "include:hello:MVI_9915",
+   "aspect": 1.7777777777777777,
+   "frames": 26,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL013",
+   "gloss": "howareyou",
+   "recording_id": "include:howareyou:MVI_9919",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL014",
+   "gloss": "marriage",
+   "recording_id": "include:marriage:MVI_8943",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL015",
+   "gloss": "neighbour",
+   "recording_id": "include:neighbour:MVI_4106",
+   "aspect": 1.7777777777777777,
+   "frames": 33,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL016",
+   "gloss": "nice",
+   "recording_id": "include:nice:MVI_9590",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 3
+  },
+  {
+   "sign_id": "ISL017",
+   "gloss": "pleased",
+   "recording_id": "include:pleased:MVI_0067",
+   "aspect": 1.7777777777777777,
+   "frames": 38,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL018",
+   "gloss": "sign",
+   "recording_id": "include:sign:MVI_4861",
+   "aspect": 1.7777777777777777,
+   "frames": 25,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL019",
+   "gloss": "thankyou",
+   "recording_id": "include:thankyou:MVI_9951",
+   "aspect": 1.7777777777777777,
+   "frames": 27,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL020",
+   "gloss": "baby",
+   "recording_id": "include:baby:MVI_3917",
+   "aspect": 1.7777777777777777,
+   "frames": 38,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL021",
+   "gloss": "boy",
+   "recording_id": "include:boy:MVI_3964",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL022",
+   "gloss": "brother",
+   "recording_id": "include:brother:MVI_5244",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL023",
+   "gloss": "child",
+   "recording_id": "include:child:MVI_4992",
+   "aspect": 1.7777777777777777,
+   "frames": 19,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL024",
+   "gloss": "daughter",
+   "recording_id": "include:daughter:MVI_3903",
+   "aspect": 1.7777777777777777,
+   "frames": 37,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL025",
+   "gloss": "family",
+   "recording_id": "include:family:MVI_3934",
+   "aspect": 1.7777777777777777,
+   "frames": 33,
+   "fps": 12.5,
+   "train_recordings": 13
+  },
+  {
+   "sign_id": "ISL026",
+   "gloss": "father",
+   "recording_id": "include:father:MVI_3910",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL027",
+   "gloss": "girl",
+   "recording_id": "include:girl:MVI_8645",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL028",
+   "gloss": "grandfather",
+   "recording_id": "include:grandfather:MVI_4085",
+   "aspect": 1.7777777777777777,
+   "frames": 39,
+   "fps": 12.5,
+   "train_recordings": 13
+  },
+  {
+   "sign_id": "ISL029",
+   "gloss": "grandmother",
+   "recording_id": "include:grandmother:MVI_4088",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 13
+  },
+  {
+   "sign_id": "ISL030",
+   "gloss": "husband",
+   "recording_id": "include:husband:MVI_4961",
+   "aspect": 1.7777777777777777,
+   "frames": 24,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL031",
+   "gloss": "man",
+   "recording_id": "include:man:MVI_3922",
+   "aspect": 1.7777777777777777,
+   "frames": 39,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL032",
+   "gloss": "mother",
+   "recording_id": "include:mother:MVI_3761",
+   "aspect": 1.7777777777777777,
+   "frames": 25,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL033",
+   "gloss": "old",
+   "recording_id": "include:old:MVI_5232",
+   "aspect": 1.7777777777777777,
+   "frames": 25,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL034",
+   "gloss": "parent",
+   "recording_id": "include:parent:MVI_4945",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL035",
+   "gloss": "sister",
+   "recording_id": "include:sister:MVI_3932",
+   "aspect": 1.7777777777777777,
+   "frames": 41,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL036",
+   "gloss": "son",
+   "recording_id": "include:son:MVI_3901",
+   "aspect": 1.7777777777777777,
+   "frames": 39,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL037",
+   "gloss": "wife",
+   "recording_id": "include:wife:MVI_3949",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL038",
+   "gloss": "woman",
+   "recording_id": "include:woman:MVI_5242",
+   "aspect": 1.7777777777777777,
+   "frames": 22,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL039",
+   "gloss": "young",
+   "recording_id": "include:young:MVI_9429",
+   "aspect": 1.7777777777777777,
+   "frames": 22,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL040",
+   "gloss": "exercise",
+   "recording_id": "include:exercise:MVI_8980",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL041",
+   "gloss": "sport",
+   "recording_id": "include:sport:MVI_8978",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL042",
+   "gloss": "bag",
+   "recording_id": "include:bag:MVI_9073",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL043",
+   "gloss": "ball",
+   "recording_id": "include:ball:MVI_8983",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 11
+  },
+  {
+   "sign_id": "ISL044",
+   "gloss": "bank",
+   "recording_id": "include:bank:MVI_3664",
+   "aspect": 1.7777777777777777,
+   "frames": 24,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL045",
+   "gloss": "bathroom",
+   "recording_id": "include:bathroom:MVI_8784",
+   "aspect": 1.7777777777777777,
+   "frames": 38,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL046",
+   "gloss": "bed",
+   "recording_id": "include:bed:MVI_9009",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL047",
+   "gloss": "bedroom",
+   "recording_id": "include:bedroom:MVI_9020",
+   "aspect": 1.7777777777777777,
+   "frames": 54,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL048",
+   "gloss": "camera",
+   "recording_id": "include:camera:MVI_9115",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL049",
+   "gloss": "chair",
+   "recording_id": "include:chair:MVI_9004",
+   "aspect": 1.7777777777777777,
+   "frames": 27,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL050",
+   "gloss": "city",
+   "recording_id": "include:city:MVI_3348",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL051",
+   "gloss": "clock",
+   "recording_id": "include:clock:MVI_4526",
+   "aspect": 1.7777777777777777,
+   "frames": 43,
+   "fps": 12.5,
+   "train_recordings": 9
+  },
+  {
+   "sign_id": "ISL052",
+   "gloss": "computer",
+   "recording_id": "include:computer:MVI_5396",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL053",
+   "gloss": "door",
+   "recording_id": "include:door:MVI_9016",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL054",
+   "gloss": "fan",
+   "recording_id": "include:fan:MVI_9098",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 11
+  },
+  {
+   "sign_id": "ISL055",
+   "gloss": "house",
+   "recording_id": "include:house:MVI_3268",
+   "aspect": 1.7777777777777777,
+   "frames": 38,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL056",
+   "gloss": "india",
+   "recording_id": "include:india:MVI_3411",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL057",
+   "gloss": "key",
+   "recording_id": "include:key:MVI_8815",
+   "aspect": 1.7777777777777777,
+   "frames": 30,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL058",
+   "gloss": "kitchen",
+   "recording_id": "include:kitchen:MVI_4898",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL059",
+   "gloss": "laptop",
+   "recording_id": "include:laptop:MVI_4548",
+   "aspect": 1.7777777777777777,
+   "frames": 37,
+   "fps": 12.5,
+   "train_recordings": 9
+  },
+  {
+   "sign_id": "ISL060",
+   "gloss": "lock",
+   "recording_id": "include:lock:MVI_8833",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL061",
+   "gloss": "market",
+   "recording_id": "include:market:MVI_3570",
+   "aspect": 1.7777777777777777,
+   "frames": 25,
+   "fps": 12.5,
+   "train_recordings": 16
+  },
+  {
+   "sign_id": "ISL062",
+   "gloss": "office",
+   "recording_id": "include:office:MVI_3297",
+   "aspect": 1.7777777777777777,
+   "frames": 30,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL063",
+   "gloss": "park",
+   "recording_id": "include:park:MVI_3627",
+   "aspect": 1.7777777777777777,
+   "frames": 24,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL064",
+   "gloss": "photograph",
+   "recording_id": "include:photograph:MVI_4392",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL065",
+   "gloss": "restaurant",
+   "recording_id": "include:restaurant:MVI_3449",
+   "aspect": 1.7777777777777777,
+   "frames": 27,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL066",
+   "gloss": "storeorshop",
+   "recording_id": "include:storeorshop:MVI_3384",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL067",
+   "gloss": "table",
+   "recording_id": "include:table:MVI_9001",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL068",
+   "gloss": "window",
+   "recording_id": "include:window:MVI_9014",
+   "aspect": 1.7777777777777777,
+   "frames": 40,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL069",
+   "gloss": "bill",
+   "recording_id": "include:bill:MVI_8939",
+   "aspect": 1.7777777777777777,
+   "frames": 33,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL070",
+   "gloss": "cheap",
+   "recording_id": "include:cheap:MVI_9617",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL071",
+   "gloss": "clothing",
+   "recording_id": "include:clothing:MVI_3718",
+   "aspect": 1.7777777777777777,
+   "frames": 27,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL072",
+   "gloss": "dress",
+   "recording_id": "include:dress:MVI_5158",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL073",
+   "gloss": "expensive",
+   "recording_id": "include:expensive:MVI_9614",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL074",
+   "gloss": "hat",
+   "recording_id": "include:hat:MVI_5008",
+   "aspect": 1.7777777777777777,
+   "frames": 25,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL075",
+   "gloss": "medicine",
+   "recording_id": "include:medicine:MVI_8935",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL076",
+   "gloss": "money",
+   "recording_id": "include:money:MVI_4808",
+   "aspect": 1.7777777777777777,
+   "frames": 26,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL077",
+   "gloss": "pant",
+   "recording_id": "include:pant:MVI_3854",
+   "aspect": 1.7777777777777777,
+   "frames": 40,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL078",
+   "gloss": "poor",
+   "recording_id": "include:poor:MVI_9739",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL079",
+   "gloss": "price",
+   "recording_id": "include:price:MVI_4329",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL080",
+   "gloss": "rich",
+   "recording_id": "include:rich:MVI_9733",
+   "aspect": 1.7777777777777777,
+   "frames": 33,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL081",
+   "gloss": "shirt",
+   "recording_id": "include:shirt:MVI_5166",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL082",
+   "gloss": "shoes",
+   "recording_id": "include:shoes:MVI_3711",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL083",
+   "gloss": "soap",
+   "recording_id": "include:soap:MVI_9039",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL084",
+   "gloss": "tshirt",
+   "recording_id": "include:tshirt:MVI_3705",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL085",
+   "gloss": "afternoon",
+   "recording_id": "include:afternoon:MVI_9193",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL086",
+   "gloss": "evening",
+   "recording_id": "include:evening:MVI_9196",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL087",
+   "gloss": "friday",
+   "recording_id": "include:friday:MVI_9156",
+   "aspect": 1.7777777777777777,
+   "frames": 33,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL088",
+   "gloss": "hour",
+   "recording_id": "include:hour:MVI_9181",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL089",
+   "gloss": "minute",
+   "recording_id": "include:minute:MVI_9184",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL090",
+   "gloss": "monday",
+   "recording_id": "include:monday:MVI_4592",
+   "aspect": 1.7777777777777777,
+   "frames": 27,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL091",
+   "gloss": "month",
+   "recording_id": "include:month:MVI_9173",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL092",
+   "gloss": "morning",
+   "recording_id": "include:morning:MVI_9189",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL093",
+   "gloss": "night",
+   "recording_id": "include:night:MVI_9200",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL094",
+   "gloss": "saturday",
+   "recording_id": "include:saturday:MVI_9159",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL095",
+   "gloss": "season",
+   "recording_id": "include:season:MVI_9138",
+   "aspect": 1.7777777777777777,
+   "frames": 56,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL096",
+   "gloss": "second",
+   "recording_id": "include:second:MVI_9187",
+   "aspect": 1.7777777777777777,
+   "frames": 41,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL097",
+   "gloss": "spring",
+   "recording_id": "include:spring:MVI_5426",
+   "aspect": 1.7777777777777777,
+   "frames": 43,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL098",
+   "gloss": "summer",
+   "recording_id": "include:summer:MVI_9123",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL099",
+   "gloss": "sunday",
+   "recording_id": "include:sunday:MVI_9141",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 11
+  },
+  {
+   "sign_id": "ISL100",
+   "gloss": "thursday",
+   "recording_id": "include:thursday:MVI_9151",
+   "aspect": 1.7777777777777777,
+   "frames": 33,
+   "fps": 12.5,
+   "train_recordings": 11
+  },
+  {
+   "sign_id": "ISL101",
+   "gloss": "time",
+   "recording_id": "include:time:MVI_9201",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL102",
+   "gloss": "today",
+   "recording_id": "include:today:MVI_9161",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL103",
+   "gloss": "tomorrow",
+   "recording_id": "include:tomorrow:MVI_5474",
+   "aspect": 1.7777777777777777,
+   "frames": 22,
+   "fps": 12.5,
+   "train_recordings": 11
+  },
+  {
+   "sign_id": "ISL104",
+   "gloss": "tuesday",
+   "recording_id": "include:tuesday:MVI_5451",
+   "aspect": 1.7777777777777777,
+   "frames": 26,
+   "fps": 12.5,
+   "train_recordings": 11
+  },
+  {
+   "sign_id": "ISL105",
+   "gloss": "wednesday",
+   "recording_id": "include:wednesday:MVI_9149",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL106",
+   "gloss": "week",
+   "recording_id": "include:week:MVI_4630",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL107",
+   "gloss": "winter",
+   "recording_id": "include:winter:MVI_9130",
+   "aspect": 1.7777777777777777,
+   "frames": 39,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL108",
+   "gloss": "year",
+   "recording_id": "include:year:MVI_9176",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 13
+  },
+  {
+   "sign_id": "ISL109",
+   "gloss": "yesterday",
+   "recording_id": "include:yesterday:MVI_9167",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 12
+  },
+  {
+   "sign_id": "ISL110",
+   "gloss": "beautiful",
+   "recording_id": "include:beautiful:MVI_9725",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 7
+  },
+  {
+   "sign_id": "ISL111",
+   "gloss": "cold",
+   "recording_id": "include:cold:MVI_5220",
+   "aspect": 1.7777777777777777,
+   "frames": 26,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL112",
+   "gloss": "dead",
+   "recording_id": "include:dead:MVI_9825",
+   "aspect": 1.7777777777777777,
+   "frames": 27,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL113",
+   "gloss": "happy",
+   "recording_id": "include:happy:MVI_9455",
+   "aspect": 1.7777777777777777,
+   "frames": 26,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL114",
+   "gloss": "healthy",
+   "recording_id": "include:healthy:MVI_9445",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL115",
+   "gloss": "hot",
+   "recording_id": "include:hot:MVI_5138",
+   "aspect": 1.7777777777777777,
+   "frames": 25,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL116",
+   "gloss": "loud",
+   "recording_id": "include:loud:MVI_9450",
+   "aspect": 1.7777777777777777,
+   "frames": 25,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL117",
+   "gloss": "quiet",
+   "recording_id": "include:quiet:MVI_9537",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL118",
+   "gloss": "sad",
+   "recording_id": "include:sad:MVI_9568",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL119",
+   "gloss": "sick",
+   "recording_id": "include:sick:MVI_9364",
+   "aspect": 1.7777777777777777,
+   "frames": 23,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL120",
+   "gloss": "strong",
+   "recording_id": "include:strong:MVI_9692",
+   "aspect": 1.7777777777777777,
+   "frames": 30,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL121",
+   "gloss": "ugly",
+   "recording_id": "include:ugly:MVI_9846",
+   "aspect": 1.7777777777777777,
+   "frames": 30,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL122",
+   "gloss": "warm",
+   "recording_id": "include:warm:MVI_5223",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL123",
+   "gloss": "weak",
+   "recording_id": "include:weak:MVI_9694",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL124",
+   "gloss": "cellphone",
+   "recording_id": "include:cellphone:MVI_9101",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL125",
+   "gloss": "he",
+   "recording_id": "include:he:MVI_9890",
+   "aspect": 1.7777777777777777,
+   "frames": 27,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL126",
+   "gloss": "i",
+   "recording_id": "include:i:MVI_9957",
+   "aspect": 1.7777777777777777,
+   "frames": 23,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL127",
+   "gloss": "it",
+   "recording_id": "include:it:MVI_9971",
+   "aspect": 1.7777777777777777,
+   "frames": 24,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL128",
+   "gloss": "letter",
+   "recording_id": "include:letter:MVI_8825",
+   "aspect": 1.7777777777777777,
+   "frames": 37,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL129",
+   "gloss": "newspaper",
+   "recording_id": "include:newspaper:MVI_8715",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL130",
+   "gloss": "radio",
+   "recording_id": "include:radio:MVI_5417",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL131",
+   "gloss": "she",
+   "recording_id": "include:she:MVI_0073",
+   "aspect": 1.7777777777777777,
+   "frames": 37,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL132",
+   "gloss": "telephone",
+   "recording_id": "include:telephone:MVI_9072",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL133",
+   "gloss": "television",
+   "recording_id": "include:television:MVI_5413",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL134",
+   "gloss": "they",
+   "recording_id": "include:they:MVI_9910",
+   "aspect": 1.7777777777777777,
+   "frames": 30,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL135",
+   "gloss": "we",
+   "recording_id": "include:we:MVI_0028",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL136",
+   "gloss": "you",
+   "recording_id": "include:you:MVI_9960",
+   "aspect": 1.7777777777777777,
+   "frames": 24,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL137",
+   "gloss": "youplural",
+   "recording_id": "include:youplural:MVI_9948",
+   "aspect": 1.7777777777777777,
+   "frames": 47,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL138",
+   "gloss": "book",
+   "recording_id": "include:book:MVI_4400",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL139",
+   "gloss": "doctor",
+   "recording_id": "include:doctor:MVI_4472",
+   "aspect": 1.7777777777777777,
+   "frames": 30,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL140",
+   "gloss": "job",
+   "recording_id": "include:job:MVI_5376",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL141",
+   "gloss": "lawyer",
+   "recording_id": "include:lawyer:MVI_8872",
+   "aspect": 1.7777777777777777,
+   "frames": 26,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL142",
+   "gloss": "library",
+   "recording_id": "include:library:MVI_3389",
+   "aspect": 1.7777777777777777,
+   "frames": 42,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL143",
+   "gloss": "manager",
+   "recording_id": "include:manager:MVI_4509",
+   "aspect": 1.7777777777777777,
+   "frames": 46,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL144",
+   "gloss": "paper",
+   "recording_id": "include:paper:MVI_9058",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL145",
+   "gloss": "patient",
+   "recording_id": "include:patient:MVI_4474",
+   "aspect": 1.7777777777777777,
+   "frames": 48,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL146",
+   "gloss": "pen",
+   "recording_id": "include:pen:MVI_8794",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL147",
+   "gloss": "pencil",
+   "recording_id": "include:pencil:MVI_8789",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL148",
+   "gloss": "school",
+   "recording_id": "include:school:MVI_3291",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL149",
+   "gloss": "student",
+   "recording_id": "include:student:MVI_4465",
+   "aspect": 1.7777777777777777,
+   "frames": 38,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL150",
+   "gloss": "teacher",
+   "recording_id": "include:teacher:MVI_5311",
+   "aspect": 1.7777777777777777,
+   "frames": 25,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL151",
+   "gloss": "university",
+   "recording_id": "include:university:MVI_3377",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL152",
+   "gloss": "waiter",
+   "recording_id": "include:waiter:MVI_4480",
+   "aspect": 1.7777777777777777,
+   "frames": 42,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL153",
+   "gloss": "bicycle",
+   "recording_id": "include:bicycle:MVI_3245",
+   "aspect": 1.7777777777777777,
+   "frames": 39,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL154",
+   "gloss": "boat",
+   "recording_id": "include:boat:MVI_3222",
+   "aspect": 1.7777777777777777,
+   "frames": 59,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL155",
+   "gloss": "bus",
+   "recording_id": "include:bus:MVI_4186",
+   "aspect": 1.7777777777777777,
+   "frames": 38,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL156",
+   "gloss": "car",
+   "recording_id": "include:car:MVI_3211",
+   "aspect": 1.7777777777777777,
+   "frames": 48,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL157",
+   "gloss": "hospital",
+   "recording_id": "include:hospital:MVI_3316",
+   "aspect": 1.7777777777777777,
+   "frames": 38,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL158",
+   "gloss": "location",
+   "recording_id": "include:location:MVI_3427",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL159",
+   "gloss": "plane",
+   "recording_id": "include:plane:MVI_3144",
+   "aspect": 1.7777777777777777,
+   "frames": 40,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL160",
+   "gloss": "police",
+   "recording_id": "include:police:MVI_8890",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 10
+  },
+  {
+   "sign_id": "ISL161",
+   "gloss": "streetorroad",
+   "recording_id": "include:streetorroad:MVI_3598",
+   "aspect": 1.7777777777777777,
+   "frames": 25,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL162",
+   "gloss": "train",
+   "recording_id": "include:train:MVI_3140",
+   "aspect": 1.7777777777777777,
+   "frames": 41,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL163",
+   "gloss": "trainstation",
+   "recording_id": "include:trainstation:MVI_3521",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL164",
+   "gloss": "trainticket",
+   "recording_id": "include:trainticket:MVI_3255",
+   "aspect": 1.7777777777777777,
+   "frames": 41,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL165",
+   "gloss": "transportation",
+   "recording_id": "include:transportation:MVI_4195",
+   "aspect": 1.7777777777777777,
+   "frames": 33,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL166",
+   "gloss": "truck",
+   "recording_id": "include:truck:MVI_3149",
+   "aspect": 1.7777777777777777,
+   "frames": 49,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL167",
+   "gloss": "biglarge",
+   "recording_id": "include:biglarge:MVI_9395",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL168",
+   "gloss": "black",
+   "recording_id": "include:black:MVI_3887",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL169",
+   "gloss": "blue",
+   "recording_id": "include:blue:MVI_8614",
+   "aspect": 1.7777777777777777,
+   "frames": 33,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL170",
+   "gloss": "brown",
+   "recording_id": "include:brown:MVI_3879",
+   "aspect": 1.7777777777777777,
+   "frames": 39,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL171",
+   "gloss": "clean",
+   "recording_id": "include:clean:MVI_9808",
+   "aspect": 1.7777777777777777,
+   "frames": 30,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL172",
+   "gloss": "dirty",
+   "recording_id": "include:dirty:MVI_9813",
+   "aspect": 1.7777777777777777,
+   "frames": 36,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL173",
+   "gloss": "dry",
+   "recording_id": "include:dry:MVI_5250",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL174",
+   "gloss": "fast",
+   "recording_id": "include:fast:MVI_9246",
+   "aspect": 1.7777777777777777,
+   "frames": 23,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL175",
+   "gloss": "green",
+   "recording_id": "include:green:MVI_5040",
+   "aspect": 1.7777777777777777,
+   "frames": 24,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL176",
+   "gloss": "grey",
+   "recording_id": "include:grey:MVI_3746",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL177",
+   "gloss": "hard",
+   "recording_id": "include:hard:MVI_9666",
+   "aspect": 1.7777777777777777,
+   "frames": 32,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL178",
+   "gloss": "heavy",
+   "recording_id": "include:heavy:MVI_9708",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL179",
+   "gloss": "high",
+   "recording_id": "include:high:MVI_9657",
+   "aspect": 1.7777777777777777,
+   "frames": 35,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL180",
+   "gloss": "long",
+   "recording_id": "include:long:MVI_9459",
+   "aspect": 1.7777777777777777,
+   "frames": 26,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL181",
+   "gloss": "low",
+   "recording_id": "include:low:MVI_9784",
+   "aspect": 1.7777777777777777,
+   "frames": 28,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL182",
+   "gloss": "new",
+   "recording_id": "include:new:MVI_5148",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL183",
+   "gloss": "orange",
+   "recording_id": "include:orange:MVI_3884",
+   "aspect": 1.7777777777777777,
+   "frames": 46,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL184",
+   "gloss": "pink",
+   "recording_id": "include:pink:MVI_3883",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL185",
+   "gloss": "red",
+   "recording_id": "include:red:MVI_3721",
+   "aspect": 1.7777777777777777,
+   "frames": 27,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL186",
+   "gloss": "short",
+   "recording_id": "include:short:MVI_9462",
+   "aspect": 1.7777777777777777,
+   "frames": 27,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL187",
+   "gloss": "slow",
+   "recording_id": "include:slow:MVI_5211",
+   "aspect": 1.7777777777777777,
+   "frames": 38,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL188",
+   "gloss": "smalllittle",
+   "recording_id": "include:smalllittle:MVI_5208",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL189",
+   "gloss": "soft",
+   "recording_id": "include:soft:MVI_9791",
+   "aspect": 1.7777777777777777,
+   "frames": 31,
+   "fps": 12.5,
+   "train_recordings": 6
+  },
+  {
+   "sign_id": "ISL190",
+   "gloss": "tall",
+   "recording_id": "include:tall:MVI_9384",
+   "aspect": 1.7777777777777777,
+   "frames": 29,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL191",
+   "gloss": "wet",
+   "recording_id": "include:wet:MVI_9438",
+   "aspect": 1.7777777777777777,
+   "frames": 30,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL192",
+   "gloss": "white",
+   "recording_id": "include:white:MVI_3743",
+   "aspect": 1.7777777777777777,
+   "frames": 26,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL193",
+   "gloss": "yellow",
+   "recording_id": "include:yellow:MVI_4211",
+   "aspect": 1.7777777777777777,
+   "frames": 33,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL194",
+   "gloss": "animal",
+   "recording_id": "include:animal:MVI_3025",
+   "aspect": 1.7777777777777777,
+   "frames": 54,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL195",
+   "gloss": "bird",
+   "recording_id": "include:bird:MVI_3072",
+   "aspect": 1.7777777777777777,
+   "frames": 47,
+   "fps": 12.5,
+   "train_recordings": 16
+  },
+  {
+   "sign_id": "ISL196",
+   "gloss": "cat",
+   "recording_id": "include:cat:MVI_3065",
+   "aspect": 1.7777777777777777,
+   "frames": 40,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL197",
+   "gloss": "cow",
+   "recording_id": "include:cow:MVI_3016",
+   "aspect": 1.7777777777777777,
+   "frames": 50,
+   "fps": 12.5,
+   "train_recordings": 15
+  },
+  {
+   "sign_id": "ISL198",
+   "gloss": "dog",
+   "recording_id": "include:dog:MVI_3060",
+   "aspect": 1.7777777777777777,
+   "frames": 43,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL199",
+   "gloss": "fish",
+   "recording_id": "include:fish:MVI_2984",
+   "aspect": 1.7777777777777777,
+   "frames": 37,
+   "fps": 12.5,
+   "train_recordings": 14
+  },
+  {
+   "sign_id": "ISL200",
+   "gloss": "horse",
+   "recording_id": "include:horse:MVI_3103",
+   "aspect": 1.7777777777777777,
+   "frames": 34,
+   "fps": 12.5,
+   "train_recordings": 12
+  }
+ ]
+}

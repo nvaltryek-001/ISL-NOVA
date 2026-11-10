@@ -34,3 +34,5 @@ artifacts/
 *.log
 test-results/
 playwright-report/
+dataset/references/*.npz
+dataset/references/*.sha256

@@ -160,6 +160,9 @@ if (-not $SkipModel) {
   $registry = $env:MODEL_REGISTRY_DIR; if (-not $registry) { $registry = "artifacts\models" }
   Run $venvPy @("scripts\fetch_model.py", "--tag", $ModelTag, "--registry", $registry, "--promote") "model download/verification"
   Ok "model installed and promoted in $registry"
+  & $venvPy scripts\fetch_references.py
+  if ($LASTEXITCODE -eq 0) { Ok "sign references installed (Practice Coach, Text-to-Sign)" }
+  else { Write-Host "    note: sign references could not be downloaded; Practice Coach will report them missing" -ForegroundColor Yellow }
 } else {
   Write-Host "    skipped: recognition will show 'model unavailable' until a model is installed"
 }

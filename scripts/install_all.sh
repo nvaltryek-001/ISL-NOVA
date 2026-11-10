@@ -75,6 +75,8 @@ c_ok "database ready (${DATABASE_URL})"
 step 6 "Trained model $MODEL_TAG"
 "$VPY" scripts/fetch_model.py --tag "$MODEL_TAG" --registry "${MODEL_REGISTRY_DIR:-artifacts/models}" --promote >/dev/null
 c_ok "model installed and promoted"
+"$VPY" scripts/fetch_references.py >/dev/null && c_ok "sign references installed (Practice Coach, Text-to-Sign)" \
+  || echo "    note: sign references could not be downloaded; Practice Coach will report them missing"
 
 step 7 "MediaPipe task files (server-side Video Analysis)"
 mkdir -p artifacts/mediapipe

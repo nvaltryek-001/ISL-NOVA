@@ -25,6 +25,7 @@ class Settings:
     cors_origins: list[str] = field(default_factory=lambda: ["http://localhost:5173", "http://localhost:8000"])
     storage_dir: Path = REPO / "storage" / "objects"
     model_registry_dir: Path = REPO / "artifacts" / "models"
+    references_dir: Path = REPO / "dataset" / "references"
     vocab_csv: Path = REPO / "dataset" / "vocabulary" / "signs_master.csv"
     vocab_dir: Path = REPO / "dataset" / "vocabulary"
     frontend_dist: Path = REPO / "frontend" / "dist"
@@ -51,6 +52,7 @@ class Settings:
             cors_origins=[o.strip() for o in e.get("CORS_ORIGINS", "http://localhost:5173,http://localhost:8000").split(",") if o.strip()],
             storage_dir=Path(e.get("STORAGE_DIR", str(cls.storage_dir))),
             model_registry_dir=Path(e.get("MODEL_REGISTRY_DIR", str(cls.model_registry_dir))),
+            references_dir=Path(e.get("REFERENCES_DIR", str(cls.references_dir))),
             max_upload_mb=int(e.get("MAX_UPLOAD_MB", "50")),
             pbkdf2_iterations=int(e.get("PBKDF2_ITERATIONS", "600000")),
             allow_synthetic_model=_bool(e.get("ALLOW_SYNTHETIC_MODEL")),

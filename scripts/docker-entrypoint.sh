@@ -18,4 +18,8 @@ if [ -n "${ISL_NOVA_MODEL_TAG:-}" ]; then
       || echo "WARNING: model $ISL_NOVA_MODEL_TAG could not be installed; recognition will report model_unavailable"
   fi
 fi
+if [ -n "${ISL_NOVA_MODEL_TAG:-}" ]; then
+  python /app/scripts/fetch_references.py --dir "${REFERENCES_DIR:-/data/references}" \
+    || echo "WARNING: sign references could not be installed; Practice Coach reports them missing"
+fi
 exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}" --proxy-headers --forwarded-allow-ips='*'

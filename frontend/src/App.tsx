@@ -16,6 +16,9 @@ import { DatasetLabPage } from './pages/DatasetLab';
 import { ExplorerPage, SignDetailPage } from './pages/Explorer';
 import { KioskPage } from './pages/Kiosk';
 import { LivePage } from './pages/Live';
+import { ConversationPage } from './pages/Conversation';
+import { PracticePage } from './pages/Practice';
+import { TextToSignPage } from './pages/TextToSign';
 import { ResearchPage } from './pages/Research';
 import { SettingsPage } from './pages/Settings';
 import { VideoAnalysisPage } from './pages/VideoAnalysis';
@@ -27,11 +30,14 @@ const NAV: { group: string; items: Nav[] }[] = [
   { group: 'Recognise', items: [
     { to: '/live', label: 'Live Recognition', icon: 'camera' },
     { to: '/analysis', label: 'Video Analysis', icon: 'film' },
+    { to: '/conversation', label: 'Conversation', icon: 'chat' },
   ] },
   { group: 'Learn & communicate', items: [
     { to: '/signs', label: 'Sign Explorer', icon: 'book' },
     { to: '/communicate', label: 'Communication', icon: 'chat' },
     { to: '/academy', label: 'Learning Academy', icon: 'cap' },
+    { to: '/practice', label: 'Practice Coach', icon: 'hand' },
+    { to: '/text-to-sign', label: 'Text to Sign', icon: 'type' },
   ] },
   { group: 'Data & AI', items: [
     { to: '/dataset', label: 'Dataset Lab', icon: 'database' },
@@ -213,6 +219,9 @@ export function App() {
           { path: '/signs/:id', render: (p) => <SignDetailPage id={p.id} /> },
           { path: '/communicate', render: () => <CommunicatePage /> },
           { path: '/academy', render: () => <AcademyPage /> },
+          { path: '/practice', render: () => <PracticePage /> },
+          { path: '/text-to-sign', render: () => <TextToSignPage /> },
+          { path: '/conversation', render: () => <ConversationPage /> },
           { path: '/dataset', render: () => <DatasetLabPage /> },
           { path: '/ai', render: () => <AILabPage /> },
           { path: '/research', render: () => <ResearchPage /> },

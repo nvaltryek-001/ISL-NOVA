@@ -12,7 +12,7 @@ RUN npm run typecheck && npm test && npm run build
 FROM python:3.13.1-slim-bookworm AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
     PYTHONPATH=/app/backend:/app/ml ISL_NOVA_ENV=production \
-    STORAGE_DIR=/data/objects MODEL_REGISTRY_DIR=/data/models FRONTEND_DIST=/app/frontend/dist
+    STORAGE_DIR=/data/objects MODEL_REGISTRY_DIR=/data/models REFERENCES_DIR=/data/references FRONTEND_DIST=/app/frontend/dist
 # libgl/libglib are needed by OpenCV/MediaPipe wheels
 RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 curl \
     && rm -rf /var/lib/apt/lists/* \

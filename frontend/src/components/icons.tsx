@@ -29,6 +29,8 @@ const P: Record<string, string> = {
   trash: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3',
   edit: 'M4 20h4L19 9l-4-4L4 16v4Zm9-13 4 4',
   play: 'M7 4v16l13-8L7 4Z',
+  mic: 'M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm6-3a6 6 0 0 1-12 0m6 6v3',
+  type: 'M4 7V5h16v2M9 19h6M12 5v14',
   pause: 'M7 4h4v16H7zM13 4h4v16h-4z',
   stop: 'M6 6h12v12H6z',
   record: 'M12 19a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z',
