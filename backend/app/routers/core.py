@@ -118,8 +118,18 @@ def login(ctx: Ctx):
         raise ApiError(401, "invalid_credentials", "email or password is incorrect")
     ctx.db.update("users", {"last_login_at": utcnow()}, "id = ?", (user["id"],))
     audit(ctx.db, user["id"], "auth.login", f"user:{user['id']}", ip=ctx.ip)
-    tok, exp = create_token(user["id"], ctx.app.settings.jwt_secret, ctx.app.settings.jwt_ttl_minutes)
+    tok, exp = create_token(user["id"], ctx.app.settings.jwt_secret, ctx.app.settings.jwt_ttl_minutes,
+                            int(user["token_version"] or 0))
     return {"access_token": tok, "token_type": "bearer", "expires_in": exp, "user": user_out(ctx, user)}
+
+
+@router.post("/auth/logout-all", summary="Sign out everywhere: revoke every token issued to this account",
+             status=200)
+def logout_all(ctx: Ctx):
+    with ctx.db.transaction():
+        ctx.db.execute("UPDATE users SET token_version = COALESCE(token_version, 0) + 1 WHERE id = ?", (ctx.uid,))
+        audit(ctx.db, ctx.uid, "auth.logout_all", f"user:{ctx.uid}", ip=ctx.ip)
+    return {"ok": True}
 
 
 @router.get("/me", summary="Current user profile")

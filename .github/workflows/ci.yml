@@ -68,6 +68,8 @@ jobs:
         run: npm run build
       - working-directory: frontend
         run: npx playwright install --with-deps chromium
+      - name: Sign references for the Practice Coach / Text-to-Sign E2E
+        run: python scripts/fetch_references.py
       - working-directory: frontend
         env:
           E2E_MODEL_TAG: model-lstm-20261104T041414Z-s13

@@ -15,6 +15,7 @@ export function SettingsPage() {
   const read = useMutation((id: number) => api(`/notifications/${id}/read`, { method: 'POST' }), { invalidates: ['/notifications'] });
   const history = useQuery<any[]>('/history');
   const bookmarks = useQuery<any[]>('/bookmarks');
+  const logoutAll = useMutation(() => api('/auth/logout-all', { method: 'POST' }), { onSuccess: () => { toast('Signed out on every device'); auth.logout(); } });
   const clear = useMutation(() => api('/history', { method: 'DELETE' }), { invalidates: ['/history', '/dashboard'], onSuccess: () => toast('History cleared') });
   const delOne = useMutation((id: number) => api(`/history/${id}`, { method: 'DELETE' }), { invalidates: ['/history'] });
 
@@ -35,6 +36,11 @@ export function SettingsPage() {
                 <Field label="New password" hint="At least 10 characters.">{(id) => <Input id={id} type="password" autoComplete="new-password" value={pw.new_password} onChange={(e) => setPw({ ...pw, new_password: e.target.value })} />}</Field>
                 <Button disabled={pw.new_password.length < 10} onClick={() => profile.mutate(pw)}>Update password</Button>
               </div>
+            </div>
+            <div className="border-t border-ink-700 pt-4">
+              <p className="label mb-1">Sessions</p>
+              <p className="mb-3 text-sm text-ink-400">Signs this account out on every device and browser, including this one.</p>
+              <Button variant="ghost" onClick={() => confirm('Sign out on every device?') && logoutAll.mutate(undefined)}>Sign out everywhere</Button>
             </div>
           </div>
         </Card>

@@ -212,4 +212,8 @@ export const STRINGS: Record<string, [hi: string, kn: string]> = {
   'Match the movement: its direction, size and speed.': ['गति की दिशा, आकार और रफ़्तार मिलाएँ।', 'ಚಲನೆಯ ದಿಕ್ಕು, ಗಾತ್ರ ಮತ್ತು ವೇಗ ಹೊಂದಿಸಿ.'],
   'Close match to the reference. Keep practising for consistency.': ['संदर्भ से अच्छा मेल। निरंतरता के लिए अभ्यास जारी रखें।', 'ಉಲ್ಲೇಖಕ್ಕೆ ಹತ್ತಿರ. ಸ್ಥಿರತೆಗೆ ಅಭ್ಯಾಸ ಮುಂದುವರಿಸಿ.'],
   'Keep both hands and your upper body in the camera view, with even lighting, and try again.': ['दोनों हाथ और ऊपरी शरीर कैमरे में रखें, रोशनी समान रखें और फिर प्रयास करें।', 'ಎರಡೂ ಕೈ ಮತ್ತು ಮೇಲ್ದೇಹ ಕ್ಯಾಮೆರಾದಲ್ಲಿರಲಿ, ಸಮ ಬೆಳಕಿನಲ್ಲಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.'],
+  'Sessions': ['सत्र', 'ಸೆಷನ್‌ಗಳು'],
+  'Sign out everywhere': ['हर जगह से साइन आउट करें', 'ಎಲ್ಲೆಡೆ ಸೈನ್ ಔಟ್ ಮಾಡಿ'],
+  'Signs this account out on every device and browser, including this one.': ['यह खाता हर डिवाइस और ब्राउज़र से साइन आउट करता है, इसमें यह भी शामिल है।', 'ಈ ಖಾತೆಯನ್ನು ಇದನ್ನೂ ಒಳಗೊಂಡು ಎಲ್ಲಾ ಸಾಧನ ಮತ್ತು ಬ್ರೌಸರ್‌ಗಳಿಂದ ಸೈನ್ ಔಟ್ ಮಾಡುತ್ತದೆ.'],
+  'Signed out on every device': ['हर डिवाइस से साइन आउट हो गया', 'ಎಲ್ಲಾ ಸಾಧನಗಳಿಂದ ಸೈನ್ ಔಟ್ ಆಗಿದೆ'],
 };

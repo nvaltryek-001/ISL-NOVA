@@ -229,13 +229,17 @@ def _authenticate(state, conn: Conn, request: Request) -> tuple[dict | None, set
     auth = request.headers.get("authorization", "")
     if not auth.lower().startswith("bearer "):
         return None, set()
-    uid = decode_token(auth[7:].strip(), state.settings.jwt_secret)
-    if uid is None:
+    decoded = decode_token(auth[7:].strip(), state.settings.jwt_secret)
+    if decoded is None:
         raise ApiError(401, "invalid_token", "token is invalid or expired")
-    user = conn.one("SELECT id, email, display_name, is_active, preferred_language, settings, created_at "
-                    "FROM users WHERE id = ?", (uid,))
+    uid, tv = decoded
+    user = conn.one("SELECT id, email, display_name, is_active, preferred_language, settings, created_at, "
+                    "token_version FROM users WHERE id = ?", (uid,))
     if user is None or not user["is_active"]:
         raise ApiError(401, "invalid_token", "account disabled or missing")
+    if int(user["token_version"] or 0) != tv:
+        raise ApiError(401, "invalid_token", "this session was signed out")
+    user = {k: v for k, v in dict(user).items() if k != "token_version"}
     roles = {r["role_name"] for r in conn.all("SELECT role_name FROM user_roles WHERE user_id = ?", (uid,))}
     return user, roles
 
