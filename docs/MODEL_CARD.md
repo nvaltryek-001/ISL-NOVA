@@ -38,7 +38,7 @@ probabilities match the server to 1e-8 and decisions agreed on 24/24 held-out sa
 
 ## Browser pipeline (virtual camera)
 
-Pending: live-pipeline run on the 73 held-out clips (see V2_STATUS / README for the result when it completes).
+[run 42859291767](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42859291767): 73 held-out INCLUDE clips played as the browser's webcam through the Live page (in-browser MediaPipe, CPU delegate, median 9 fps): **84.9 % top-1** (62/73; v2 83.6 %, v1 74.0 %), 95.9 % top-5; 50 recognized (**49 correct**), 15 uncertain, 8 unknown. Offline Python on the same clips: 93.2 %. The ≥ 85 % target is **not met** (one clip short). Not a live person.
 
 ## Intended use, limitations
 As for earlier models: isolated signs only; **not signer-independent**; one school in Chennai;

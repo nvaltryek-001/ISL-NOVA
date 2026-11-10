@@ -52,3 +52,18 @@ model: [`model-lstm-20261110T111537Z-s7`](https://github.com/nvaltryek-001/ISL-N
 | Practice Coach similarity, 120 test recordings vs train references (local) | — | own-sign median 93 vs other-sign median 13; own > other in 88 % of pairs |
 
 **Targets not met:** browser top-1 ≥ 85 % (83.6 %); unknown-sign FAR < 10 % with FRR ≤ 15 % (best 11.5 % / 12.9 %). Still **not signer-independent**; still **no live-person or new-signer result**.
+
+## v3 results (2026-11-10)
+
+Run [42851786127](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42851786127); details in [V3_MODELS.md](V3_MODELS.md).
+
+| Measured | v3 BiLSTM-attention (selected) | Target |
+|---|---:|---|
+| Test top-1 / top-5 (635) | **95.1 % / 99.4 %** | — |
+| Test macro-F1 / ECE | 94.1 % / 0.013 | — |
+| Unknown signs accepted, part B (shipped detector) | **8.8 %** | < 10 % — met |
+| Known signs not recognized, part B | **13.2 %** | ≤ 15 % — met |
+| Browser pipeline, 73 held-out clips | **84.9 %** ([run 42859291767](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42859291767)) | ≥ 85 % — not met |
+| Best ensemble (not selected) | 97.2 % test top-1 | — |
+
+Still **not signer-independent**; still **no live-person, new-signer or user-study result**.

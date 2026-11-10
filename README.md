@@ -10,15 +10,15 @@
 
 [![CI](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/ci.yml/badge.svg?branch=feat%2Fisl-nova-v2)](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/ci.yml)
 [![Windows setup](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/windows-local.yml/badge.svg?branch=run%2Fwindows-check)](https://github.com/nvaltryek-001/ISL-NOVA/actions/workflows/windows-local.yml)
-![version](https://img.shields.io/badge/version-2.0.0--dev-8b5cf6)
+![version](https://img.shields.io/badge/version-2.0.0-8b5cf6)
 ![python](https://img.shields.io/badge/python-3.11%E2%80%933.13-3776ab)
 ![node](https://img.shields.io/badge/node-22-5fa04e)
 ![react](https://img.shields.io/badge/react-19.2-22d3ee)
 <br/>
-![model](https://img.shields.io/badge/LSTM%20v2%20·%20200%20classes-92.0%25%20top--1%20(INCLUDE%20test)-10b981)
-![browser](https://img.shields.io/badge/browser%20pipeline-83.6%25%20top--1-10b981)
+![model](https://img.shields.io/badge/BiLSTM--attention%20v3%20·%20200%20signs-95.1%25%20top--1%20(INCLUDE%20test)-10b981)
+![browser](https://img.shields.io/badge/browser%20pipeline-84.9%25%20top--1-10b981)
 ![languages](https://img.shields.io/badge/languages-English%20·%20हिन्दी%20·%20ಕನ್ನಡ-22d3ee)
-![open-set](https://img.shields.io/badge/unknown--sign%20AUROC-0.918-f59e0b)
+![open-set](https://img.shields.io/badge/unknown%20signs%20accepted-8.8%25%20(target%20%3C10%25)-10b981)
 ![verified](https://img.shields.io/badge/linguistically%20verified-0%20%2F%20200-ef4444)
 [![demo](https://img.shields.io/badge/live%20demo-isl--nova.onrender.com-8b5cf6)](https://isl-nova.onrender.com)
 
@@ -28,7 +28,8 @@
   <a href="#-implemented-vs-tested"><b>🧪 What is tested</b></a> ·
   <a href="#-windows-setup"><b>🪟 Windows setup</b></a> ·
   <a href="docs/MODEL_CARD.md"><b>📄 Model card</b></a> ·
-  <a href="docs/report/ISL_NOVA_Project_Report.pdf"><b>📘 Project report (PDF)</b></a>
+  <a href="docs/report/ISL_NOVA_Project_Report.pdf"><b>📘 Project report (PDF)</b></a> ·
+  <a href="docs/PROJECT_STATUS.md"><b>📋 Status and remaining work</b></a>
 </p>
 
 <img src="docs/screenshots/dashboard-model.png" alt="ISL NOVA dashboard with the trained 200-class model live" width="100%" />
@@ -40,10 +41,10 @@
 >
 > | | |
 > |---|---|
-> | ✅ **Platform (v2)** | 15 modules incl. **Practice Coach**, **Text-to-Sign**, **Conversation mode**, installable **offline PWA**; interface and all 200 sign meanings in **English, हिन्दी and ಕನ್ನಡ**; sign-out-everywhere, password reset, optional **two-factor sign-in**, retention job, Prometheus metrics. CI green: **77** Python tests, **20** unit tests, **25** end-to-end tests incl. an **axe-core WCAG 2.1 AA scan** of 18 routes in both themes. |
-> | ✅ **Real model (v2)** | LSTM with frame-rate augmentation, trained on genuine INCLUDE recordings, **200 classes**: **92.0 % top-1 · 98.7 % top-5** on the 635-video official test split (3-seed mean **93.0 ± 0.7 %** vs 90.6 ± 0.9 % without augmentation). Through the full browser pipeline (held-out clips as a virtual webcam): **83.6 % top-1** (v1: 74.0 %). |
-> | ✅ **Deployed (v1)** | Free-tier demo at **[isl-nova.onrender.com](https://isl-nova.onrender.com)** runs the v1 platform and model; 24/24 held-out samples correct through the public API. v2 is not deployed yet. |
-> | ⚠️ **Unknown signs** | 62 held-out INCLUDE glosses: AUROC 0.918, but **34 % of unseen signs are still "recognized"** at the shipped threshold (v1: 29 %). Target FAR < 10 % not met. |
+> | ✅ **Platform** | 17 modules incl. **Practice Coach**, **Text-to-Sign**, **Conversation** (signs split at pauses), **teacher classes**, **analytics**, installable **offline app** with **on-device recognition**; every screen and all 200 sign meanings in **English, हिन्दी and ಕನ್ನಡ**; refresh tokens, sign-out-everywhere, reset codes, **two-factor sign-in**, retention job; optional Redis, S3 storage, Prometheus + Grafana. CI green: **104** Python tests (incl. real Redis, S3 and PostgreSQL), **27** unit tests, **25** end-to-end tests incl. an **axe-core WCAG 2.1 AA scan**. |
+> | ✅ **Real model (v3)** | BiLSTM with attention, trained on genuine INCLUDE recordings, **200 signs**: **95.1 % top-1 · 99.4 % top-5** on the 635-video official test split (v1 91.7 %, v2 92.0 %), selected by validation among 21 candidates. Through the full browser pipeline (held-out clips as a virtual webcam): **84.9 % top-1** (v1 74.0 %; target 85 % missed by one clip). |
+> | ✅ **Says "I don't know"** | A calibrated detector ships with the model: on 31 out-of-vocabulary glosses never used for any choice, **8.8 %** of unknown signs are accepted and **13.2 %** of known signs held back, meeting both targets (v1 accepted 29 %). |
+> | ⏸️ **Deployed (v1)** | The free demo at **[isl-nova.onrender.com](https://isl-nova.onrender.com)** still runs v1; switching it to `main` waits for the owner's go-ahead. |
 > | ⚠️ **Hindi / Kannada** | All 200 meanings exist as **machine drafts**, clearly marked; **0 verified by a linguist**. |
 > | ⛔ **Not yet shown** | Accuracy on **new signers** (INCLUDE has no signer IDs, so results are **not signer-independent**) · recognition with **a real person at a webcam** · **linguistic verification** (0 / 200 signs verified) · any user study. |
 
@@ -139,7 +140,13 @@ India has millions of Deaf people and very few ISL interpreters. Software can he
 | 🔁 | **Text-to-Sign & Conversation** | Type English or Hindi → the matching signs as reference animations (unknown words flagged); two-way mode: hearing person speaks (speech-to-text), deaf person signs (continuous recognition), each side sees the other's words. Output is a *recognized word sequence*, **not a translation** |
 | 📴 | **Installable & offline** | PWA: install to the home screen; the app shell and MediaPipe assets are cached so it opens offline (recognition still needs the server) |
 | 🏅 | **Streaks and badges** | Daily streak, points, weekly goal and seven badges in *My progress*, derived only from your own quiz and Practice Coach attempts |
-| 🛡️ | **Account security** | Sign out everywhere (token versioning), admin-issued one-time reset codes, optional TOTP two-factor (RFC 6238), audit-logged |
+| 🛡️ | **Account security** | Rotating refresh tokens with reuse detection, sign out everywhere, admin-issued one-time reset codes, optional TOTP two-factor (RFC 6238), audit-logged |
+| 📱 | **On-device recognition** | The model also runs in the browser (TypeScript port, identical results): works offline and is the automatic fallback when the server is unreachable |
+| 🚫 | **Says "not a sign I know"** | A calibrated unknown-sign detector ships with the model: 8.8 % of unseen out-of-vocabulary signs are accepted, 13.2 % of known signs held back (held-out glosses) |
+| 🧑‍🏫 | **Teacher classes** | Teachers create a class and share a code; they see each learner's progress summary and the class's hardest signs. Learners can leave at any time; history and recordings are never shared |
+| 📊 | **Analytics** | Activity per day, active and new users, most practised and hardest signs, common corrections; aggregates only |
+| 🔁 | **Spaced repetition** | Mistakes come back today, correct answers after 1, 2, 4, 8 and 16 days; daily goal |
+| ⚙️ | **Scales out** | Optional Redis (shared rate limit + job queue with worker processes), S3-compatible storage, Prometheus + Grafana dashboard; load-tested |
 | ✅ | **Expert verification** | Only the `linguist` role verifies; a documented entry and a three-item checklist are enforced by the API; CSV review sheet for all 200 signs |
 | 🧪 | **Full ML lifecycle** | Versioned feature contract, leakage checks, four model families, calibration, registry with promote/rollback, background training jobs |
 | 📈 | **Evaluation workflows** | Held-out test, open-set (unknown signs), new-signer evaluation runs with per-signer accuracy, virtual-camera replay |
@@ -162,6 +169,11 @@ India has millions of Deaf people and very few ISL interpreters. Software can he
 | 10 | **3D Landmark Viewer** *(experimental)* | Record or load real landmark sequences; orbit, frame stepping, speed, wrist trajectories |
 | 11 | **Admin** | User roles, feedback inbox, audit log |
 | 12 | **Kiosk Mode** | Full-screen, high-contrast, large targets, verified quick phrases, one-tap session reset |
+| 13 | **Practice Coach** | Reference animation from real recordings, scored attempt with per-part tips |
+| 14 | **Text to Sign** | English or Hindi words → reference animations of the matching signs |
+| 15 | **Conversation** | Speech ↔ signs; signs split at pauses into a *recognized word sequence* (not a translation) |
+| 16 | **Classes** | Teacher dashboard and class join codes |
+| 17 | **Analytics** | Aggregate usage and learning statistics (admin, researcher) |
 
 Roles (enforced on the server): `admin`, `linguist`, `data_curator`, `researcher`, `learner`.
 
@@ -314,6 +326,22 @@ All models share the feature contract, select on **validation** only, get **temp
 
 ## 📊 Results
 
+### v3 at a glance (2026-11-10)
+
+Default model [`model-bilstm_attn-20261110T162800Z-s7`](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/model-bilstm_attn-20261110T162800Z-s7): BiLSTM with attention pooling, chosen by **validation** macro-F1 among 15 new models (TCN, Transformer, BiLSTM-attention, LSTM, with and without an `__other__` class, 3 seeds each), 5 ensembles and the v2 model ([run 42851786127](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42851786127)). Write-up: [research/V3_MODELS.md](research/V3_MODELS.md).
+
+| Measured | v1 | v2 | **v3** | Target |
+|---|---:|---:|---:|---|
+| Test top-1 / top-5 (635 videos) | 91.7 % / 98.3 % | 92.0 % / 98.7 % | **95.1 % / 99.4 %** | — |
+| Test macro-F1 · ECE | 91.7 % · 0.027 | 91.6 % · 0.015 | **94.1 % · 0.013** | — |
+| Browser pipeline, 73 held-out clips | 74.0 % | 83.6 % | **84.9 %** ([run](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42859291767)) | ≥ 85 % — **not met** (1 clip) |
+| *recognized* answers that were correct (browser) | 45/48 | 49/54 | **49/50** | — |
+| Unknown signs accepted (shipped rule) | 29.3 % | 34.0 % | **8.8 %** (part B) | < 10 % — **met** |
+| Known signs held back (shipped rule) | 12.1 % | — | **13.2 %** (part B) | ≤ 15 % — **met** |
+| On-device (browser) model | — | — | ✅ matches server, 24/24 | — |
+
+v1/v2 unknown-sign figures use all 62 out-of-vocabulary glosses; v3 uses the 31 glosses of part B, which were never used to fit or choose anything. The best ensemble reached 97.2 % test top-1 but tied with the selected model on validation, so it was not chosen.
+
 ### v2 at a glance (2026-11-10)
 
 Default model [`model-lstm-20261110T111537Z-s7`](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/model-lstm-20261110T111537Z-s7): the same LSTM, trained with landmark sequences that simulate 8–30 fps, cropped starts/ends and missed hand detections. Same data, split and features as v1; selected by **validation** score. Model card: [docs/MODEL_CARD.md](docs/MODEL_CARD.md).
@@ -403,6 +431,11 @@ Artifacts: model release [`model-lstm-20261104T041414Z-s13`](https://github.com/
 | **v2** · Sign out everywhere, reset codes, TOTP 2FA | ✅ | pytest (RFC 6238 vectors, replay refused) + E2E for all three | — |
 | **v2** · Retention job, Prometheus `/metrics` | ✅ | pytest (dry run, apply, counts; metrics format) | — |
 | **v2** · Automated accessibility scan | ✅ | axe-core WCAG 2.1 A/AA, 18 routes × light/dark; 0 serious/critical after fixes | CI |
+| **v3** · TCN, Transformer, BiLSTM-attention, ensembles, `__other__` class | ✅ | gradient checks; 15 models × held-out test; ensembles | BiLSTM-attention 95.1 % ([V3_MODELS.md](research/V3_MODELS.md)) |
+| **v3** · Unknown-sign detector in server and browser | ✅ | fit on val + part A2, evaluated once on part B | FAR 8.8 %, FRR 13.2 % |
+| **v3** · On-device / offline recognition, ONNX export | ✅ | TS vs Python parity (1e-8), 24/24 E2E agreement; onnxruntime parity in CI | — |
+| **v3** · Teacher classes, analytics, spaced repetition, pause segmentation | ✅ | pytest, unit, E2E | — |
+| **v3** · Refresh tokens, Redis, S3 storage, worker, Grafana, load test | ✅ | CI against real Redis + S3 server; load test 2 vCPU | ~90 req/s, 0 errors |
 | Live webcam / new signers / user study | ✅ tooling | ⛔ **not run** — needs people ([protocol](research/USER_STUDY_PROTOCOL.md)) | — |
 
 ## 🚀 Quick start
@@ -421,7 +454,7 @@ pip install -r backend/requirements-dev.txt
 
 export PYTHONPATH=backend:ml
 export BOOTSTRAP_ADMIN_EMAIL=you@example.org BOOTSTRAP_ADMIN_PASSWORD='a-long-password'
-python scripts/fetch_model.py --tag model-lstm-20261110T111537Z-s7 --registry artifacts/models --promote
+python scripts/fetch_model.py --tag model-bilstm_attn-20261110T162800Z-s7 --registry artifacts/models --promote
 uvicorn app.main:app --app-dir backend --port 8000
 ```
 
@@ -502,7 +535,7 @@ Migrations are versioned and checksummed (an edited migration is refused) and ea
 The trained model is **not** committed to Git. It is published as a GitHub pre-release and installed with a checksum check:
 
 ```bash
-python scripts/fetch_model.py --tag model-lstm-20261110T111537Z-s7 --registry artifacts/models --promote
+python scripts/fetch_model.py --tag model-bilstm_attn-20261110T162800Z-s7 --registry artifacts/models --promote
 ```
 
 This downloads the tarball and its `.sha256`, verifies both, unpacks path-safely, verifies the weights hash, registers and promotes the model, and runs a load check with the production `Predictor`. Restart the server to load it. In Docker, set `ISL_NOVA_MODEL_TAG` and the entrypoint does this at start-up. Rollback: `POST /api/v1/models/rollback` (admin) or *AI Laboratory → Registry*.
@@ -575,7 +608,13 @@ docker compose up --build
 # or the app alone, with the trained model installed at start-up
 docker build -t isl-nova .
 docker run -p 8000:8000 -e ISL_NOVA_ENV=production -e JWT_SECRET=$(openssl rand -hex 32) \
-  -e CORS_ORIGINS=http://localhost:8000 -e ISL_NOVA_MODEL_TAG=model-lstm-20261110T111537Z-s7 isl-nova
+  -e CORS_ORIGINS=http://localhost:8000 -e ISL_NOVA_MODEL_TAG=model-bilstm_attn-20261110T162800Z-s7 isl-nova
+```
+
+Optional services for several API processes and monitoring (see the comments in [`docker-compose.yml`](docker-compose.yml)):
+
+```bash
+docker compose --profile scale --profile monitoring up --build   # + Redis, job worker, S3 storage, Prometheus, Grafana (:3000)
 ```
 
 The multi-stage [`Dockerfile`](Dockerfile) builds the SPA and the API into one image running as a non-root user. [`scripts/docker-entrypoint.sh`](scripts/docker-entrypoint.sh) applies migrations, installs the model named by `ISL_NOVA_MODEL_TAG` (SHA-256 verified; a failed download is logged and the API reports `model_unavailable`), and serves on `$PORT`.
@@ -634,6 +673,10 @@ Copy [`.env.example`](.env.example) to `.env` (the Windows setup does this for y
 | `BOOTSTRAP_ADMIN_EMAIL` / `_PASSWORD` | ensure an admin exists at start-up | - |
 | `ALLOW_OPEN_REGISTRATION` | allow self sign-up as learner | `true` |
 | `MAX_UPLOAD_MB`, `ANALYSIS_RETENTION_HOURS` | upload limit, analysis retention | 50, 24 |
+| `VOCABULARY_LIMIT` | fixed vocabulary size (creating or accepting signs beyond it is refused; 0 = no limit) | 200 |
+| `REFRESH_TTL_DAYS` | refresh-token lifetime | 30 |
+| `STORAGE_BACKEND`, `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_REGION` | `local` or `s3` (any S3-compatible service) | local |
+| `REDIS_URL` | shared rate limit and job queue (run `python -m app.worker` for jobs) | unset |
 | `RETENTION_INTERVAL_HOURS`, `HISTORY_RETENTION_DAYS`, `NOTIFICATION_RETENTION_DAYS` | retention job interval (0 = off); history age limit (0 = keep); read-notification age limit | 24, 0, 180 |
 | `METRICS_TOKEN` | bearer token for `/metrics` from outside localhost | unset |
 | `RATE_LIMIT_PER_MINUTE`, `AUTH_RATE_LIMIT_PER_MINUTE` | per-IP limits | 120, 10 |

@@ -77,6 +77,12 @@ The selected model, loaded through the production `Predictor`, reproduced **95.1
 top-5** on all 635 test sequences (median 18 ms per request including feature extraction). The
 TypeScript on-device runtime matches it to 1e-8 and agreed with the server on 24/24 held-out samples.
 
+## Through the browser (virtual camera)
+
+[run 42859291767](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42859291767): the same 73 held-out clips as v1/v2, played as Chromium's webcam through the Live page:
+**84.9 % top-1** (62/73), 95.9 % top-5; 50 *recognized* (49 correct, 98 %), 15 uncertain, 8 unknown;
+offline Python on the same clips 93.2 %. Target ≥ 85 %: **not met** (one clip short).
+
 ## Not shown by these numbers
 
 New signers, a live person at a webcam, regional variation, lighting and camera differences.

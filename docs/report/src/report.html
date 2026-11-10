@@ -100,6 +100,7 @@ pre .k { color: #c4b5fd; } pre .c { color: #67e8f9; } pre .m { color: #94a3b8; }
 .small { font-size: 8pt; color: var(--muted); }
 .fit img { object-fit: cover; object-position: top left; }
 table.dense { font-size: 7.3pt; } table.dense td, table.dense th { padding: 1.2mm 1.2mm; white-space: nowrap; }
+table.dense.wrap td, table.dense.wrap th { white-space: normal; }
 </style>
 </head>
 <body>
@@ -139,6 +140,7 @@ table.dense { font-size: 7.3pt; } table.dense td, table.dense th { padding: 1.2m
     <li><span class="n">08</span><span class="t">Testing, quality and security<span class="d">Test suites, CI, bugs found and fixed, security controls</span></span><span class="p">20</span></li>
     <li><span class="n">09</span><span class="t">Deployment, setup and project structure<span class="d">Live demo, Docker, Windows scripts, folder structure, API</span></span><span class="p">21</span></li>
     <li><span class="n">10</span><span class="t">Limitations, future work and conclusion<span class="d">What is not yet proven, next steps, references</span></span><span class="p">23</span></li>
+    <li><span class="n">11</span><span class="t">ISL NOVA 2.0 and 3.0<span class="d">Three languages, new models, unknown-sign detector, on-device, platform</span></span><span class="p">24</span></li>
   </ul>
   <h2>The project at a glance</h2>
   <div class="grid4">
@@ -809,5 +811,68 @@ git checkout feat/isl-nova-platform
   <div class="note v"><b>Dataset attribution.</b> INCLUDE by A. Sridhar, R. G. Ganesan, P. Kumar and M. Khapra (AI4Bharat, IIT Madras), CC BY 4.0. Landmark images in this report are derived from it. MediaPipe is © Google, used under its licence.</div>
   <div class="foot"><span>Chapter 10 · Conclusion</span><span>23</span></div>
 </section>
+
+<!-- ============ 24-26 CH11 v2 / v3 ============ -->
+<section class="page">
+  <div class="chapter"><div class="num">11</div><div><h1>ISL NOVA 2.0 and 3.0</h1><p>Three languages, better models, a detector that says "I don't know"</p></div></div>
+  <p>After this report's first edition, the project went through two more rounds (branch <span class="mono">feat/isl-nova-v2</span>, merged to <span class="mono">main</span>). The vocabulary stays fixed at <b>200 signs</b>; all work went into making those 200 signs more accurate, more usable and safer. Every number below comes from a GitHub Actions run or a local test that actually ran.</p>
+  <div class="grid4">
+    <div class="card v stat"><b>95.1 %</b><span>test top-1, v3 BiLSTM-attention (v1 91.7 %)</span></div>
+    <div class="card g stat g"><b>8.8 %</b><span>unseen signs accepted (v1 29.3 %, target &lt; 10 %)</span></div>
+    <div class="card c stat c"><b>84.9 %</b><span>browser pipeline top-1 (v1 74.0 %)</span></div>
+    <div class="card a stat a"><b>3</b><span>languages: English, हिन्दी, ಕನ್ನಡ</span></div>
+  </div>
+  <figure><img src="IMG/v3_models.png" alt=""><figcaption>Best seed of every v3 architecture on the 635-video test split (run 42851786127). Selection used validation only; the selected model is green.</figcaption></figure>
+  <h3>What changed in the models</h3>
+  <ul class="check">
+    <li><b>Frame-rate augmentation</b> (v2): training also sees each recording at 8–30 fps, cropped and with missed hand detections. Three-seed mean test top-1 rose from 90.6 % to 93.0 %.</li>
+    <li><b>New architectures</b> (v3): TCN, Transformer and BiLSTM with attention, written in NumPy with hand-derived gradients that are checked numerically in the test suite. Three seeds each, plus ensembles.</li>
+    <li><b>Selected model</b>: BiLSTM-attention, 98.1 % validation macro-F1, <b>95.1 % test top-1, 99.4 % top-5</b>, 2.6 MB.</li>
+  </ul>
+  <div class="foot"><span>Chapter 11 · ISL NOVA 2.0 and 3.0</span><span>24</span></div>
+</section>
+
+<section class="page">
+  <h2>Saying "I don't know"</h2>
+  <figure><img src="IMG/v3_openset.png" alt=""><figcaption>Unknown-sign errors. v3 numbers use 31 out-of-vocabulary glosses that were never used for any choice (part B); v1 and v2 used all 62 glosses.</figcaption></figure>
+  <p>A small logistic detector combines the model's top probability, the gap to the second sign and the entropy of the prediction. It is fitted on validation signs and one set of unknown glosses, and tested once on a different set. It accepts <b>8.8 %</b> of unknown signs while holding back <b>13.2 %</b> of known ones, meeting both targets (under 10 % and at most 15 %). Training an explicit "other" class was also tried and did not do better (16–25 % accepted).</p>
+  <div class="grid2">
+    <figure><img src="IMG/v3_browser.png" alt=""><figcaption>Held-out INCLUDE clips played as the browser's webcam through the real Live page (not a live person).</figcaption></figure>
+    <div>
+      <h3>Recognition everywhere</h3>
+      <ul class="check">
+        <li><b>On-device</b>: the model and detector also run in the browser (TypeScript), matching the server to 1e-8; recognition keeps working offline.</li>
+        <li><b>Conversation</b>: signs are split at pauses and shown as a <i>recognized word sequence</i>, never called a translation.</li>
+        <li><b>Practice Coach</b>: a 0–100 similarity score against real reference recordings (own sign median 93 vs other signs 13).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Chapter 11 · ISL NOVA 2.0 and 3.0</span><span>25</span></div>
+</section>
+
+<section class="page">
+  <h2>Platform, languages and status</h2>
+  <table class="dense wrap" style="table-layout:fixed;width:100%">
+    <colgroup><col style="width:18%"><col style="width:57%"><col style="width:25%"></colgroup>
+    <tr><th>Area</th><th>Added in 2.0 / 3.0</th><th>Tested by</th></tr>
+    <tr><td>Languages</td><td>Every screen in English, Hindi and Kannada; all 200 meanings in all three (Hindi/Kannada marked as machine drafts)</td><td>unit test (100 % of UI strings), E2E</td></tr>
+    <tr><td>Learning</td><td>Practice Coach, Text-to-Sign, streaks and badges, spaced-repetition review, daily goal, teacher classes</td><td>pytest, E2E</td></tr>
+    <tr><td>Analytics</td><td>Activity per day, active users, hardest signs, corrections (aggregates only)</td><td>pytest, E2E</td></tr>
+    <tr><td>Security</td><td>Rotating refresh tokens, sign out everywhere, reset codes, two-factor sign-in, retention job</td><td>pytest incl. RFC 6238 vectors, E2E</td></tr>
+    <tr><td>Scale and operations</td><td>Redis rate limit + job queue with workers, S3-compatible storage, Prometheus + Grafana, load test (~90 req/s on 2 vCPU, 0 errors)</td><td>CI against real Redis and an S3 server</td></tr>
+    <tr><td>Accessibility</td><td>axe-core WCAG 2.1 AA scan of 20 routes in light and dark theme; contrast fixed</td><td>CI</td></tr>
+    <tr><td>Offline</td><td>Installable app; app shell, MediaPipe and the model cached</td><td>E2E</td></tr>
+  </table>
+  <h3>Still not shown</h3>
+  <ul class="cross">
+    <li>Accuracy on <b>new signers</b>; INCLUDE has no signer IDs, so no result here is signer-independent.</li>
+    <li>A test with <b>a real person at a webcam</b>, and a user study with Deaf users.</li>
+    <li><b>Linguistic verification</b>: 0 of 200 signs and 0 of 400 Hindi/Kannada meanings verified by experts.</li>
+    <li>Facial (non-manual) features, which need all 57 GB of video processed again.</li>
+  </ul>
+  <div class="note v"><b>Conclusion.</b> ISL NOVA now recognises its 200 signs at 95 % on held-out recordings, says "I don't know" for most signs outside its vocabulary, and works in three languages and offline. What it needs next is people: signers, linguists and users.</div>
+  <div class="foot"><span>Chapter 11 · ISL NOVA 2.0 and 3.0</span><span>26</span></div>
+</section>
+
 </body>
 </html>

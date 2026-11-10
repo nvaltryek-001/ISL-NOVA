@@ -69,6 +69,12 @@ in-browser MediaPipe on the CPU delegate:
 | No loss on the held-out test split | 92.0 % vs 91.7 % (3-seed means 93.0 vs 90.6 %) | Met |
 | Results over ≥ 3 seeds | 3 seeds per LSTM variant | Met |
 
+## v3 follow-up
+
+The v3 BiLSTM-attention model (same augmentation) reached **84.9 %** (62/73) through the browser,
+[run 42859291767](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42859291767): 50 *recognized* answers, 49 of them correct; offline Python on the same clips 93.2 %. Still
+one clip short of the 85 % target. See [V3_MODELS.md](V3_MODELS.md).
+
 ## Caveats
 
 * Same signers as training (INCLUDE has no signer IDs) — **not signer-independent**.
