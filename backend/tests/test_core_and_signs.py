@@ -252,3 +252,22 @@ def test_prometheus_metrics(app_env, monkeypatch):
     assert 'isl_nova_http_requests_total{method="GET",route="/api/v1/health",status="2xx"}' in body
     assert "isl_nova_http_request_seconds_bucket" in body and "isl_nova_vocabulary_signs 200" in body
     assert "isl_nova_model_available 0" in body
+
+
+def test_grafana_dashboard_uses_metrics_the_app_exposes(app_env):
+    import json
+    import re
+    from pathlib import Path
+
+    c, *_ = app_env
+    c.get(f"{A}/health")
+    body = c.get("/metrics").text
+    dash = json.loads((Path(__file__).resolve().parents[2] / "monitoring/grafana/dashboards/isl-nova.json").read_text())
+    exprs = [t["expr"] for p in dash["panels"] for t in p["targets"]]
+    names = {n for e in exprs for n in re.findall(r"isl_nova_[a-z_]+", e)}
+    assert names
+    for n in names:
+        base = re.sub(r"_(bucket|sum|count)$", "", n)
+        assert f"# TYPE {base} " in body, n
+    for e in exprs:  # status labels are grouped (2xx/4xx/5xx), never raw codes
+        assert not re.search(r'status=~?"\d\d', e), e

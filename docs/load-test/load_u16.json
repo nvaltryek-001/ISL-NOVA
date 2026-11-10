@@ -1,0 +1,34 @@
+{
+  "base": "http://127.0.0.1:8765",
+  "users": 16,
+  "seconds": 60.5,
+  "requests": 5684,
+  "throughput_rps": 93.9,
+  "status_codes": {
+    "200": 5684
+  },
+  "error_rate": 0.0,
+  "endpoints": {
+    "GET /health": {
+      "n": 591,
+      "p50_ms": 67.1,
+      "p95_ms": 165.1,
+      "p99_ms": 222.0,
+      "errors": 0
+    },
+    "GET /signs?q=": {
+      "n": 2273,
+      "p50_ms": 66.9,
+      "p95_ms": 156.5,
+      "p99_ms": 206.3,
+      "errors": 0
+    },
+    "POST /predict/sequence": {
+      "n": 2820,
+      "p50_ms": 251.9,
+      "p95_ms": 439.0,
+      "p99_ms": 551.5,
+      "errors": 0
+    }
+  }
+}

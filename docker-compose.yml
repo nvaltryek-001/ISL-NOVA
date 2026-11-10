@@ -32,6 +32,69 @@ services:
       - appdata:/data
     restart: unless-stopped
 
+# ---------------------------------------------------------------------------
+# Optional services (docker compose --profile scale --profile monitoring up):
+#   scale      - Redis (shared rate limit + job queue), a job worker, MinIO object storage.
+#                Set in .env: REDIS_URL=redis://redis:6379/0, STORAGE_BACKEND=s3,
+#                S3_ENDPOINT=http://minio:9000, S3_BUCKET=isl-nova, S3_ACCESS_KEY / S3_SECRET_KEY
+#                (= MINIO_ROOT_USER / MINIO_ROOT_PASSWORD).
+#   monitoring - Prometheus (scrapes /metrics with METRICS_TOKEN) and Grafana with the
+#                ISL NOVA dashboard on http://localhost:3000. Write the METRICS_TOKEN value
+#                to monitoring/metrics_token first.
+  redis:
+    image: redis:7.4-alpine
+    profiles: [scale]
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
+    profiles: [scale]
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-islnova}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD in .env}
+    volumes:
+      - miniodata:/data
+    ports:
+      - "9001:9001"
+    restart: unless-stopped
+
+  worker:
+    build: .
+    profiles: [scale]
+    command: ["python", "-m", "app.worker"]
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://islnova:${POSTGRES_PASSWORD}@db:5432/islnova
+      ISL_NOVA_ENV: production
+    volumes:
+      - appdata:/data
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    profiles: [monitoring]
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/metrics_token:/etc/prometheus/metrics_token:ro
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    profiles: [monitoring]
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in .env}
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
 volumes:
   pgdata:
   appdata:
+  miniodata:

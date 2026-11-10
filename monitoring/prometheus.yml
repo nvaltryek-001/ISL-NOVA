@@ -1,0 +1,13 @@
+# Prometheus scrape config for the ISL NOVA app (docker compose --profile monitoring).
+# /metrics needs a bearer token from outside localhost: put the same value as the
+# app's METRICS_TOKEN into monitoring/metrics_token (git-ignored).
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: isl-nova
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials_file: /etc/prometheus/metrics_token
+    static_configs:
+      - targets: ["app:8000"]
