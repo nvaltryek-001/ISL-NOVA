@@ -334,6 +334,27 @@ describe('modules render with real data', () => {
     await ctx.close();
   });
 
+  test('interface switches to Hindi and Kannada and persists; meanings show draft status', async () => {
+    const { page, ctx, errors } = await newPage(browser, srv.base);
+    await page.goto('/signs');
+    await page.getByRole('heading', { level: 1, name: 'Sign Explorer' }).waitFor();
+    await page.getByLabel('Interface language').selectOption('hi');
+    await page.getByRole('heading', { level: 1, name: 'संकेत खोज' }).waitFor();
+    assert.equal(await page.evaluate(() => document.documentElement.lang), 'hi');
+    await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'लाइव पहचान' }).waitFor();
+    await page.getByText('अनुवाद कवरेज').waitFor();
+    await page.reload();
+    await page.getByRole('heading', { level: 1, name: 'संकेत खोज' }).waitFor();
+    await page.getByLabel('इंटरफ़ेस भाषा').selectOption('kn');
+    await page.getByRole('heading', { level: 1, name: 'ಸಂಜ್ಞೆ ಅನ್ವೇಷಕ' }).waitFor();
+    const cov = await (await fetch(`${srv.base}/api/v1/translations/coverage`)).json();
+    assert.equal(cov.languages.hi.draft, 200); assert.equal(cov.languages.kn.verified, 0);
+    await page.getByLabel('ಇಂಟರ್ಫೇಸ್ ಭಾಷೆ').selectOption('en');
+    await page.getByRole('heading', { level: 1, name: 'Sign Explorer' }).waitFor();
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  });
+
   test('light theme is the default and the toggle switches to dark and back', async () => {
     const { page, ctx, errors } = await newPage(browser, srv.base);
     await page.goto('/');

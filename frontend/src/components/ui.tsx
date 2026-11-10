@@ -7,6 +7,7 @@ import {
 import type { ApiError } from '../lib/api';
 import { toasts, useStore } from '../lib/store';
 import { Icon, type IconName } from './icons';
+import { tr, useT } from '../i18n';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'signal';
 const V: Record<Variant, string> = {
@@ -19,6 +20,7 @@ const V: Record<Variant, string> = {
 
 export function Button({ variant = 'secondary', size = 'md', icon, loading, children, className, ...rest }:
   { variant?: Variant; size?: 'sm' | 'md' | 'lg'; icon?: IconName; loading?: boolean } & ButtonHTMLAttributes<HTMLButtonElement>) {
+  const t = useT();
   return (
     <button
       className={clsx('inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all active:scale-[.98] disabled:pointer-events-none disabled:opacity-45',
@@ -26,12 +28,14 @@ export function Button({ variant = 'secondary', size = 'md', icon, loading, chil
       disabled={loading || rest.disabled} aria-busy={loading || undefined} {...rest}
     >
       {loading ? <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden /> : icon && <Icon name={icon} size={size === 'lg' ? 22 : 16} />}
-      {children}
+      {tr(children, t)}
     </button>
   );
 }
 
 export function Card({ children, className, title, action, subtitle }: { children: ReactNode; className?: string; title?: ReactNode; subtitle?: ReactNode; action?: ReactNode }) {
+  const t = useT();
+  title = tr(title, t); subtitle = tr(subtitle, t);
   return (
     <section className={clsx('card rise p-5', className)}>
       {(title || action) && (
@@ -77,15 +81,17 @@ const STATUS: Record<string, [Tone, string]> = {
 };
 
 export function StatusBadge({ status }: { status: string }) {
+  const t = useT();
   const [tone, label] = STATUS[status] ?? ['neutral', status];
-  return <Badge tone={tone}><span className="size-1.5 rounded-full bg-current opacity-80" aria-hidden />{label}</Badge>;
+  return <Badge tone={tone}><span className="size-1.5 rounded-full bg-current opacity-80" aria-hidden />{t(label)}</Badge>;
 }
 
 export function Field({ label, hint, error, children }: { label: string; hint?: ReactNode; error?: string; children: (id: string) => ReactNode }) {
   const id = useId();
+  const t = useT();
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-sm font-medium text-ink-200">{label}</label>
+      <label htmlFor={id} className="block text-sm font-medium text-ink-200">{t(label)}</label>
       {children(id)}
       {hint && !error && <p className="muted text-xs">{hint}</p>}
       {error && <p className="text-xs text-rose-300" role="alert">{error}</p>}
@@ -138,12 +144,13 @@ export function Table({ head, children, empty, className }: { head: ReactNode[];
 }
 
 export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: { id: T; label: string; count?: number }[]; value: T; onChange: (t: T) => void }) {
+  const tt = useT();
   return (
     <div role="tablist" className="flex max-w-full gap-1 overflow-x-auto rounded-xl border border-ink-700 bg-ink-850 p-1">
       {tabs.map((t) => (
         <button key={t.id} role="tab" aria-selected={value === t.id} onClick={() => onChange(t.id)}
           className={clsx('whitespace-nowrap rounded-lg px-3 py-1.5 text-sm transition-colors', value === t.id ? 'bg-ink-700 text-fg' : 'text-ink-400 hover:text-ink-100')}>
-          {t.label}{t.count !== undefined && <span className="ml-1.5 text-xs text-ink-400">{t.count}</span>}
+          {tt(t.label)}{t.count !== undefined && <span className="ml-1.5 text-xs text-ink-400">{t.count}</span>}
         </button>
       ))}
     </div>
@@ -154,7 +161,7 @@ export function Empty({ icon = 'info', title, children, action }: { icon?: IconN
   return (
     <div className="flex flex-col items-center justify-center gap-2 px-6 py-10 text-center">
       <div className="grid size-11 place-items-center rounded-xl bg-ink-800 text-ink-400 ring-1 ring-ink-700"><Icon name={icon} size={20} /></div>
-      <p className="font-medium text-ink-100">{title}</p>
+      <p className="font-medium text-ink-100">{useT()(title)}</p>
       {children && <div className="muted max-w-md text-sm">{children}</div>}
       {action && <div className="mt-2">{action}</div>}
     </div>
@@ -180,7 +187,7 @@ export function Notice({ tone = 'info', title, children }: { tone?: 'info' | 'wa
   return (
     <div className={clsx('flex gap-3 rounded-xl border p-4 text-sm', c)} role="note">
       <Icon name={tone === 'warn' ? 'alert' : tone === 'ok' ? 'check' : 'info'} className="mt-0.5 shrink-0" />
-      <div><p className="font-medium">{title}</p>{children && <div className="mt-1 opacity-85">{children}</div>}</div>
+      <div><p className="font-medium">{useT()(title)}</p>{children && <div className="mt-1 opacity-85">{children}</div>}</div>
     </div>
   );
 }
@@ -218,6 +225,8 @@ export function Meter({ value, max, label, tone = 'nova' }: { value: number; max
 }
 
 export function PageHeader({ title, kicker, children, actions }: { title: string; kicker?: string; children?: ReactNode; actions?: ReactNode }) {
+  const t = useT();
+  title = t(title); kicker = kicker && t(kicker);
   return (
     <div className="mb-6 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end md:justify-between">
       <div className="min-w-0">

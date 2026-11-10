@@ -1,0 +1,201 @@
+sign_id,hi,hi_translit,kn,kn_translit
+ISL001,ठीक है,theek hai,ಸರಿ,sari
+ISL002,बुरा,bura,ಕೆಟ್ಟ,ketta
+ISL003,अंधा,andha,ಕುರುಡ,kuruda
+ISL004,बधिर,badhir,ಕಿವುಡ,kivuda
+ISL005,दोस्त,dost,ಸ್ನೇಹಿತ,snehita
+ISL006,उपहार,upahaar,ಉಡುಗೊರೆ,udugore
+ISL007,अच्छा,achchha,ಒಳ್ಳೆಯ,olleya
+ISL008,शुभ दोपहर,shubh dopahar,ಶುಭ ಮಧ್ಯಾಹ್ನ,shubha madhyahna
+ISL009,शुभ संध्या,shubh sandhya,ಶುಭ ಸಂಜೆ,shubha sanje
+ISL010,सुप्रभात,suprabhaat,ಶುಭೋದಯ,shubhodaya
+ISL011,शुभ रात्रि,shubh ratri,ಶುಭ ರಾತ್ರಿ,shubha ratri
+ISL012,नमस्ते,namaste,ನಮಸ್ಕಾರ,namaskara
+ISL013,आप कैसे हैं,aap kaise hain,ನೀವು ಹೇಗಿದ್ದೀರಿ,neevu hegiddiri
+ISL014,विवाह,vivaah,ಮದುವೆ,maduve
+ISL015,पड़ोसी,padosi,ನೆರೆಹೊರೆಯವರು,nerehoreyavaru
+ISL016,बढ़िया,badhiya,ಚೆನ್ನಾಗಿದೆ,chennagide
+ISL017,प्रसन्न,prasann,ಸಂತೋಷವಾಯಿತು,santoshavayitu
+ISL018,संकेत,sanket,ಸಂಜ್ಞೆ,sanjne
+ISL019,धन्यवाद,dhanyavaad,ಧನ್ಯವಾದ,dhanyavada
+ISL020,शिशु,shishu,ಮಗು,magu
+ISL021,लड़का,ladka,ಹುಡುಗ,huduga
+ISL022,भाई,bhai,ಸಹೋದರ,sahodara
+ISL023,बच्चा,bachcha,ಮಗು,magu
+ISL024,बेटी,beti,ಮಗಳು,magalu
+ISL025,परिवार,parivaar,ಕುಟುಂಬ,kutumba
+ISL026,पिता,pita,ತಂದೆ,tande
+ISL027,लड़की,ladki,ಹುಡುಗಿ,hudugi
+ISL028,दादा,dada,ಅಜ್ಜ,ajja
+ISL029,दादी,dadi,ಅಜ್ಜಿ,ajji
+ISL030,पति,pati,ಗಂಡ,ganda
+ISL031,आदमी,aadmi,ಗಂಡಸು,gandasu
+ISL032,माँ,maan,ತಾಯಿ,tayi
+ISL033,बूढ़ा,boodha,ಮುದುಕ,muduka
+ISL034,माता-पिता,mata-pita,ಪೋಷಕರು,poshakaru
+ISL035,बहन,bahan,ಸಹೋದರಿ,sahodari
+ISL036,बेटा,beta,ಮಗ,maga
+ISL037,पत्नी,patni,ಹೆಂಡತಿ,hendati
+ISL038,औरत,aurat,ಹೆಂಗಸು,hengasu
+ISL039,युवा,yuva,ಯುವ,yuva
+ISL040,व्यायाम,vyayaam,ವ್ಯಾಯಾಮ,vyayama
+ISL041,खेल,khel,ಕ್ರೀಡೆ,kride
+ISL042,थैला,thaila,ಚೀಲ,cheela
+ISL043,गेंद,gend,ಚೆಂಡು,chendu
+ISL044,बैंक,bank,ಬ್ಯಾಂಕ್,byank
+ISL045,स्नानघर,snaanghar,ಸ್ನಾನಗೃಹ,snanagriha
+ISL046,बिस्तर,bistar,ಹಾಸಿಗೆ,hasige
+ISL047,शयनकक्ष,shayankaksh,ಮಲಗುವ ಕೋಣೆ,malaguva kone
+ISL048,कैमरा,camera,ಕ್ಯಾಮೆರಾ,kyamera
+ISL049,कुर्सी,kursi,ಕುರ್ಚಿ,kurchi
+ISL050,शहर,shahar,ನಗರ,nagara
+ISL051,घड़ी,ghadi,ಗಡಿಯಾರ,gadiyara
+ISL052,कंप्यूटर,computer,ಕಂಪ್ಯೂಟರ್,kampyutar
+ISL053,दरवाज़ा,darvaaza,ಬಾಗಿಲು,bagilu
+ISL054,पंखा,pankha,ಫ್ಯಾನ್,fyan
+ISL055,घर,ghar,ಮನೆ,mane
+ISL056,भारत,Bharat,ಭಾರತ,Bharata
+ISL057,चाबी,chaabi,ಕೀಲಿ,keeli
+ISL058,रसोई,rasoi,ಅಡುಗೆಮನೆ,adugemane
+ISL059,लैपटॉप,laptop,ಲ್ಯಾಪ್‌ಟಾಪ್,lyaptap
+ISL060,ताला,taala,ಬೀಗ,beega
+ISL061,बाज़ार,baazaar,ಮಾರುಕಟ್ಟೆ,marukatte
+ISL062,कार्यालय,karyaalay,ಕಚೇರಿ,kacheri
+ISL063,पार्क,park,ಉದ್ಯಾನ,udyana
+ISL064,फ़ोटो,photo,ಛಾಯಾಚಿತ್ರ,chayachitra
+ISL065,रेस्टोरेंट,restaurant,ಉಪಾಹಾರ ಗೃಹ,upahara griha
+ISL066,दुकान,dukaan,ಅಂಗಡಿ,angadi
+ISL067,मेज़,mez,ಮೇಜು,meju
+ISL068,खिड़की,khidki,ಕಿಟಕಿ,kitaki
+ISL069,बिल,bill,ಬಿಲ್,bil
+ISL070,सस्ता,sasta,ಅಗ್ಗ,agga
+ISL071,कपड़े,kapde,ಬಟ್ಟೆ,batte
+ISL072,पोशाक,poshaak,ಉಡುಪು,udupu
+ISL073,महँगा,mahanga,ದುಬಾರಿ,dubari
+ISL074,टोपी,topi,ಟೋಪಿ,topi
+ISL075,दवा,dava,ಔಷಧಿ,aushadhi
+ISL076,पैसा,paisa,ಹಣ,hana
+ISL077,पतलून,patloon,ಪ್ಯಾಂಟ್,pyant
+ISL078,गरीब,gareeb,ಬಡವ,badava
+ISL079,कीमत,keemat,ಬೆಲೆ,bele
+ISL080,अमीर,ameer,ಶ್ರೀಮಂತ,shrimanta
+ISL081,कमीज़,kameez,ಅಂಗಿ,angi
+ISL082,जूते,joote,ಬೂಟುಗಳು,bootugalu
+ISL083,साबुन,saabun,ಸಾಬೂನು,saboonu
+ISL084,टी-शर्ट,T-shirt,ಟಿ-ಶರ್ಟ್,ti-shart
+ISL085,दोपहर,dopahar,ಮಧ್ಯಾಹ್ನ,madhyahna
+ISL086,शाम,shaam,ಸಂಜೆ,sanje
+ISL087,शुक्रवार,shukravaar,ಶುಕ್ರವಾರ,shukravara
+ISL088,घंटा,ghanta,ಗಂಟೆ,gante
+ISL089,मिनट,minat,ನಿಮಿಷ,nimisha
+ISL090,सोमवार,somvaar,ಸೋಮವಾರ,somavara
+ISL091,महीना,maheena,ತಿಂಗಳು,tingalu
+ISL092,सुबह,subah,ಬೆಳಿಗ್ಗೆ,beligge
+ISL093,रात,raat,ರಾತ್ರಿ,ratri
+ISL094,शनिवार,shanivaar,ಶನಿವಾರ,shanivara
+ISL095,ऋतु,ritu,ಋತು,ritu
+ISL096,सेकंड,second,ಸೆಕೆಂಡ್,sekend
+ISL097,वसंत,vasant,ವಸಂತ,vasanta
+ISL098,गर्मी,garmi,ಬೇಸಿಗೆ,besige
+ISL099,रविवार,ravivaar,ಭಾನುವಾರ,bhanuvara
+ISL100,गुरुवार,guruvaar,ಗುರುವಾರ,guruvara
+ISL101,समय,samay,ಸಮಯ,samaya
+ISL102,आज,aaj,ಇಂದು,indu
+ISL103,कल (आने वाला),kal (aane vala),ನಾಳೆ,nale
+ISL104,मंगलवार,mangalvaar,ಮಂಗಳವಾರ,mangalavara
+ISL105,बुधवार,budhvaar,ಬುಧವಾರ,budhavara
+ISL106,सप्ताह,saptaah,ವಾರ,vara
+ISL107,सर्दी,sardi,ಚಳಿಗಾಲ,chaligala
+ISL108,साल,saal,ವರ್ಷ,varsha
+ISL109,कल (बीता हुआ),kal (beeta hua),ನಿನ್ನೆ,ninne
+ISL110,सुंदर,sundar,ಸುಂದರ,sundara
+ISL111,ठंडा,thanda,ತಣ್ಣಗೆ,tannage
+ISL112,मृत,mrit,ಸತ್ತ,satta
+ISL113,खुश,khush,ಸಂತೋಷ,santosha
+ISL114,स्वस्थ,swasth,ಆರೋಗ್ಯವಂತ,arogyavanta
+ISL115,गरम,garam,ಬಿಸಿ,bisi
+ISL116,ऊँची आवाज़,oonchi aavaaz,ಜೋರು,joru
+ISL117,शांत,shaant,ಶಾಂತ,shanta
+ISL118,उदास,udaas,ದುಃಖ,duhkha
+ISL119,बीमार,beemaar,ಅಸ್ವಸ್ಥ,asvastha
+ISL120,मज़बूत,mazboot,ಬಲಶಾಲಿ,balashali
+ISL121,बदसूरत,badsoorat,ಕುರೂಪ,kurupa
+ISL122,गुनगुना,gungunaa,ಬೆಚ್ಚಗೆ,bechchage
+ISL123,कमज़ोर,kamzor,ದುರ್ಬಲ,durbala
+ISL124,मोबाइल फ़ोन,mobile phone,ಮೊಬೈಲ್ ಫೋನ್,mobail phon
+ISL125,वह (पुरुष),vah (purush),ಅವನು,avanu
+ISL126,मैं,main,ನಾನು,nanu
+ISL127,यह,yah,ಅದು,adu
+ISL128,पत्र,patra,ಪತ್ರ,patra
+ISL129,अख़बार,akhbaar,ದಿನಪತ್ರಿಕೆ,dinapatrike
+ISL130,रेडियो,radio,ರೇಡಿಯೋ,rediyo
+ISL131,वह (स्त्री),vah (stri),ಅವಳು,avalu
+ISL132,टेलीफ़ोन,telephone,ದೂರವಾಣಿ,duravani
+ISL133,टेलीविज़न,television,ದೂರದರ್ಶನ,duradarshana
+ISL134,वे,ve,ಅವರು,avaru
+ISL135,हम,ham,ನಾವು,navu
+ISL136,तुम,tum,ನೀನು,neenu
+ISL137,आप सब,aap sab,ನೀವೆಲ್ಲರೂ,neevellaru
+ISL138,किताब,kitaab,ಪುಸ್ತಕ,pustaka
+ISL139,डॉक्टर,doctor,ವೈದ್ಯ,vaidya
+ISL140,नौकरी,naukri,ಕೆಲಸ,kelasa
+ISL141,वकील,vakeel,ವಕೀಲ,vakila
+ISL142,पुस्तकालय,pustakaalay,ಗ್ರಂಥಾಲಯ,granthalaya
+ISL143,प्रबंधक,prabandhak,ವ್ಯವಸ್ಥಾಪಕ,vyavasthapaka
+ISL144,काग़ज़,kaagaz,ಕಾಗದ,kagada
+ISL145,मरीज़,mareez,ರೋಗಿ,rogi
+ISL146,कलम,kalam,ಲೇಖನಿ,lekhani
+ISL147,पेंसिल,pencil,ಪೆನ್ಸಿಲ್,pensil
+ISL148,विद्यालय,vidyaalay,ಶಾಲೆ,shale
+ISL149,छात्र,chhaatra,ವಿದ್ಯಾರ್ಥಿ,vidyarthi
+ISL150,शिक्षक,shikshak,ಶಿಕ್ಷಕ,shikshaka
+ISL151,विश्वविद्यालय,vishvavidyaalay,ವಿಶ್ವವಿದ್ಯಾಲಯ,vishvavidyalaya
+ISL152,वेटर,waiter,ಮಾಣಿ,mani
+ISL153,साइकिल,cycle,ಸೈಕಲ್,saikal
+ISL154,नाव,naav,ದೋಣಿ,doni
+ISL155,बस,bus,ಬಸ್,bas
+ISL156,कार,car,ಕಾರು,karu
+ISL157,अस्पताल,aspataal,ಆಸ್ಪತ್ರೆ,aspatre
+ISL158,स्थान,sthaan,ಸ್ಥಳ,sthala
+ISL159,हवाई जहाज़,havaai jahaaz,ವಿಮಾನ,vimana
+ISL160,पुलिस,police,ಪೊಲೀಸ್,polis
+ISL161,सड़क,sadak,ರಸ್ತೆ,raste
+ISL162,रेलगाड़ी,relgaadi,ರೈಲು,railu
+ISL163,रेलवे स्टेशन,railway station,ರೈಲು ನಿಲ್ದಾಣ,railu nildana
+ISL164,रेल टिकट,rail ticket,ರೈಲು ಟಿಕೆಟ್,railu tiket
+ISL165,परिवहन,parivahan,ಸಾರಿಗೆ,sarige
+ISL166,ट्रक,truck,ಲಾರಿ,lari
+ISL167,बड़ा,bada,ದೊಡ್ಡ,dodda
+ISL168,काला,kaala,ಕಪ್ಪು,kappu
+ISL169,नीला,neela,ನೀಲಿ,neeli
+ISL170,भूरा,bhoora,ಕಂದು,kandu
+ISL171,साफ़,saaf,ಸ್ವಚ್ಛ,svachchha
+ISL172,गंदा,ganda,ಕೊಳಕು,kolaku
+ISL173,सूखा,sookha,ಒಣ,ona
+ISL174,तेज़,tez,ವೇಗ,vega
+ISL175,हरा,hara,ಹಸಿರು,hasiru
+ISL176,स्लेटी,sleti,ಬೂದು,boodu
+ISL177,कठोर,kathor,ಗಟ್ಟಿ,gatti
+ISL178,भारी,bhaari,ಭಾರ,bhara
+ISL179,ऊँचा,ooncha,ಎತ್ತರ,ettara
+ISL180,लंबा,lamba,ಉದ್ದ,udda
+ISL181,नीचा,neecha,ಕಡಿಮೆ,kadime
+ISL182,नया,naya,ಹೊಸ,hosa
+ISL183,नारंगी,naarangi,ಕಿತ್ತಳೆ ಬಣ್ಣ,kittale banna
+ISL184,गुलाबी,gulaabi,ಗುಲಾಬಿ,gulabi
+ISL185,लाल,laal,ಕೆಂಪು,kempu
+ISL186,छोटा (लंबाई),chhota (lambai),ಚಿಕ್ಕ,chikka
+ISL187,धीमा,dheema,ನಿಧಾನ,nidhana
+ISL188,छोटा,chhota,ಸಣ್ಣ,sanna
+ISL189,मुलायम,mulaayam,ಮೃದು,mridu
+ISL190,लंबा (क़द),lamba (qad),ಎತ್ತರದ,ettarada
+ISL191,गीला,geela,ಒದ್ದೆ,odde
+ISL192,सफ़ेद,safed,ಬಿಳಿ,bili
+ISL193,पीला,peela,ಹಳದಿ,haladi
+ISL194,जानवर,jaanvar,ಪ್ರಾಣಿ,prani
+ISL195,पक्षी,pakshi,ಹಕ್ಕಿ,hakki
+ISL196,बिल्ली,billi,ಬೆಕ್ಕು,bekku
+ISL197,गाय,gaay,ಹಸು,hasu
+ISL198,कुत्ता,kutta,ನಾಯಿ,nayi
+ISL199,मछली,machhli,ಮೀನು,meenu
+ISL200,घोड़ा,ghoda,ಕುದುರೆ,kudure

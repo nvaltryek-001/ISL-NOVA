@@ -33,7 +33,7 @@ jobs:
       - name: Ruff
         run: ruff check backend ml dataset/scripts scripts
       - name: Vocabulary is reproducible
-        run: python dataset/scripts/build_vocabulary.py && git diff --exit-code -- dataset/vocabulary ':!dataset/vocabulary/verification_log.csv'
+        run: python dataset/scripts/build_vocabulary.py && python dataset/scripts/draft_translations.py && git diff --exit-code -- dataset/vocabulary ':!dataset/vocabulary/verification_log.csv'
       - name: Tests (SQLite)
         run: pytest -q
       - name: Tests (PostgreSQL)

@@ -5,6 +5,7 @@ import { Badge, Button, Toasts } from './components/ui';
 import { clearCache, useQuery } from './lib/query';
 import { Link, navigate, Routes, useLocation } from './lib/router';
 import { auth, can, prefs, resolvedTheme, useAuth, usePrefs } from './lib/store';
+import { type Lang, LANG_NAMES, useT } from './i18n';
 import { AdminPage } from './pages/Admin';
 import { AILabPage } from './pages/AILab';
 import { AcademyPage } from './pages/Academy';
@@ -46,25 +47,27 @@ const NAV: { group: string; items: Nav[] }[] = [
 
 function ModelPill() {
   const { data } = useQuery<{ available: boolean; synthetic?: boolean; n_classes?: number }>('/model/info', { poll: 60000 });
+  const t = useT();
   if (!data) return null;
   return (
-    <Link to="/ai" className="hidden sm:block" title="Recognition model status">
+    <Link to="/ai" className="hidden sm:block" title={t('Recognition model status')}>
       {data.available
-        ? <Badge tone={data.synthetic ? 'warn' : 'ok'}>{data.synthetic ? 'Synthetic test model' : `Model live · ${data.n_classes} signs`}</Badge>
-        : <Badge tone="bad"><span className="size-1.5 rounded-full bg-current" />No trained model</Badge>}
+        ? <Badge tone={data.synthetic ? 'warn' : 'ok'}>{data.synthetic ? 'Synthetic test model' : `${t('Model live')} · ${data.n_classes} ${t('signs')}`}</Badge>
+        : <Badge tone="bad"><span className="size-1.5 rounded-full bg-current" />{t('No trained model')}</Badge>}
     </Link>
   );
 }
 
 function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { user } = useAuth();
+  const t = useT();
   return (
     <nav aria-label="Main" className="flex h-full flex-col gap-6 overflow-y-auto px-3 py-5">
       <Link to="/" className="flex items-center gap-3 px-2" onClick={onNavigate}>
         <img src="/favicon.svg" alt="" className="size-9" />
         <span>
           <span className="block font-display text-[17px] font-semibold tracking-tight text-fg">ISL NOVA</span>
-          <span className="block text-[11px] text-ink-400">Beyond gestures. Towards understanding.</span>
+          <span className="block text-[11px] text-ink-400">{t('Beyond gestures. Towards understanding.')}</span>
         </span>
       </Link>
       {NAV.map((g) => {
@@ -72,19 +75,31 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         if (!items.length) return null;
         return (
           <div key={g.group}>
-            <p className="label mb-1.5 px-3 text-[10px]">{g.group}</p>
+            <p className="label mb-1.5 px-3 text-[10px]">{t(g.group)}</p>
             <ul className="space-y-0.5">
               {items.map((i) => (
-                <li key={i.to}><Link to={i.to} className="nav-link" onClick={onNavigate}><Icon name={i.icon} />{i.label}</Link></li>
+                <li key={i.to}><Link to={i.to} className="nav-link" onClick={onNavigate}><Icon name={i.icon} />{t(i.label)}</Link></li>
               ))}
             </ul>
           </div>
         );
       })}
       <div className="mt-auto rounded-xl border border-ink-700 bg-ink-800 p-3 text-xs text-ink-400">
-        Vocabulary entries are derived from the INCLUDE dataset (CC BY 4.0) and await qualified ISL review.
+        {t('Vocabulary entries are derived from the INCLUDE dataset (CC BY 4.0) and await qualified ISL review.')}
       </div>
     </nav>
+  );
+}
+
+function LanguageSwitcher() {
+  const p = usePrefs();
+  const t = useT();
+  return (
+    <select aria-label={t('Interface language')} title={t('Interface language')} value={p.language}
+      onChange={(e) => prefs.set({ language: e.target.value as Lang })}
+      className="h-9 rounded-lg border border-ink-700 bg-ink-850 px-2 text-sm text-ink-100">
+      {(Object.keys(LANG_NAMES) as Lang[]).map((l) => <option key={l} value={l} lang={l}>{LANG_NAMES[l]}</option>)}
+    </select>
   );
 }
 
@@ -140,7 +155,7 @@ function Shell({ children }: { children: ReactNode }) {
           <button onClick={() => navigate('/signs')} className="flex h-9 min-w-0 max-w-sm flex-1 items-center gap-2 rounded-lg border border-ink-700 bg-ink-850 px-3 text-sm text-ink-400 shadow-sm hover:border-ink-600">
             <Icon name="search" size={16} /><span className="truncate">Search signs in English, हिन्दी, ಕನ್ನಡ…</span>
           </button>
-          <div className="ml-auto flex shrink-0 items-center gap-2"><ModelPill /><ThemeToggle /><UserMenu /></div>
+          <div className="ml-auto flex shrink-0 items-center gap-2"><ModelPill /><LanguageSwitcher /><ThemeToggle /><UserMenu /></div>
         </header>
         <main id="main" className="mx-auto max-w-[1400px] px-4 py-6 md:px-8 md:py-8">{children}</main>
       </div>

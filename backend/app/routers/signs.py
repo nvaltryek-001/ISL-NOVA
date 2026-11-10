@@ -88,6 +88,7 @@ VERIFY_REQUIRED_FIELDS = ("linguistic_description", "hands_required", "movement_
 class TranslationIn(BaseModel):
     text: str = Field(max_length=300)
     status: str = Field(pattern="^(draft|verified|rejected)$")
+    transliteration: str | None = Field(default=None, max_length=300)
 
 
 class ReferenceIn(BaseModel):
@@ -105,8 +106,11 @@ def translations_for(conn: Conn, ids: list[str]) -> dict[str, dict]:
         return {}
     marks = ",".join("?" for _ in ids)
     out: dict[str, dict] = {i: {} for i in ids}
-    for t in conn.all(f"SELECT sign_id, language, text, status FROM translations WHERE sign_id IN ({marks})", ids):
-        out[t["sign_id"]][t["language"]] = {"text": t["text"], "status": t["status"]}
+    for t in conn.all(f"SELECT sign_id, language, text, status, transliteration, source, reviewer FROM translations "
+                      f"WHERE sign_id IN ({marks})", ids):
+        out[t["sign_id"]][t["language"]] = {"text": t["text"], "status": t["status"],
+                                            "transliteration": t["transliteration"], "source": t["source"],
+                                            "reviewer": t["reviewer"]}
     return out
 
 
@@ -352,8 +356,12 @@ def set_translation(ctx: Ctx):
         raise ApiError(403, "linguist_required", "only a linguist can mark a translation verified")
     if b.status == "verified" and not b.text.strip():
         raise ApiError(422, "validation_error", "a verified translation needs text")
-    vals = {"text": b.text.strip(), "status": b.status, "updated_at": utcnow(),
-            "reviewer": ctx.user["display_name"] if b.status == "verified" else None}
+    now = utcnow()
+    vals = {"text": b.text.strip(), "status": b.status, "updated_at": now, "source": "human (app)",
+            "reviewer": ctx.user["display_name"] if b.status in ("verified", "rejected") else None,
+            "reviewed_at": now if b.status in ("verified", "rejected") else None}
+    if b.transliteration is not None:
+        vals["transliteration"] = b.transliteration.strip() or None
     if ctx.db.one("SELECT id FROM translations WHERE sign_id = ? AND language = ?", (sid, lang)):
         ctx.db.update("translations", vals, "sign_id = ? AND language = ?", (sid, lang))
     else:

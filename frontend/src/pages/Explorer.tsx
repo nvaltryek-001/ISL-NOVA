@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Icon } from '../components/icons';
+import { TranslationsPanel } from '../components/TranslationsPanel';
 import { Badge, Button, Card, Dialog, Empty, ErrorNote, Field, Input, Loading, Notice, PageHeader, Select, StatusBadge, Textarea, fmt } from '../components/ui';
 import { api, qs } from '../lib/api';
 import { invalidate, useMutation, useQuery } from '../lib/query';
@@ -44,6 +45,7 @@ export function ExplorerPage() {
         </>}>
         Search the 200-slot ISL NOVA vocabulary in English, Hindi or Kannada. Status badges show how far each entry is through qualified review.
       </PageHeader>
+      <div className="mb-5"><TranslationsPanel /></div>
       <div className="mb-5 grid gap-3 md:grid-cols-[1fr_auto_auto]">
         <label className="relative">
           <span className="sr-only">Search signs</span>

@@ -26,10 +26,10 @@ from .api import RateLimiter, build_routes, error_response, openapi
 from .config import Settings
 from .db import Database
 from .migrate import migrate
-from .routers import core, dataset, ml, personal, signs
+from .routers import core, dataset, ml, personal, signs, translations
 from .services import Jobs, LocalStorage, ModelService, ensure_user, seed_roles, seed_vocabulary
 
-ROUTERS = [core.router, signs.router, dataset.router, ml.router, personal.router]
+ROUTERS = [core.router, signs.router, translations.router, dataset.router, ml.router, personal.router]
 
 
 class JsonFormatter(logging.Formatter):

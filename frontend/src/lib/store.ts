@@ -100,6 +100,7 @@ export function applyPrefs(p: Prefs) {
   c.toggle('hc', p.highContrast);
   c.toggle('reduce-motion', p.reducedMotion);
   c.toggle('large-text', p.largeText);
+  document.documentElement.lang = p.language === 'hi' ? 'hi' : p.language === 'kn' ? 'kn' : 'en';
 }
 
 export const usePrefs = () => useStore(prefs, (s) => s);

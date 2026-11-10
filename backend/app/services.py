@@ -196,10 +196,18 @@ def seed_vocabulary(conn: Conn, vocab_dir: Path) -> int:
         if tr_path.exists():
             with tr_path.open(newline="", encoding="utf-8") as fh:
                 for t in csv.DictReader(fh):
-                    if conn.one("SELECT id FROM translations WHERE sign_id = ? AND language = ?", (t["sign_id"], t["language"])):
+                    cur = conn.one("SELECT id, status, text FROM translations WHERE sign_id = ? AND language = ?",
+                                   (t["sign_id"], t["language"]))
+                    if cur:
+                        # upgrade untouched placeholders to newer drafts; never touch human-edited rows
+                        if cur["status"] == "pending" and not (cur["text"] or "").strip() and t["status"] == "draft":
+                            conn.update("translations", {"text": t["text"], "status": "draft", "source": t["source"] or None,
+                                                         "transliteration": t.get("transliteration") or None,
+                                                         "updated_at": now}, "id = ?", (cur["id"],))
                         continue
                     conn.insert("translations", {"sign_id": t["sign_id"], "language": t["language"], "text": t["text"],
                                                  "status": t["status"], "source": t["source"] or None,
+                                                 "transliteration": t.get("transliteration") or None,
                                                  "reviewer": t["reviewer"] or None, "updated_at": now})
         ref_path = vocab_dir / "references.csv"
         if ref_path.exists() and not conn.scalar("SELECT COUNT(*) FROM sign_references"):

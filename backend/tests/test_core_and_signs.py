@@ -73,7 +73,10 @@ def test_vocabulary_has_200_unverified_slots(app_env):
     assert ids == [f"ISL{i:03d}" for i in range(1, 201)]
     assert all(s["verification_status"] == "reference_found" for s in r["items"])
     assert all(s["data_readiness"] == "no_data" for s in r["items"])
-    assert all(s["translations"]["hi"]["text"] == "" for s in r["items"]), "no invented Hindi"
+    # Hindi/Kannada are machine drafts: present, but never presented as verified
+    for lang in ("hi", "kn"):
+        assert all(s["translations"][lang]["status"] == "draft" and s["translations"][lang]["text"] for s in r["items"])
+        assert all("machine" in (s["translations"][lang]["source"] or "") for s in r["items"])
     stats = c.get(f"{A}/dataset/stats").json()
     assert stats["class_slots"] == 200 and stats["verified_classes"] == 0
     assert stats["classes_with_recordings"] == 0 and stats["approved_samples"] == 0
@@ -196,7 +199,7 @@ def test_deactivated_user_cannot_use_token(app_env):
 
 def test_migrations_idempotent_and_tamper_detected(tmp_path, monkeypatch):
     db = Database(f"sqlite:///{tmp_path / 'm.db'}")
-    assert migrate(db) == ["0001_core"]
+    assert migrate(db) == ["0001_core", "0002_translations_v2"]
     assert migrate(db) == []
     assert status(db)["pending"] == []
     with db.connect() as conn:
