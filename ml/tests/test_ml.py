@@ -313,3 +313,29 @@ def test_open_set_evaluation_reports_genuine_counts(trained, tmp_path):
     assert sum(rep["unknown_states"].values()) == len(unknown)
     assert (tmp_path / "out" / "open_set_rows.csv").exists()
     reg.rollback()
+
+
+def test_raw_variant_simulates_low_fps_crop_and_misses():
+    from isl_nova_ml.augment import raw_variant
+
+    frames = seq(cls=2, n=60)
+    rng = np.random.default_rng(1)
+    lens = [len(raw_variant(frames, rng)) for _ in range(50)]
+    assert min(lens) < 30 < max(lens) <= 60, "frame rate and crop vary the length"
+    v = raw_variant(frames, np.random.default_rng(3), fps_range=(10, 10), crop=0.0, miss_max=0.0)
+    assert 22 <= len(v) <= 26  # 60 frames at 25 fps -> ~24 at 10 fps
+    assert all(set(f) == set(frames[0]) for f in v)
+    assert extract_features(v, 4 / 3).features.shape == (C.SEQUENCE_LENGTH, C.FEATURE_DIM)
+
+
+def test_build_tensors_adds_marked_augmented_copies(tmp_path):
+    from isl_nova_ml.data import build_tensors
+
+    write_synthetic_dataset(tmp_path, n_classes=2, n_signers=2, reps=1)
+    m = json.loads((tmp_path / "manifest.json").read_text())
+    entries = m["entries"]
+    cidx = {s: i for i, s in enumerate(sorted({e["sign_id"] for e in entries}))}
+    plain = build_tensors(entries, tmp_path, cidx)
+    aug = build_tensors(entries, tmp_path, cidx, raw_aug_copies=2, seed=5)
+    assert len(aug.y) > len(plain.y)
+    assert sum("#aug" not in i for i in aug.ids) == len(plain.ids)

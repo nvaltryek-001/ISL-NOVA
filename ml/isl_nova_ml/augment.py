@@ -45,3 +45,41 @@ def augment_batch(X: np.ndarray, rng: np.random.Generator, noise: float = 0.01,
         mask[PRESENCE_OFFSET: PRESENCE_OFFSET + 3] = False
         X[b][:, mask] += rng.normal(0, noise, (T, int(mask.sum()))).astype(X.dtype)
     return X
+
+
+# --- raw landmark-level augmentation (ISL NOVA v2) ---------------------------
+# Live capture differs from studio video: the browser may track at 8-15 fps
+# instead of 25, the capture window starts and ends at arbitrary points of the
+# sign, and the hand detector misses frames. These transforms simulate that on
+# the raw landmark sequence, before the feature contract resamples it.
+
+def raw_variant(frames: list[dict], rng: np.random.Generator, src_fps: float = 25.0,
+                fps_range: tuple[float, float] = (8.0, 30.0), crop: float = 0.15,
+                miss_max: float = 0.15) -> list[dict]:
+    n = len(frames)
+    if n < 4:
+        return [dict(f) for f in frames]
+    # 1) temporal crop: start late / stop early by up to `crop` of the clip
+    a = int(rng.uniform(0, crop) * n)
+    b = n - int(rng.uniform(0, crop) * n)
+    seq = frames[a:max(b, a + 4)]
+    # 2) frame-rate simulation: keep frames at a random target rate with random phase
+    target = float(rng.uniform(*fps_range))
+    if target < src_fps:
+        step = src_fps / target
+        pos = rng.uniform(0, step)
+        idx = []
+        while pos < len(seq):
+            idx.append(int(pos))
+            pos += step
+        seq = [seq[i] for i in idx] or seq[:1]
+    # 3) missed hand detections
+    p = float(rng.uniform(0, miss_max))
+    out = []
+    for f in seq:
+        g = dict(f)
+        for side in ("left", "right"):
+            if g.get(side) is not None and rng.random() < p:
+                g[side] = None
+        out.append(g)
+    return out

@@ -85,7 +85,11 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
 
     log(f"[data] eligible={len(eligible)} excluded={dict(excluded)} classes={len(class_ids)} "
         f"train/val/test={len(tr)}/{len(va)}/{len(te)} synthetic={synthetic}")
-    Ttr, Tva, Tte = (build_tensors(s, data_root, cidx) for s in (tr, va, te))
+    raw_aug = int(cfg.get("raw_aug_copies", 0)) if cfg["model"] in ("lstm", "gru") else 0
+    Ttr = build_tensors(tr, data_root, cidx, raw_aug_copies=raw_aug, seed=cfg["seed"])
+    Tva, Tte = (build_tensors(s, data_root, cidx) for s in (va, te))
+    if raw_aug:
+        log(f"[data] raw-level augmentation: {raw_aug} variant(s) per training sequence -> {len(Ttr.y)} training tensors")
     if len(Tva.y) == 0 or len(Tte.y) == 0:
         raise TrainingError("validation and test splits must both contain usable samples")
 
@@ -186,7 +190,8 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
         "config": cfg,
         "lineage": {"dataset_version": dataset_version, "manifest_sha256": sha256_file(manifest_path),
                     "split_policy": "official/source split where provided, else signer-independent",
-                    "split_counts": {"train": len(Ttr.y), "val": len(Tva.y), "test": len(Tte.y)},
+                    "split_counts": {"train": sum("#aug" not in i for i in Ttr.ids), "val": len(Tva.y), "test": len(Tte.y)},
+                    "train_augmented_variants": sum("#aug" in i for i in Ttr.ids),
                     "train_recording_ids": Ttr.ids, "val_recording_ids": Tva.ids, "test_recording_ids": Tte.ids,
                     "skipped": Ttr.skipped + Tva.skipped + Tte.skipped, "excluded": dict(excluded),
                     "leakage": leak},
