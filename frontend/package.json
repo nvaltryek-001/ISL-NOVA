@@ -20,6 +20,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "axe-core": "4.10.2",
     "esbuild": "0.28.2",
     "playwright": "1.63.0",
     "tailwindcss": "4.3.3",

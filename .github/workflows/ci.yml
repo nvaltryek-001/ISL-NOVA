@@ -73,6 +73,7 @@ jobs:
       - working-directory: frontend
         env:
           E2E_MODEL_TAG: model-lstm-20261104T041414Z-s13
+          AXE_REQUIRED: "1"
         run: npm run e2e
 
   audit:
