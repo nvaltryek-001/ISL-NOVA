@@ -435,13 +435,13 @@ One script sets up **everything** in a single run: packages, the frontend build,
 ```powershell
 git clone https://github.com/nvaltryek-001/ISL-NOVA.git ; cd ISL-NOVA ; git checkout feat/isl-nova-v2
 powershell -ExecutionPolicy Bypass -File scripts\install_all_windows.ps1 -Start
-#   add -Train lstm (or -Train all) to also train; -SkipDataset to skip the 176 MB download
+#   add -Train lstm-fps (the v2 recipe), -Train lstm or -Train all to also train; -SkipDataset to skip the 176 MB download
 ```
 
 **Linux / macOS (bash):**
 ```bash
 git clone https://github.com/nvaltryek-001/ISL-NOVA.git && cd ISL-NOVA && git checkout feat/isl-nova-v2
-bash scripts/install_all.sh --start          # --train lstm | all · --skip-dataset · --port 8080
+bash scripts/install_all.sh --start          # --train lstm-fps | lstm | all · --skip-dataset · --port 8080
 bash scripts/start.sh                        # later starts
 ```
 

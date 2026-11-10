@@ -40,7 +40,8 @@ REPO = "nvaltryek-001/ISL-NOVA"
 DATA_RUN = "41764539272"
 ARTIFACT = "include-landmarks-v1"
 RELEASE = "dataset-include-landmarks-v1"
-CONFIGS = {"lstm": "lstm_baseline.json", "gru": "gru.json", "pooled-logreg": "pooled-logreg.json", "dtw-1nn": "dtw-1nn.json"}
+CONFIGS = {"lstm": "lstm_baseline.json", "lstm-fps": "lstm_fps_aug.json", "gru": "gru.json", "gru-fps": "gru_fps_aug.json",
+           "pooled-logreg": "pooled-logreg.json", "dtw-1nn": "dtw-1nn.json"}
 
 
 def fail(msg: str) -> None:
@@ -141,7 +142,8 @@ def main(argv=None) -> int:
     print("|---|---|---:|---:|---:|---:|---:|")
     for r in results:
         print(f"| {r['kind']} | {r['model_id']} | {r['val_macro_f1']:.3f} | {r['top1']:.3f} | {r['top5']:.3f} | {r['macro_f1']:.3f} | {r['minutes']} |")
-    print("(released LSTM for comparison: val macro-F1 0.911, test top-1 0.917, top-5 0.983, macro-F1 0.917)")
+    print("(released models for comparison: v2 LSTM fps-aug val macro-F1 0.958, test top-1 0.920, top-5 0.987, "
+          "macro-F1 0.916; v1 LSTM test top-1 0.917)")
 
     if a.promote:
         best = max(results, key=lambda r: r["val_macro_f1"])  # select on validation, never on test

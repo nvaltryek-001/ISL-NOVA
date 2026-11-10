@@ -2,7 +2,7 @@
 # ISL NOVA: complete local installation on Linux or macOS in one command.
 #
 #   bash scripts/install_all.sh                 # everything except training
-#   bash scripts/install_all.sh --train lstm    # also train (lstm | gru | pooled-logreg | dtw-1nn | all)
+#   bash scripts/install_all.sh --train lstm    # also train (lstm | lstm-fps | gru | gru-fps | pooled-logreg | dtw-1nn | all)
 #   bash scripts/install_all.sh --start         # start the app at the end
 #   bash scripts/install_all.sh --skip-dataset  # skip the 176 MB dataset download
 #

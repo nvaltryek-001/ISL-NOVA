@@ -33,7 +33,7 @@
 #>
 [CmdletBinding()]
 param(
-  [ValidateSet("", "lstm", "gru", "pooled-logreg", "dtw-1nn", "all")][string]$Train = "",
+  [ValidateSet("", "lstm", "lstm-fps", "gru", "gru-fps", "pooled-logreg", "dtw-1nn", "all")][string]$Train = "",
   [switch]$Start,
   [switch]$SkipDataset,
   [int]$Port = 8000,
