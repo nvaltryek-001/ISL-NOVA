@@ -1,5 +1,7 @@
 # ISL NOVA v2: status
 
+> **Superseded by [PROJECT_STATUS.md](PROJECT_STATUS.md)** for the current state (phases 7–11 done since this page was written; v3 model, detector, on-device, classes, analytics, refresh tokens, Redis, S3, load test).
+
 _Branch `feat/isl-nova-v2` (from `feat/isl-nova-platform` @ `32aa056`). Updated 2026-11-10._
 Every result here comes from a command that ran (local sandbox or GitHub
 Actions, run linked). **Targets are listed separately from results.** Starting
