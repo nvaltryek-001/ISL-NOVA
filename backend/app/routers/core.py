@@ -47,7 +47,32 @@ class TokenOut(BaseModel):
     access_token: str
     token_type: str = "bearer"  # noqa: S105 - OAuth token type, not a secret
     expires_in: int
+    refresh_token: str | None = None
+    refresh_expires_in: int | None = None
     user: dict
+
+
+class RefreshIn(BaseModel):
+    refresh_token: str = Field(min_length=20, max_length=200)
+
+
+def _issue_refresh(ctx: Ctx, user_id: int, token_version: int, family: str | None = None) -> tuple[str, int]:
+    days = ctx.app.settings.refresh_ttl_days
+    tok = secrets.token_urlsafe(32)
+    ctx.db.insert("refresh_tokens", {
+        "user_id": user_id, "token_hash": _reset_hash(tok), "family": family or secrets.token_hex(16),
+        "token_version": int(token_version or 0),
+        "expires_at": (datetime.now(UTC) + timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "created_at": utcnow(), "user_agent": (ctx.request.headers.get("user-agent") or "")[:200]})
+    return tok, days * 86400
+
+
+def _session(ctx: Ctx, user: dict) -> dict:
+    tv = int(user.get("token_version") or 0)
+    tok, exp = create_token(user["id"], ctx.app.settings.jwt_secret, ctx.app.settings.jwt_ttl_minutes, tv)
+    rt, rexp = _issue_refresh(ctx, user["id"], tv)
+    return {"access_token": tok, "token_type": "bearer", "expires_in": exp, "refresh_token": rt,
+            "refresh_expires_in": rexp, "user": user_out(ctx, user)}
 
 
 class ProfileIn(BaseModel):
@@ -113,8 +138,7 @@ def register(ctx: Ctx):
         ctx.db.insert("user_roles", {"user_id": uid, "role_name": "learner", "granted_at": utcnow()}, pk=None)
         audit(ctx.db, uid, "auth.register", f"user:{uid}", ip=ctx.ip)
     user = ctx.db.one("SELECT * FROM users WHERE id = ?", (uid,))
-    tok, exp = create_token(uid, ctx.app.settings.jwt_secret, ctx.app.settings.jwt_ttl_minutes)
-    return {"access_token": tok, "token_type": "bearer", "expires_in": exp, "user": user_out(ctx, user)}
+    return _session(ctx, user)
 
 
 @router.post("/auth/login", summary="Exchange credentials for an access token", auth="none", body=LoginIn,
@@ -136,9 +160,41 @@ def login(ctx: Ctx):
         ctx.db.update("users", {"totp_last_step": step}, "id = ?", (user["id"],))
     ctx.db.update("users", {"last_login_at": utcnow()}, "id = ?", (user["id"],))
     audit(ctx.db, user["id"], "auth.login", f"user:{user['id']}", ip=ctx.ip)
-    tok, exp = create_token(user["id"], ctx.app.settings.jwt_secret, ctx.app.settings.jwt_ttl_minutes,
-                            int(user["token_version"] or 0))
-    return {"access_token": tok, "token_type": "bearer", "expires_in": exp, "user": user_out(ctx, user)}
+    return _session(ctx, user)
+
+
+@router.post("/auth/refresh", summary="Exchange a refresh token for a new access + refresh token (rotation)",
+             auth="none", body=RefreshIn, response=TokenOut, rate="auth")
+def refresh(ctx: Ctx):
+    now = utcnow()
+    row = ctx.db.one("SELECT * FROM refresh_tokens WHERE token_hash = ?", (_reset_hash(ctx.body.refresh_token),))
+    bad = ApiError(401, "invalid_refresh_token", "session expired; sign in again")
+    if not row or row["revoked_at"] or str(row["expires_at"]) < now:
+        raise bad
+    if row["used_at"]:  # a rotated token presented again: possible theft -> end the whole family
+        ctx.db.execute("UPDATE refresh_tokens SET revoked_at = ? WHERE family = ? AND revoked_at IS NULL",
+                       (now, row["family"]))
+        audit(ctx.db, row["user_id"], "auth.refresh_reuse_detected", f"user:{row['user_id']}", ip=ctx.ip)
+        raise bad
+    user = ctx.db.one("SELECT * FROM users WHERE id = ?", (row["user_id"],))
+    if not user or not user["is_active"] or int(user["token_version"] or 0) != int(row["token_version"]):
+        raise bad
+    with ctx.db.transaction():
+        ctx.db.update("refresh_tokens", {"used_at": now}, "id = ?", (row["id"],))
+        tv = int(user["token_version"] or 0)
+        tok, exp = create_token(user["id"], ctx.app.settings.jwt_secret, ctx.app.settings.jwt_ttl_minutes, tv)
+        rt, rexp = _issue_refresh(ctx, user["id"], tv, family=row["family"])
+    return {"access_token": tok, "token_type": "bearer", "expires_in": exp, "refresh_token": rt,
+            "refresh_expires_in": rexp, "user": user_out(ctx, user)}
+
+
+@router.post("/auth/logout", summary="Sign out this session (revokes its refresh token)", auth="none", body=RefreshIn)
+def logout(ctx: Ctx):
+    row = ctx.db.one("SELECT family FROM refresh_tokens WHERE token_hash = ?", (_reset_hash(ctx.body.refresh_token),))
+    if row:
+        ctx.db.execute("UPDATE refresh_tokens SET revoked_at = ? WHERE family = ? AND revoked_at IS NULL",
+                       (utcnow(), row["family"]))
+    return {"ok": True}
 
 
 @router.post("/auth/logout-all", summary="Sign out everywhere: revoke every token issued to this account",
@@ -146,6 +202,8 @@ def login(ctx: Ctx):
 def logout_all(ctx: Ctx):
     with ctx.db.transaction():
         ctx.db.execute("UPDATE users SET token_version = COALESCE(token_version, 0) + 1 WHERE id = ?", (ctx.uid,))
+        ctx.db.execute("UPDATE refresh_tokens SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL",
+                       (utcnow(), ctx.uid))
         audit(ctx.db, ctx.uid, "auth.logout_all", f"user:{ctx.uid}", ip=ctx.ip)
     return {"ok": True}
 

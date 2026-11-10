@@ -193,6 +193,25 @@ describe('authentication and RBAC', () => {
     await ctx.close();
   });
 
+  test('an expired access token is renewed with the refresh token; sign out revokes it', async () => {
+    const { page, errors, ctx } = await newPage(browser, srv.base);
+    await login(page);
+    const before = await page.evaluate(() => JSON.parse(sessionStorage.getItem('isl-nova-session')));
+    assert.ok(before.refresh);
+    await page.evaluate(() => { const s = JSON.parse(sessionStorage.getItem('isl-nova-session')); s.token = 'expired.invalid.token'; sessionStorage.setItem('isl-nova-session', JSON.stringify(s)); });
+    await page.goto('/settings');
+    await page.getByRole('heading', { name: 'Settings & activity' }).waitFor();
+    await page.waitForFunction(() => JSON.parse(sessionStorage.getItem('isl-nova-session') || '{}').token !== 'expired.invalid.token');
+    assert.equal(page.url(), `${srv.base}/settings`);   // still signed in, not sent to the login page
+    const after = await page.evaluate(() => JSON.parse(sessionStorage.getItem('isl-nova-session')));
+    assert.notEqual(after.token, 'expired.invalid.token');
+    assert.notEqual(after.refresh, before.refresh);   // rotated
+    const old = await fetch(`${srv.base}/api/v1/auth/refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: before.refresh }) });
+    assert.equal(old.status, 401);
+    assert.deepEqual(errors, []);
+    await ctx.close();
+  });
+
   test('two-factor sign-in: set up, sign in with a code, turn off', async () => {
     const creds = await makeUser(srv.base, admin, 'tfa1@example.org');
     const { page, errors, ctx } = await newPage(browser, srv.base);

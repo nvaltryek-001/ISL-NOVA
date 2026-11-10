@@ -22,6 +22,7 @@ class Settings:
     database_url: str = f"sqlite:///{REPO / 'storage' / 'isl_nova.db'}"
     jwt_secret: str = ""
     jwt_ttl_minutes: int = 120
+    refresh_ttl_days: int = 30
     cors_origins: list[str] = field(default_factory=lambda: ["http://localhost:5173", "http://localhost:8000"])
     storage_dir: Path = REPO / "storage" / "objects"
     model_registry_dir: Path = REPO / "artifacts" / "models"
@@ -53,6 +54,7 @@ class Settings:
             database_url=e.get("DATABASE_URL", cls.database_url),
             jwt_secret=e.get("JWT_SECRET", ""),
             jwt_ttl_minutes=int(e.get("JWT_TTL_MINUTES", "120")),
+            refresh_ttl_days=int(e.get("REFRESH_TTL_DAYS", "30")),
             cors_origins=[o.strip() for o in e.get("CORS_ORIGINS", "http://localhost:5173,http://localhost:8000").split(",") if o.strip()],
             storage_dir=Path(e.get("STORAGE_DIR", str(cls.storage_dir))),
             model_registry_dir=Path(e.get("MODEL_REGISTRY_DIR", str(cls.model_registry_dir))),

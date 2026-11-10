@@ -29,29 +29,42 @@ export type User = {
 
 const KEY = 'isl-nova-session';
 
-function load(): { token: string | null; user: User | null } {
+type Session = { token: string | null; refresh: string | null; user: User | null };
+
+function load(): Session {
   try {
     const raw = sessionStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return { refresh: null, ...JSON.parse(raw) };
   } catch { /* storage unavailable */ }
-  return { token: null, user: null };
+  return { token: null, refresh: null, user: null };
+}
+
+function save(s: Session) {
+  try { sessionStorage.setItem(KEY, JSON.stringify(s)); } catch { /* ignore */ }
 }
 
 const authStore = createStore(load());
 
 export const auth = {
   ...authStore,
-  login(token: string, user: User) {
-    authStore.set({ token, user });
-    try { sessionStorage.setItem(KEY, JSON.stringify({ token, user })); } catch { /* ignore */ }
+  login(token: string, user: User, refresh: string | null = null) {
+    authStore.set({ token, user, refresh });
+    save({ token, user, refresh });
   },
   setUser(user: User) {
     authStore.set({ user });
-    try { sessionStorage.setItem(KEY, JSON.stringify({ token: authStore.get().token, user })); } catch { /* ignore */ }
+    save({ ...authStore.get(), user });
+  },
+  setTokens(token: string, refresh: string | null) {
+    authStore.set({ token, refresh });
+    save({ ...authStore.get(), token, refresh });
   },
   logout() {
-    authStore.set({ token: null, user: null });
+    const refresh = authStore.get().refresh;
+    authStore.set({ token: null, user: null, refresh: null });
     try { sessionStorage.removeItem(KEY); } catch { /* ignore */ }
+    // revoke the refresh token on the server too (best effort, no await)
+    if (refresh) fetch('/api/v1/auth/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: refresh }) }).catch(() => undefined);
   },
 };
 

@@ -102,3 +102,27 @@ def test_retention_job_dry_run_then_apply(app_env):
     assert done["deleted"]["password_resets_expired_or_used"] >= 1
     again = c.post(f"{A}/admin/retention", json={}, headers=admin).json()
     assert again["would_delete"]["password_resets_expired_or_used"] == 0
+
+
+def test_refresh_token_rotation_reuse_detection_and_logout(app_env):
+    c, api, admin, _ = app_env
+    api.user(admin)
+    email = "rt@example.org"
+    c.post(f"{A}/auth/register", json={"email": email, "password": "password-123!", "display_name": "RT"})
+    s1 = c.post(f"{A}/auth/login", json={"email": email, "password": "password-123!"}).json()
+    assert s1["refresh_token"] and s1["refresh_expires_in"] == 30 * 86400
+    s2 = c.post(f"{A}/auth/refresh", json={"refresh_token": s1["refresh_token"]}).json()
+    assert s2["refresh_token"] != s1["refresh_token"]
+    assert c.get(f"{A}/me", headers={"Authorization": f"Bearer {s2['access_token']}"}).status_code == 200
+    # the rotated token presented again = theft signal: the whole family is revoked
+    r = c.post(f"{A}/auth/refresh", json={"refresh_token": s1["refresh_token"]})
+    assert r.status_code == 401 and r.json()["error"]["code"] == "invalid_refresh_token"
+    assert c.post(f"{A}/auth/refresh", json={"refresh_token": s2["refresh_token"]}).status_code == 401
+    # a separate session: logout revokes it; sign-out-everywhere revokes the rest
+    s3 = c.post(f"{A}/auth/login", json={"email": email, "password": "password-123!"}).json()
+    s4 = c.post(f"{A}/auth/login", json={"email": email, "password": "password-123!"}).json()
+    assert c.post(f"{A}/auth/logout", json={"refresh_token": s3["refresh_token"]}).json()["ok"] is True
+    assert c.post(f"{A}/auth/refresh", json={"refresh_token": s3["refresh_token"]}).status_code == 401
+    c.post(f"{A}/auth/logout-all", headers={"Authorization": f"Bearer {s4['access_token']}"})
+    assert c.post(f"{A}/auth/refresh", json={"refresh_token": s4["refresh_token"]}).status_code == 401
+    assert c.post(f"{A}/auth/refresh", json={"refresh_token": "x" * 40}).status_code == 401

@@ -39,9 +39,9 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
     try {
       const body = mode === 'login' ? { email: form.email, password: form.password, ...(needOtp ? { otp: form.otp } : {}) }
         : { email: form.email, password: form.password, display_name: form.display_name };
-      const res = await api<{ access_token: string; user: User }>(`/auth/${mode}`, { body });
+      const res = await api<{ access_token: string; refresh_token?: string; user: User }>(`/auth/${mode}`, { body });
       clearCache();
-      auth.login(res.access_token, res.user);
+      auth.login(res.access_token, res.user, res.refresh_token ?? null);
       navigate(next.startsWith('/') && !next.startsWith('//') ? next : '/', true);
     } catch (err) {
       const e2 = err as ApiError;

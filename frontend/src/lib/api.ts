@@ -11,7 +11,25 @@ export class ApiError extends Error {
 
 type Opts = { method?: string; body?: unknown; form?: FormData; signal?: AbortSignal };
 
-export async function api<T = any>(path: string, opts: Opts = {}): Promise<T> {
+let refreshing: Promise<boolean> | null = null;
+
+/** Exchange the refresh token for a new pair once; concurrent 401s share one refresh. */
+function tryRefresh(): Promise<boolean> {
+  const refresh = auth.get().refresh;
+  if (!refresh) return Promise.resolve(false);
+  refreshing ??= fetch(API + '/auth/refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: refresh }) })
+    .then(async (r) => {
+      if (!r.ok) return false;
+      const d = await r.json();
+      auth.setTokens(d.access_token, d.refresh_token ?? null);
+      return true;
+    })
+    .catch(() => false)
+    .finally(() => { refreshing = null; });
+  return refreshing;
+}
+
+export async function api<T = any>(path: string, opts: Opts = {}, retried = false): Promise<T> {
   const headers: Record<string, string> = {};
   const token = auth.get().token;
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -32,7 +50,10 @@ export async function api<T = any>(path: string, opts: Opts = {}): Promise<T> {
   const data = text ? safeJson(text) : null;
   if (!res.ok) {
     const err = data?.error ?? {};
-    if (res.status === 401 && token && err.code === 'invalid_token') auth.logout();
+    if (res.status === 401 && token && err.code === 'invalid_token') {
+      if (!retried && await tryRefresh()) return api<T>(path, opts, true);
+      auth.logout();
+    }
     throw new ApiError(res.status, err.code ?? 'http_error', err.message ?? res.statusText, err.details);
   }
   return data as T;

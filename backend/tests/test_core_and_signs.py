@@ -202,7 +202,7 @@ def test_deactivated_user_cannot_use_token(app_env):
 
 def test_migrations_idempotent_and_tamper_detected(tmp_path, monkeypatch):
     db = Database(f"sqlite:///{tmp_path / 'm.db'}")
-    assert migrate(db) == ["0001_core", "0002_translations_v2", "0003_sign_proposals", "0004_token_version", "0005_password_resets", "0006_totp", "0007_classes_and_review"]
+    assert migrate(db) == ["0001_core", "0002_translations_v2", "0003_sign_proposals", "0004_token_version", "0005_password_resets", "0006_totp", "0007_classes_and_review", "0008_refresh_tokens"]
     assert migrate(db) == []
     assert status(db)["pending"] == []
     with db.connect() as conn:

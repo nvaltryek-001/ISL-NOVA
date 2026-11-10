@@ -30,6 +30,8 @@ def run_retention(conn: Conn, settings, storage=None, apply: bool = False) -> di
     rules: list[tuple[str, str, tuple]] = [
         ("password_resets_expired_or_used",
          "FROM password_resets WHERE expires_at < ? OR used_at IS NOT NULL", (now,)),
+        ("refresh_tokens_expired_or_revoked",
+         "FROM refresh_tokens WHERE expires_at < ? OR revoked_at IS NOT NULL OR used_at IS NOT NULL", (now,)),
         ("notifications_read_old",
          "FROM notifications WHERE read_at IS NOT NULL AND created_at < ?",
          (_ago(settings.notification_retention_days),)),
