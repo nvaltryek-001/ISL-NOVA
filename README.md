@@ -40,7 +40,7 @@
 >
 > | | |
 > |---|---|
-> | ✅ **Platform (v2)** | 15 modules incl. **Practice Coach**, **Text-to-Sign**, **Conversation mode**, installable **offline PWA**; interface and all 200 sign meanings in **English, हिन्दी and ಕನ್ನಡ**; sign-out-everywhere, password reset, optional **two-factor sign-in**, retention job, Prometheus metrics. CI green: **75** Python tests, **20** unit tests, **24** end-to-end tests incl. an **axe-core WCAG 2.1 AA scan** of 18 routes in both themes. |
+> | ✅ **Platform (v2)** | 15 modules incl. **Practice Coach**, **Text-to-Sign**, **Conversation mode**, installable **offline PWA**; interface and all 200 sign meanings in **English, हिन्दी and ಕನ್ನಡ**; sign-out-everywhere, password reset, optional **two-factor sign-in**, retention job, Prometheus metrics. CI green: **77** Python tests, **20** unit tests, **25** end-to-end tests incl. an **axe-core WCAG 2.1 AA scan** of 18 routes in both themes. |
 > | ✅ **Real model (v2)** | LSTM with frame-rate augmentation, trained on genuine INCLUDE recordings, **200 classes**: **92.0 % top-1 · 98.7 % top-5** on the 635-video official test split (3-seed mean **93.0 ± 0.7 %** vs 90.6 ± 0.9 % without augmentation). Through the full browser pipeline (held-out clips as a virtual webcam): **83.6 % top-1** (v1: 74.0 %). |
 > | ✅ **Deployed (v1)** | Free-tier demo at **[isl-nova.onrender.com](https://isl-nova.onrender.com)** runs the v1 platform and model; 24/24 held-out samples correct through the public API. v2 is not deployed yet. |
 > | ⚠️ **Unknown signs** | 62 held-out INCLUDE glosses: AUROC 0.918, but **34 % of unseen signs are still "recognized"** at the shipped threshold (v1: 29 %). Target FAR < 10 % not met. |

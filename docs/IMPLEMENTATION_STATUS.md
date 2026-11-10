@@ -1,5 +1,7 @@
 # Implementation status
 
+> **v2 (`feat/isl-nova-v2`, 2026-11-10):** see [V2_STATUS.md](V2_STATUS.md) for everything added in v2 (three languages, frame-rate-robust model `lstm-20261110T111537Z-s7` with 83.6 % browser top-1, Practice Coach, Text-to-Sign, Conversation, PWA, account security, retention, accessibility scan) and what is still pending. The table below is the v1 baseline.
+
 _Last updated: 2026-11-04, branch `feat/isl-nova-platform`._ Every result below
 was produced by a command that actually ran: in the build sandbox (2 vCPU,
 Python 3.13, Node 22, Chromium via Playwright), in GitHub Actions, or against

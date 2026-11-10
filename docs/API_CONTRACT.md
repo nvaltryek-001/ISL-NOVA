@@ -14,12 +14,19 @@ Generated from the application's OpenAPI document by `scripts/gen_api_contract.p
 | `GET` | `/api/v1/health` | Service health | public | - |
 | `POST` | `/api/v1/auth/register` | Create an account (learner role) | public | - |
 | `POST` | `/api/v1/auth/login` | Exchange credentials for an access token | public | - |
+| `POST` | `/api/v1/auth/logout-all` | Sign out everywhere: revoke every token issued to this account | required | - |
+| `POST` | `/api/v1/me/2fa/setup` | Start two-factor setup: a new TOTP secret (not active until confirmed) | required | - |
+| `POST` | `/api/v1/me/2fa/enable` | Confirm a code from the authenticator app and turn two-factor on | required | - |
+| `POST` | `/api/v1/me/2fa/disable` | Turn two-factor off (needs a current code) | required | - |
 | `GET` | `/api/v1/me` | Current user profile | required | - |
 | `PATCH` | `/api/v1/me` | Update profile, preferences or password | required | - |
 | `GET` | `/api/v1/notifications` | My notifications | required | - |
 | `POST` | `/api/v1/notifications/{nid}/read` | Mark a notification read | required | - |
 | `GET` | `/api/v1/admin/users` | List users | required | `admin:users` |
 | `PATCH` | `/api/v1/admin/users/{uid}` | Change roles or deactivate a user | required | `admin:users` |
+| `POST` | `/api/v1/admin/users/{uid}/password-reset` | Issue a one-time password reset code (30 min) | required | `admin:users` |
+| `POST` | `/api/v1/auth/reset-password` | Set a new password with a one-time reset code | public | - |
+| `POST` | `/api/v1/admin/retention` | Run the data-retention job (dry run unless apply=true) | required | `admin:users` |
 | `GET` | `/api/v1/admin/audit` | Audit log | required | `admin:audit` |
 | `GET` | `/api/v1/admin/roles` | Roles and permissions | required | `admin:users` |
 
@@ -42,6 +49,22 @@ Generated from the application's OpenAPI document by `scripts/gen_api_contract.p
 | `GET` | `/api/v1/bookmarks` | My bookmarked signs | required | - |
 | `PUT` | `/api/v1/bookmarks/{sign_id}` | Bookmark a sign | required | - |
 | `DELETE` | `/api/v1/bookmarks/{sign_id}` | Remove a bookmark | required | - |
+
+## translations
+
+| Method | Path | Summary | Auth | Permission |
+|---|---|---|---|---|
+| `GET` | `/api/v1/translations/coverage` | Meanings per language and review status | optional | - |
+| `GET` | `/api/v1/translations/review-sheet.csv` | CSV of all en/hi/kn meanings for native-speaker review | required | `translations:write` |
+| `POST` | `/api/v1/translations/import` | Apply a reviewed translation sheet (new_text / new_status columns) | required | `translations:write` |
+
+## proposals
+
+| Method | Path | Summary | Auth | Permission |
+|---|---|---|---|---|
+| `POST` | `/api/v1/vocabulary/proposals` | Propose a new vocabulary sign | required | - |
+| `GET` | `/api/v1/vocabulary/proposals` | List proposals (reviewers see all, others their own) | required | - |
+| `POST` | `/api/v1/vocabulary/proposals/{pid}/decide` | Accept or reject a proposal | required | `signs:write` |
 
 ## dataset
 
@@ -91,6 +114,14 @@ Generated from the application's OpenAPI document by `scripts/gen_api_contract.p
 | `GET` | `/api/v1/evaluation/runs` | Evaluation runs on dataset versions | required | `experiments:read` |
 | `GET` | `/api/v1/evaluation/runs/{rid}` | Evaluation run detail with per-recording rows | required | `experiments:read` |
 
+## practice
+
+| Method | Path | Summary | Auth | Permission |
+|---|---|---|---|---|
+| `GET` | `/api/v1/practice/status` | Whether practice reference data is installed | optional | - |
+| `GET` | `/api/v1/practice/reference/{sign_id}` | Reference landmark sequence of a sign for animation | optional | - |
+| `POST` | `/api/v1/practice/score` | Score a practice attempt against the sign's reference | optional | - |
+
 ## personal
 
 | Method | Path | Summary | Auth | Permission |
@@ -106,6 +137,7 @@ Generated from the application's OpenAPI document by `scripts/gen_api_contract.p
 | `GET` | `/api/v1/learning/lessons` | Lessons by category (verified content by default) | optional | - |
 | `GET` | `/api/v1/learning/quiz` | Quiz built only from verified signs and verified meanings | optional | - |
 | `GET` | `/api/v1/learning/progress` | My learning progress | required | - |
+| `GET` | `/api/v1/learning/achievements` | My streaks, points, weekly goal and badges (from my own attempts) | required | - |
 | `POST` | `/api/v1/learning/attempts` | Record a practice or quiz attempt | required | - |
 | `GET` | `/api/v1/phrases` | My saved phrases and the curated quick phrases | optional | - |
 | `POST` | `/api/v1/phrases` | Save a composed phrase | required | - |

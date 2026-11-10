@@ -33,7 +33,7 @@ new commits are deployed with a manual deploy from the dashboard or API). It was
 | Variable | Value | Why |
 |---|---|---|
 | `ISL_NOVA_ENV` | `production` | strict config checks, HSTS |
-| `ISL_NOVA_MODEL_TAG` | `model-lstm-20261104T041414Z-s13` | entrypoint installs the verified release (SHA-256 checked) at start |
+| `ISL_NOVA_MODEL_TAG` | `model-lstm-20261104T041414Z-s13` (live v1 demo) · `model-lstm-20261110T111537Z-s7` for v2 | entrypoint installs the verified release (SHA-256 checked) at start; with v2 it also fetches the Practice Coach references |
 | `ISL_NOVA_GENERATE_JWT_SECRET` | `1` | container generates its own signing key; no secret passes through config or logs |
 | `DATABASE_URL` | `sqlite:////data/isl_nova.sqlite` | free plan has no disk and free Postgres expires after 30 days |
 | `CORS_ORIGINS` | `https://isl-nova.onrender.com` | same-origin SPA |
