@@ -9,9 +9,8 @@ All models consume ``float32 [N, T, D]`` tensors produced by
 ``features.extract_features`` and expose ``logits(X)``. Weights are stored as
 ``.npz`` arrays plus JSON metadata; nothing is unpickled at load time.
 
-TCN and Temporal-Transformer candidates are documented in
-research/EXPERIMENT_PROTOCOL.md but not implemented here because they need an
-autodiff framework (PyTorch) that was not installable in the build sandbox.
+TCN, Transformer, BiLSTM-attention and ensembles live in ``deep.py`` (NumPy with
+hand-written, gradient-checked backward passes) and are registered below.
 """
 
 from __future__ import annotations
@@ -393,6 +392,7 @@ class DTW1NN:
 
 
 REGISTRY = {c.kind: c for c in (LSTMClassifier, GRUClassifier, PooledLogReg, DTW1NN)}
+GRADIENT_KINDS = {"lstm", "gru", "tcn", "transformer", "bilstm_attn"}
 
 
 def save_model(model, directory: Path) -> None:
@@ -418,3 +418,6 @@ def fit_temperature(logits: np.ndarray, y: np.ndarray) -> float:
         if nll < best:
             best, best_t = nll, float(t)
     return best_t
+
+
+from . import deep as _deep  # noqa: E402,F401  (registers its classes in REGISTRY)

@@ -417,7 +417,7 @@ def cmd_verify(a) -> int:
     from .inference import Predictor
 
     pred = Predictor.from_registry(Path(a.registry))
-    known = {c["sign_id"] for c in pred.classes}
+    known = {c["sign_id"] for c in pred.vocabulary}
     entries = [e for e in json.loads(Path(a.manifest).read_text())["entries"] if e["split"] == "test" and e["sign_id"] in known]
     states, correct, top5, lat = Counter(), 0, 0, []
     for e in entries:
@@ -451,7 +451,7 @@ def cmd_open_set(a) -> int:
     from .metrics import auroc
 
     pred = Predictor.from_registry(Path(a.registry))
-    known_ids = {c["sign_id"] for c in pred.classes}
+    known_ids = {c["sign_id"] for c in pred.vocabulary}
     man = json.loads(Path(a.manifest).read_text())
     groups = {"known": [e for e in man["entries"] if e["split"] == "test" and e["sign_id"] in known_ids],
               "unknown": [e for e in man.get("open_set_entries", []) if e.get("open_set")]}
@@ -461,7 +461,7 @@ def cmd_open_set(a) -> int:
             frames, aspect = load_landmarks(Path(a.data_root) / e["landmarks_path"])
             fr = extract_features(frames, aspect)
             out = pred.predict(frames, aspect, 5)
-            p1 = float(pred.predict_features(fr.features).max()) if fr.status == "ok" else None
+            p1 = pred.known_max(pred.predict_features(fr.features)) if fr.status == "ok" else None
             if p1 is not None:
                 scores[g].append(p1)
             top = out["top"][0]["sign_id"] if out["top"] else None
@@ -515,11 +515,11 @@ def cmd_open_set_v2(a) -> int:
     from .data import load_landmarks
     from .features import extract_features
     from .inference import Predictor
-    from .openset import CentroidScorer, base_scores, evaluate, gloss_half, pooled
+    from .openset import CentroidScorer, base_scores, evaluate, gloss_half, pooled, unknown_part
 
     pred = Predictor.from_registry(Path(a.registry))
-    known_ids = {c["sign_id"] for c in pred.classes}
-    cidx = {c["sign_id"]: i for i, c in enumerate(pred.classes)}
+    known_ids = {c["sign_id"] for c in pred.vocabulary}
+    cidx = {c["sign_id"]: i for i, c in enumerate(pred.vocabulary)}
     man = json.loads(Path(a.manifest).read_text())
 
     def feats(entries):
@@ -530,14 +530,17 @@ def cmd_open_set_v2(a) -> int:
             if fr.status != "ok":
                 continue
             F = np.asarray(fr.features, dtype=np.float64)
-            P.append(pred.predict_features(F))
+            P.append(pred.predict_features(F)[pred.known_cols])
             Z.append(pooled(F))
             keep.append(e)
         return np.array(P), np.array(Z), keep
 
     by = {sp: [e for e in man["entries"] if e["split"] == sp and e["sign_id"] in known_ids] for sp in ("train", "val", "test")}
     unk = [e for e in man.get("open_set_entries", []) if e.get("open_set")]
-    halves = {h: [e for e in unk if gloss_half(e["gloss"]) == h] for h in ("A", "B")}
+    # an "__other__" model was trained on part A1, so only part A2 may fit detectors for it
+    halves = {"A": [e for e in unk if (unknown_part(e["gloss"]) == "A2" if pred.other_col is not None
+                                        else gloss_half(e["gloss"]) == "A")],
+              "B": [e for e in unk if gloss_half(e["gloss"]) == "B"]}
     _, Ztr, ktr = feats(by["train"])
     cent = CentroidScorer().fit(Ztr, np.array([cidx[e["sign_id"]] for e in ktr]))
     parts = {}
@@ -556,6 +559,149 @@ def cmd_open_set_v2(a) -> int:
     Path(a.out).mkdir(parents=True, exist_ok=True)
     (Path(a.out) / "open_set_v2.json").write_text(json.dumps(out, indent=2))
     print(json.dumps(out, indent=1))
+    return 0
+
+
+def _entries_and_parts(a, pred):
+    from .data import assign_splits, training_eligible
+    from .openset import unknown_part
+
+    man = json.loads(Path(a.manifest).read_text())
+    known_ids = {c["sign_id"] for c in pred.vocabulary}
+    seed = int((pred.info.get("config") or {}).get("seed", 13))
+    if pred.info["kind"] == "ensemble":
+        seed = int(json.loads((pred.dir / "architecture.json").read_text())["members"][0].get("seed", 13))
+    entries = assign_splits([e for e in man["entries"] if training_eligible(e)[0]], seed=seed)  # as in training
+    by = {sp: [e for e in entries if e["split"] == sp and e["sign_id"] in known_ids] for sp in ("val", "test")}
+    unk = [e for e in man.get("open_set_entries", []) if e.get("open_set")]
+    parts = {k: [e for e in unk if unknown_part(e["gloss"]) == k] for k in ("A1", "A2", "B")}
+    return by, parts
+
+
+def _probs(a, pred, entries):
+    import numpy as np
+
+    from .data import load_landmarks
+    from .features import extract_features
+
+    P, keep = [], []
+    for e in entries:
+        fr = extract_features(*load_landmarks(Path(a.data_root) / e["landmarks_path"]))
+        if fr.status != "ok":
+            continue
+        P.append(pred.predict_features(np.asarray(fr.features, dtype=np.float64)))
+        keep.append(e)
+    return np.array(P), keep
+
+
+def cmd_calibrate_open_set(a) -> int:
+    """Fit the production unknown-sign detector on (known VALIDATION, unknown part A2), store it in the
+    active model's model.json, then evaluate the Predictor's final decisions ONCE on (known TEST, unknown
+    part B). Parts A1/A2/B have disjoint glosses; A1 may have trained an "__other__" class."""
+    import numpy as np
+
+    from .inference import Predictor
+    from .metrics import auroc
+    from .openset import detector_features, detector_score, fit_detector
+
+    pred = Predictor.from_registry(Path(a.registry))
+    if pred.detector:
+        print("active model already has an open_set_detector; refitting")
+    by, parts = _entries_and_parts(a, pred)
+    feats = lambda P: detector_features(P, pred.known_cols, pred.other_col)  # noqa: E731
+    Pv, _ = _probs(a, pred, by["val"])
+    Pa2, _ = _probs(a, pred, parts["A2"])
+    det = fit_detector(feats(Pv), feats(Pa2), target_far=a.target_far)
+    det["fit_parts"] = {"known": "validation split", "unknown": "part A2",
+                        "unknown_glosses": len({e["gloss"] for e in parts["A2"]})}
+
+    info_path = pred.dir / "model.json"
+    info = json.loads(info_path.read_text())
+    baseline_rule = {"tau": pred.tau, "margin": pred.margin}
+    info["open_set_detector"] = det
+    info_path.write_text(json.dumps(info, indent=2))
+    pred2 = Predictor(pred.dir)  # reload exactly as the API will
+
+    Pt, kt = _probs(a, pred2, by["test"])
+    Pb, _ = _probs(a, pred2, parts["B"])
+
+    def rates(rule):
+        if rule == "detector":
+            st_k = [pred2.state_for(p)[0] for p in Pt]
+            st_u = [pred2.state_for(p)[0] for p in Pb]
+        else:
+            pred2.detector = None
+            st_k = [pred2.state_for(p)[0] for p in Pt]
+            st_u = [pred2.state_for(p)[0] for p in Pb]
+            pred2.detector = det
+        vocab_idx = {c["sign_id"]: i for i, c in enumerate(pred2.classes)}
+        top = [int(np.asarray(pred2.known_cols)[np.argmax(p[pred2.known_cols])]) for p in Pt]
+        correct = [t == vocab_idx[e["sign_id"]] for t, e in zip(top, kt, strict=True)]
+        rk = np.array([s == "recognized" for s in st_k])
+        ru = np.array([s == "recognized" for s in st_u])
+        return {"false_rejection": float(1 - rk.mean()), "false_acceptance": float(ru.mean()),
+                "known_recognized_and_correct": float((rk & np.array(correct)).mean()),
+                "known_recognized_but_wrong": float((rk & ~np.array(correct)).mean()),
+                "known_states": dict(Counter(st_k)), "unknown_states": dict(Counter(st_u))}
+
+    sk = detector_score(det, feats(Pt))
+    su = detector_score(det, feats(Pb))
+    rep = {"model_id": pred2.info["model_id"], "has_other_class": pred2.other_col is not None,
+           "protocol": "detector fitted on known validation + unknown part A2; thresholds chosen on that fit set; "
+                       "evaluated once on known test + unknown part B (disjoint glosses, never used for any choice)",
+           "counts": {"val_known": int(len(Pv)), "unknown_A2": int(len(Pa2)), "test_known": int(len(Pt)),
+                      "unknown_B": int(len(Pb)), "glosses_A2": len({e["gloss"] for e in parts["A2"]}),
+                      "glosses_B": len({e["gloss"] for e in parts["B"]})},
+           "detector": {k: det[k] for k in ("features", "t_recognized", "t_uncertain", "chosen_on_fit_set")},
+           "auroc_detector": auroc(sk, su),
+           "auroc_maxprob": auroc(np.array([pred2.known_max(p) for p in Pt]), np.array([pred2.known_max(p) for p in Pb])),
+           "max_probability_rule": {**baseline_rule, **rates("maxprob")},
+           "open_set_detector_rule": rates("detector"),
+           "targets": {"false_acceptance_below": 0.10, "false_rejection_at_most": 0.15}}
+    Path(a.out).mkdir(parents=True, exist_ok=True)
+    (Path(a.out) / "open_set_v3.json").write_text(json.dumps(rep, indent=2))
+    print(json.dumps(rep, indent=1))
+    return 0
+
+
+def cmd_ensemble(a) -> int:
+    """Build ensembles from trained models in a registry (members chosen by VALIDATION macro-F1)."""
+    from .train import build_ensemble
+
+    root = Path(a.registry)
+    rows = []
+    for d in sorted(p for p in root.iterdir() if (p / "model.json").exists()):
+        info = json.loads((d / "model.json").read_text())
+        if info["kind"] == "ensemble" or info.get("synthetic"):
+            continue
+        if info["kind"] not in ("lstm", "gru", "tcn", "transformer", "bilstm_attn"):
+            continue
+        m = json.loads((d / "metrics.json").read_text())
+        rows.append((m["validation"]["macro_f1"], d, info))
+    built = []
+    for ncls in sorted({len(r[2]["classes"]) for r in rows}):
+        group = sorted((r for r in rows if len(r[2]["classes"]) == ncls), key=lambda r: -r[0])
+        cands = []
+        best_per_kind = {}
+        for r in group:
+            best_per_kind.setdefault(r[2]["kind"], r)
+        if len(best_per_kind) >= 2:
+            cands.append([r[1] for r in best_per_kind.values()])
+        for k in (3, 5):
+            if len(group) >= k:
+                cands.append([r[1] for r in group[:k]])
+        seen = set()
+        for c in cands:
+            key = tuple(sorted(str(x) for x in c))
+            if key in seen:
+                continue
+            seen.add(key)
+            try:
+                built.append(build_ensemble(c, Path(a.manifest), Path(a.data_root), root,
+                                            dataset_version=a.dataset_version))
+            except Exception as exc:  # noqa: BLE001 - one failed candidate must not stop the others
+                print(f"[ensemble] skipped {[x.name for x in c]}: {exc}")
+    print(json.dumps(built, indent=1))
     return 0
 
 
@@ -594,6 +740,17 @@ def main(argv=None) -> int:
     p.add_argument("--manifest", required=True)
     p.add_argument("--data-root", required=True)
     p.add_argument("--out", required=True)
+    p = sub.add_parser("calibrate-open-set")
+    p.add_argument("--registry", required=True)
+    p.add_argument("--manifest", required=True)
+    p.add_argument("--data-root", required=True)
+    p.add_argument("--out", required=True)
+    p.add_argument("--target-far", type=float, default=0.10)
+    p = sub.add_parser("ensemble")
+    p.add_argument("--registry", required=True)
+    p.add_argument("--manifest", required=True)
+    p.add_argument("--data-root", required=True)
+    p.add_argument("--dataset-version", default="unversioned")
     p = sub.add_parser("open-set-v2")
     p.add_argument("--registry", required=True)
     p.add_argument("--manifest", required=True)
@@ -607,7 +764,8 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     return {"preflight": cmd_preflight, "parts": cmd_parts, "extract-part": cmd_extract_part,
             "merge": cmd_merge, "compare": cmd_compare, "verify": cmd_verify,
-            "fetch-test-videos": cmd_fetch_test_videos, "open-set": cmd_open_set, "open-set-v2": cmd_open_set_v2}[a.cmd](a)
+            "fetch-test-videos": cmd_fetch_test_videos, "open-set": cmd_open_set, "open-set-v2": cmd_open_set_v2,
+            "calibrate-open-set": cmd_calibrate_open_set, "ensemble": cmd_ensemble}[a.cmd](a)
 
 
 if __name__ == "__main__":

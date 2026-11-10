@@ -1,0 +1,26 @@
+{
+  "data_run_id": 41773683352,
+  "artifact": "landmarks-include-official-v2",
+  "dataset_version": "include-official-v1+oov62",
+  "epochs": 60,
+  "baseline_model_tag": "model-lstm-20261110T111537Z-s7",
+  "publish_release": true,
+  "purpose": "v3: TCN / Transformer / BiLSTM-attention with frame-rate augmentation, an explicit __other__ class trained on unknown-gloss part A1, ensembles, and the production unknown-sign detector fitted on part A2 and evaluated once on part B",
+  "models": [
+    {"name": "transformer_s13", "config": "ml/configs/transformer_fps_aug.json", "seed": 13},
+    {"name": "transformer_s7", "config": "ml/configs/transformer_fps_aug.json", "seed": 7},
+    {"name": "transformer_s21", "config": "ml/configs/transformer_fps_aug.json", "seed": 21},
+    {"name": "tcn_s13", "config": "ml/configs/tcn_fps_aug.json", "seed": 13},
+    {"name": "tcn_s7", "config": "ml/configs/tcn_fps_aug.json", "seed": 7},
+    {"name": "tcn_s21", "config": "ml/configs/tcn_fps_aug.json", "seed": 21},
+    {"name": "bilstm_attn_s13", "config": "ml/configs/bilstm-attn_fps_aug.json", "seed": 13},
+    {"name": "bilstm_attn_s7", "config": "ml/configs/bilstm-attn_fps_aug.json", "seed": 7},
+    {"name": "bilstm_attn_s21", "config": "ml/configs/bilstm-attn_fps_aug.json", "seed": 21},
+    {"name": "lstm_fps_s13", "config": "ml/configs/lstm_fps_aug.json", "seed": 13},
+    {"name": "lstm_fps_s21", "config": "ml/configs/lstm_fps_aug.json", "seed": 21},
+    {"name": "lstm_other_s7", "config": "ml/configs/lstm_fps_aug_other.json", "seed": 7},
+    {"name": "lstm_other_s13", "config": "ml/configs/lstm_fps_aug_other.json", "seed": 13},
+    {"name": "transformer_other_s7", "config": "ml/configs/transformer_fps_aug_other.json", "seed": 7},
+    {"name": "transformer_other_s13", "config": "ml/configs/transformer_fps_aug_other.json", "seed": 13}
+  ]
+}

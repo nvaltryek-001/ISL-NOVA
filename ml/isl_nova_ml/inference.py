@@ -15,6 +15,7 @@ import numpy as np
 from . import contract as C
 from .features import extract_features
 from .models import load_model
+from .openset import OTHER_ID, detector_features, detector_score
 from .registry import Registry, RegistryError, verify_integrity
 
 
@@ -32,7 +33,11 @@ class Predictor:
             )
         verify_integrity(self.dir)
         self.model = load_model(self.dir)
-        self.classes = self.info["classes"]
+        self.classes = self.info["classes"]  # every model output, incl. an optional "__other__" class
+        self.other_col = next((i for i, c in enumerate(self.classes) if c["sign_id"] == OTHER_ID), None)
+        self.known_cols = [i for i, c in enumerate(self.classes) if c["sign_id"] != OTHER_ID]
+        self.vocabulary = [self.classes[i] for i in self.known_cols]
+        self.detector = self.info.get("open_set_detector")
         th = self.info.get("thresholds", {})
         self.tau = float(th.get("tau", 0.5))
         self.margin = float(th.get("margin", 0.1))
@@ -63,24 +68,44 @@ class Predictor:
         p = self.predict_features(fr.features)
         return self.decide(p, top_k, quality, t0)
 
+    def known_max(self, p: np.ndarray) -> float:
+        return float(p[self.known_cols].max())
+
     def decide(self, p: np.ndarray, top_k: int, quality: dict, t0: float) -> dict:
-        order = np.argsort(-p)[:top_k]
+        state, reasons = self.state_for(p)
+        kc = np.asarray(self.known_cols)
+        order = kc[np.argsort(-p[kc])[:top_k]]
         top = [{"sign_id": self.classes[i]["sign_id"], "label": self.classes[i]["label"],
                 "probability": round(float(p[i]), 4)} for i in order]
-        p1 = float(p[order[0]])
-        p2 = float(p[order[1]]) if len(order) > 1 else 0.0
+        out = {"state": state, "top": top, "reasons": reasons, "quality": quality,
+               "latency_ms": round((time.perf_counter() - t0) * 1000, 2), **self.describe()}
+        if self.other_col is not None:
+            out["other_probability"] = round(float(p[self.other_col]), 4)
+        return out
+
+    def state_for(self, p: np.ndarray) -> tuple[str, list[str]]:
+        """recognized / uncertain / unknown for one calibrated probability vector."""
+        if self.other_col is not None and int(np.argmax(p)) == self.other_col:
+            return "unknown", [f"closest to signs outside the vocabulary (p={float(p[self.other_col]):.2f})"]
+        K = np.sort(p[self.known_cols])[::-1]
+        p1, p2 = float(K[0]), float(K[1]) if len(K) > 1 else 0.0
+        if self.detector:
+            s = float(detector_score(self.detector, detector_features(p[None], self.known_cols, self.other_col))[0])
+            if s >= self.detector["t_recognized"]:
+                return "recognized", []
+            if s >= self.detector["t_uncertain"]:
+                return "uncertain", [f"unknown-sign detector score {s:.2f} below {self.detector['t_recognized']:.2f}"]
+            return "unknown", [f"unknown-sign detector score {s:.2f}: likely a sign outside the vocabulary"]
         if p1 >= self.tau and (p1 - p2) >= self.margin:
-            state, reasons = "recognized", []
-        elif p1 >= 0.6 * self.tau:
-            state, reasons = "uncertain", [f"top probability {p1:.2f} or margin {p1 - p2:.2f} below threshold"]
-        else:
-            state, reasons = "unknown", [f"top probability {p1:.2f} below rejection threshold {0.6 * self.tau:.2f}"]
-        return {"state": state, "top": top, "reasons": reasons, "quality": quality,
-                "latency_ms": round((time.perf_counter() - t0) * 1000, 2), **self.describe()}
+            return "recognized", []
+        if p1 >= 0.6 * self.tau:
+            return "uncertain", [f"top probability {p1:.2f} or margin {p1 - p2:.2f} below threshold"]
+        return "unknown", [f"top probability {p1:.2f} below rejection threshold {0.6 * self.tau:.2f}"]
 
     def describe(self) -> dict:
         return {"model_id": self.info["model_id"], "synthetic": self.synthetic,
-                "contract": self.info["contract"]["name"]}
+                "contract": self.info["contract"]["name"],
+                "decision_rule": "open_set_detector" if self.detector else "max_probability"}
 
 
 class StreamSmoother:

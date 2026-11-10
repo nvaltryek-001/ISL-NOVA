@@ -1,0 +1,132 @@
+# ISL NOVA v3 models: new architectures, "__other__" class, ensembles and the production
+# unknown-sign detector. Settings: ml/runs/include-v3.json. Start: push run/include-v3
+# (or run manually). Selection uses VALIDATION only; the test split and unknown-gloss
+# part B are evaluated once at the end.
+name: INCLUDE v3 models
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["run/include-v3"]
+
+permissions:
+  contents: write   # publish the selected model as a pre-release
+  actions: read     # download the landmark artifact from the data run
+
+env:
+  PYTHONPATH: ml
+
+jobs:
+  settings:
+    runs-on: ubuntu-24.04
+    outputs:
+      cfg: ${{ steps.cfg.outputs.cfg }}
+      matrix: ${{ steps.cfg.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: cfg
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          c = json.load(open("ml/runs/include-v3.json"))
+          print("cfg=" + json.dumps({k: v for k, v in c.items() if k != "models"}))
+          print("matrix=" + json.dumps({"include": c["models"]}))
+          PY
+
+  train:
+    needs: settings
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.settings.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: pip install -r backend/requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ fromJSON(needs.settings.outputs.cfg).artifact }}
+          path: data
+          run-id: ${{ fromJSON(needs.settings.outputs.cfg).data_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Train ${{ matrix.name }}
+        run: |
+          python -c "import json;c=json.load(open('${{ matrix.config }}'));c['epochs']=${{ fromJSON(needs.settings.outputs.cfg).epochs }};c['seed']=${{ matrix.seed }};json.dump(c,open('cfg.json','w'))"
+          python -m isl_nova_ml.train --config cfg.json --manifest data/manifest.json --data-root data \
+            --registry reg --vocab dataset/vocabulary/signs_master.csv \
+            --dataset-version "${{ fromJSON(needs.settings.outputs.cfg).dataset_version }}" 2>&1 | tee train.log
+          cp train.log reg/*/
+      - uses: actions/upload-artifact@v4
+        with: { name: "v3-model-${{ matrix.name }}", path: reg, retention-days: 90 }
+
+  select:
+    needs: [settings, train]
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: pip install -r backend/requirements.txt
+      - uses: actions/download-artifact@v4
+        with: { pattern: "v3-model-*", path: dl }
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ fromJSON(needs.settings.outputs.cfg).artifact }}
+          path: data
+          run-id: ${{ fromJSON(needs.settings.outputs.cfg).data_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Assemble the registry (new models + the released v2 model as a candidate)
+        run: |
+          mkdir -p registry && for d in dl/*/*/; do [ -f "$d/model.json" ] && cp -r "$d" registry/; done
+          python scripts/fetch_model.py --tag "${{ fromJSON(needs.settings.outputs.cfg).baseline_model_tag }}" --registry registry
+          ls registry
+      - name: Ensembles (members chosen by validation macro-F1)
+        run: python -m isl_nova_ml.include_pipeline ensemble --registry registry --manifest data/manifest.json --data-root data --dataset-version "${{ fromJSON(needs.settings.outputs.cfg).dataset_version }}"
+      - name: Compare and select by validation macro-F1
+        run: python -m isl_nova_ml.include_pipeline compare --registry registry --out report
+      - name: Unknown-sign detector (fit on validation + part A2, evaluate once on test + part B)
+        run: python -m isl_nova_ml.include_pipeline calibrate-open-set --registry registry --manifest data/manifest.json --data-root data --out report
+      - name: Detector comparison for the selected model
+        run: python -m isl_nova_ml.include_pipeline open-set-v2 --registry registry --manifest data/manifest.json --data-root data --out report
+      - name: End-to-end check through the production Predictor
+        run: python -m isl_nova_ml.include_pipeline verify --registry registry --manifest data/manifest.json --data-root data --out report
+      - name: Per-model unknown-gloss part B (production rule, every model)
+        run: |
+          python - <<'PY' > report/part_b.md
+          import json, pathlib
+          print("| Model | Kind | Classes | Val macro-F1 | Test top-1 | Part B false acceptance | FRR (test) |")
+          print("|---|---|---:|---:|---:|---:|---:|")
+          for d in sorted(pathlib.Path("registry").iterdir()):
+              if not (d / "metrics.json").exists():
+                  continue
+              m = json.loads((d / "metrics.json").read_text()); i = json.loads((d / "model.json").read_text())
+              b = m.get("open_set_part_b") or {}
+              fa = f"{100*b['false_acceptance']:.1f}%" if b else "-"
+              fr = f"{100*b['false_rejection']:.1f}%" if b else "-"
+              print(f"| {i['model_id']} | {i['kind']} | {len(i['classes'])} | {100*m['validation']['macro_f1']:.1f}% | {100*m['test']['top1']:.1f}% | {fa} | {fr} |")
+          PY
+          cat report/part_b.md
+      - name: Summary
+        run: |
+          { echo "## v3 models (INCLUDE official split; NOT signer-independent)"; cat report/comparison.md; echo; cat report/part_b.md; echo;
+            echo '### Unknown-sign detector (part B, evaluated once)'; echo '```json'; cat report/open_set_v3.json; echo '```';
+            echo '```json'; cat report/verify.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with: { name: v3-models, path: "registry\nreport", retention-days: 90 }
+      - name: Publish the selected model (pre-release)
+        if: ${{ fromJSON(needs.settings.outputs.cfg).publish_release }}
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          best=$(python -c "import json;print(json.load(open('report/comparison.json'))['best'])")
+          if gh release view "model-$best" >/dev/null 2>&1; then echo "release exists"; exit 0; fi
+          tar -czf "$best.tar.gz" -C registry "$best"
+          sha256sum "$best.tar.gz" > "$best.tar.gz.sha256"
+          gh release download "${{ fromJSON(needs.settings.outputs.cfg).baseline_model_tag }}" -p include_test_landmark_sample.tar.gz
+          gh release create "model-$best" "$best.tar.gz" "$best.tar.gz.sha256" report/comparison.md report/comparison.json \
+            report/part_b.md report/open_set_v3.json report/open_set_v2.json report/verify.json include_test_landmark_sample.tar.gz \
+            --target "$GITHUB_SHA" --prerelease --title "ISL NOVA model $best (v3, INCLUDE official split)" \
+            --notes "Trained by workflow run $GITHUB_RUN_ID on INCLUDE (Sridhar et al., ACM MM 2020, CC BY 4.0) landmarks. Selected by validation macro-F1. Unknown-sign detector fitted on validation + out-of-vocabulary part A2, evaluated once on test + part B (disjoint glosses). INCLUDE has no signer IDs: results are NOT signer-independent."

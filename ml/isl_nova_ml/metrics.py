@@ -92,6 +92,30 @@ def open_set_report(P_known: np.ndarray, P_unknown: np.ndarray, tau: float) -> d
     }
 
 
+def recognized_mask(P: np.ndarray, tau: float, margin: float, known_cols: list[int]) -> np.ndarray:
+    """The Predictor's max-probability rule: top class is a vocabulary sign, p1 >= tau and p1 - p2 >= margin."""
+    if len(P) == 0:
+        return np.zeros(0, bool)
+    K = P[:, known_cols]
+    s = np.sort(K, 1)[:, ::-1]
+    top_is_known = np.isin(P.argmax(1), known_cols)
+    return top_is_known & (s[:, 0] >= tau) & ((s[:, 0] - s[:, 1]) >= margin)
+
+
+def open_set_report_with_other(P_known: np.ndarray, P_unknown: np.ndarray, tau: float, margin: float,
+                               known_cols: list[int]) -> dict:
+    """Known test vs unseen unknown glosses with the production decision rule (works with or without
+    an explicit "__other__" output: its column is simply not in ``known_cols``)."""
+    rk = recognized_mask(P_known, tau, margin, known_cols)
+    ru = recognized_mask(P_unknown, tau, margin, known_cols)
+    sk = P_known[:, known_cols].max(1) if len(P_known) else np.zeros(0)
+    su = P_unknown[:, known_cols].max(1) if len(P_unknown) else np.zeros(0)
+    return {"tau": tau, "margin": margin, "n_known": int(len(rk)), "n_unknown": int(len(ru)),
+            "false_rejection": float(1 - rk.mean()) if len(rk) else float("nan"),
+            "false_acceptance": float(ru.mean()) if len(ru) else float("nan"),
+            "auroc_known_maxprob": auroc(sk, su) if len(su) else float("nan")}
+
+
 def choose_threshold(P_val: np.ndarray, y_val: np.ndarray, keep: float = 0.95) -> float:
     """Confidence threshold that keeps ``keep`` of correct validation predictions."""
     if len(y_val) == 0:

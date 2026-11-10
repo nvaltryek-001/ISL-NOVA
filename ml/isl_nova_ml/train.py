@@ -28,8 +28,9 @@ import numpy as np
 from . import contract as C
 from .augment import augment_batch
 from .data import assign_splits, build_tensors, leakage_report, load_manifest, sha256_file, training_eligible
-from .metrics import choose_threshold, classification_report, open_set_report
-from .models import REGISTRY, fit_temperature, save_model, softmax
+from .metrics import choose_threshold, classification_report, open_set_report, open_set_report_with_other
+from .models import GRADIENT_KINDS, REGISTRY, fit_temperature, save_model, softmax
+from .openset import OTHER_ID, OTHER_LABEL, unknown_part
 from .registry import Registry
 
 DEFAULTS = {
@@ -80,12 +81,28 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
     class_ids = sorted(c for c, n in counts.items() if n >= cfg["min_train_samples"])
     if len(class_ids) < 2:
         raise TrainingError("fewer than 2 classes meet min_train_samples")
-    cidx = {c: i for i, c in enumerate(class_ids)}
     labels = _labels(vocab)
+
+    # Unknown (out-of-vocabulary) glosses, split by gloss into disjoint parts:
+    #   A1 = training data for the optional "__other__" class, A2 = fitting the
+    #   unknown-sign detector, B = evaluation only (never used for any choice).
+    unk_all = [e for e in raw.get("open_set_entries", []) if e.get("open_set", True) and training_eligible(e)[0]]
+    unk_part = {k: [e for e in unk_all if unknown_part(e.get("gloss") or e["sign_id"]) == k]
+                for k in ("A1", "A2", "B")}
+    other = bool(cfg.get("other_class"))
+    if other:
+        if not unk_part["A1"]:
+            raise TrainingError("other_class needs open_set_entries (out-of-vocabulary recordings)")
+        class_ids = class_ids + [OTHER_ID]
+        labels[OTHER_ID] = OTHER_LABEL
+        tr = tr + [dict(e, sign_id=OTHER_ID, split="train") for e in unk_part["A1"]]
+        log(f"[data] other class: {len(unk_part['A1'])} out-of-vocabulary recordings "
+            f"({len({e.get('gloss') or e['sign_id'] for e in unk_part['A1']})} glosses, part A1)")
+    cidx = {c: i for i, c in enumerate(class_ids)}
 
     log(f"[data] eligible={len(eligible)} excluded={dict(excluded)} classes={len(class_ids)} "
         f"train/val/test={len(tr)}/{len(va)}/{len(te)} synthetic={synthetic}")
-    raw_aug = int(cfg.get("raw_aug_copies", 0)) if cfg["model"] in ("lstm", "gru") else 0
+    raw_aug = int(cfg.get("raw_aug_copies", 0)) if cfg["model"] in GRADIENT_KINDS else 0
     Ttr = build_tensors(tr, data_root, cidx, raw_aug_copies=raw_aug, seed=cfg["seed"])
     Tva, Tte = (build_tensors(s, data_root, cidx) for s in (va, te))
     if raw_aug:
@@ -108,7 +125,7 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
     D, Cn = C.FEATURE_DIM, len(class_ids)
     history = []
     t_start = time.perf_counter()
-    if kind in ("lstm", "gru"):
+    if kind in GRADIENT_KINDS:
         model = cls(D, Cn, cfg["hidden"], cfg["seed"])
         model.norm.fit(Ttr.X)
         opt = model.make_optimizer(cfg["lr"], cfg["weight_decay"])
@@ -157,14 +174,21 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
     test = classification_report(Pt, Tte.y, Cn)
     val = classification_report(Pv, Tva.y, Cn)
 
-    open_set = None
-    if raw.get("open_set_entries"):
-        unk = [e for e in raw["open_set_entries"] if training_eligible(e)[0]]
+    open_set = open_set_b = None
+    if unk_all:
         from .data import load_landmarks
         from .features import extract_features
-        Xu = [extract_features(*load_landmarks(data_root / e["landmarks_path"])).features for e in unk]
-        Pu = model.predict_proba(np.stack(Xu)) if Xu else np.zeros((0, Cn))
-        open_set = open_set_report(Pt, Pu, tau)
+
+        def unk_proba(ents):
+            Xu = [f.features for f in (extract_features(*load_landmarks(data_root / e["landmarks_path"])) for e in ents)
+                  if f.status == "ok"]
+            return model.predict_proba(np.stack(Xu)) if Xu else np.zeros((0, Cn))
+        known_cols = [i for i, c in enumerate(class_ids) if c != OTHER_ID]
+        if not other:  # all unknown glosses are unseen by this model
+            open_set = open_set_report(Pt, unk_proba(unk_all), tau)
+        Pb = unk_proba(unk_part["B"])
+        open_set_b = open_set_report_with_other(Pt, Pb, tau, cfg["margin"], known_cols)
+        open_set_b["glosses"] = len({e.get("gloss") or e["sign_id"] for e in unk_part["B"]})
 
     by_signer = {}
     test_sid = {e["recording_id"]: e["signer_id"] for e in te}
@@ -202,7 +226,7 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
     }
     (out / "model.json").write_text(json.dumps(info, indent=2))
     metrics = {"model_id": model_id, "synthetic": synthetic, "validation": val, "test": test,
-               "open_set": open_set, "per_signer_test": by_signer,
+               "open_set": open_set, "open_set_part_b": open_set_b, "per_signer_test": by_signer,
                "latency_ms_per_sample_batch": round(latency_ms, 3),
                "model_size_bytes": info["model_size_bytes"]}
     (out / "metrics.json").write_text(json.dumps(metrics, indent=2, default=float))
@@ -212,7 +236,7 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
     Registry(registry_root).register(out)
     log(f"[done] {model_id} test_top1={test['top1']:.3f} macroF1={test['macro_f1']:.3f} synthetic={synthetic}")
     return {"model_id": model_id, "dir": str(out), "summary": summary, "synthetic": synthetic,
-            "open_set": open_set, "softmax_check": float(softmax(np.zeros((1, 2))).sum())}
+            "open_set": open_set, "open_set_part_b": open_set_b, "softmax_check": float(softmax(np.zeros((1, 2))).sum())}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -231,3 +255,77 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def build_ensemble(member_dirs: list[Path], manifest_path: Path, data_root: Path, registry_root: Path,
+                   dataset_version: str = "unversioned", log=print, allow_synthetic: bool = False) -> dict:
+    """Average the calibrated probabilities of trained models that share one class list, re-fit the
+    temperature and threshold on VALIDATION and evaluate the TEST split once."""
+    from .deep import EnsembleModel
+    from .models import load_model
+
+    infos = [json.loads((Path(d) / "model.json").read_text()) for d in member_dirs]
+    classes = infos[0]["classes"]
+    if any(i["classes"] != classes for i in infos):
+        raise TrainingError("ensemble members must share the same class list")
+    if any(i["kind"] not in GRADIENT_KINDS for i in infos):
+        raise TrainingError("ensembles combine LSTM/GRU/TCN/Transformer/BiLSTM-attention models only")
+    synthetic = any(i.get("synthetic") for i in infos)
+    if synthetic and not (allow_synthetic and all(i.get("synthetic") for i in infos)):
+        raise TrainingError("synthetic models cannot be ensembled (tests only, never mixed with real ones)")
+    members = []
+    for d in member_dirs:
+        m = load_model(Path(d))
+        members.append(m)
+    ens = EnsembleModel(members)
+    cidx = {c["sign_id"]: c["index"] for c in classes}
+    eligible = [e for e in load_manifest(manifest_path) if training_eligible(e)[0]]
+    entries = assign_splits(eligible, seed=int(infos[0]["config"].get("seed", 13)))
+    split = {sp: [e for e in entries if e.get("split") == sp and e["sign_id"] in cidx] for sp in ("val", "test")}
+    Tva, Tte = build_tensors(split["val"], data_root, cidx), build_tensors(split["test"], data_root, cidx)
+    for d in infos:  # same split as the members were trained with
+        if set(Tva.ids) != set(d["lineage"]["val_recording_ids"]) or set(Tte.ids) != set(d["lineage"]["test_recording_ids"]):
+            raise TrainingError(f"member {d['model_id']} was trained on a different split")
+    ens.temperature = 1.0
+    ens.temperature = fit_temperature(ens.logits(Tva.X), Tva.y)
+    Pv = ens.predict_proba(Tva.X)
+    margin = float(infos[0]["thresholds"].get("margin", 0.1))
+    tau = choose_threshold(Pv, Tva.y, float(infos[0]["config"].get("tau_keep", 0.95)))
+    t0 = time.perf_counter()
+    Pt = ens.predict_proba(Tte.X)
+    latency_ms = (time.perf_counter() - t0) * 1000 / max(len(Tte.y), 1)
+    Cn = len(classes)
+    val, test = classification_report(Pv, Tva.y, Cn), classification_report(Pt, Tte.y, Cn)
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    model_id = f"{'syn-' if synthetic else ''}ensemble-{stamp}-n{len(members)}"
+    out = Path(registry_root) / model_id
+    save_model(ens, out)
+    summary = {"val_top1": val["top1"], "val_macro_f1": val["macro_f1"], "test_top1": test["top1"],
+               "test_top5": test["top5"], "test_macro_f1": test["macro_f1"],
+               "test_weighted_f1": test["weighted_f1"], "test_ece": test["ece"]}
+    base_lineage = infos[0]["lineage"]
+    info = {
+        "model_id": model_id, "kind": "ensemble", "created_utc": stamp, "synthetic": synthetic,
+        "warning": "SYNTHETIC SMOKE-TEST MODEL - NOT ISL - DO NOT REPORT" if synthetic else None,
+        "contract": infos[0]["contract"], "classes": classes,
+        "thresholds": {"tau": tau, "margin": margin, "temperature": ens.temperature},
+        "config": {"members": [i["model_id"] for i in infos], "rule": "mean of calibrated member probabilities"},
+        "lineage": {"dataset_version": dataset_version, "manifest_sha256": sha256_file(manifest_path),
+                    "members": [{"model_id": i["model_id"], "kind": i["kind"],
+                                 "weights_sha256": i["weights_sha256"]} for i in infos],
+                    "split_policy": base_lineage.get("split_policy"), "split_counts": base_lineage["split_counts"],
+                    "val_recording_ids": Tva.ids, "test_recording_ids": Tte.ids},
+        "metrics_summary": summary,
+        "weights_sha256": sha256_file(out / "weights.npz"),
+        "model_size_bytes": (out / "weights.npz").stat().st_size,
+        "train_seconds": round(sum(i.get("train_seconds") or 0 for i in infos), 2),
+    }
+    (out / "model.json").write_text(json.dumps(info, indent=2))
+    metrics = {"model_id": model_id, "synthetic": synthetic, "validation": val, "test": test, "open_set": None,
+               "per_signer_test": {}, "latency_ms_per_sample_batch": round(latency_ms, 3),
+               "model_size_bytes": info["model_size_bytes"]}
+    (out / "metrics.json").write_text(json.dumps(metrics, indent=2, default=float))
+    Registry(registry_root).register(out)
+    log(f"[ensemble] {model_id} members={[i['model_id'] for i in infos]} val_macroF1={val['macro_f1']:.3f} "
+        f"test_top1={test['top1']:.3f}")
+    return {"model_id": model_id, "dir": str(out), "summary": summary}
