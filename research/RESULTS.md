@@ -67,3 +67,7 @@ Run [42851786127](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/4285178
 | Best ensemble (not selected) | 97.2 % test top-1 | — |
 
 Still **not signer-independent**; still **no live-person, new-signer or user-study result**.
+
+## v4: face features (2026-11-11)
+
+Contract 2.0.0 (hands + pose + 51 face values), runs [42957883286](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42957883286) (data) and [42964878980](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42964878980) (training). Three-seed test top-1: BiLSTM-attention 95.8 % (v3 94.5 %), Transformer 96.4 % (95.7 %), TCN 95.0 % (95.9 %); best single 97.3 %. Selected face model: 95.1 % top-1, unknown signs accepted 14.2 % (target < 10 % missed). The default stays v3 ([V4_FACE_FEATURES.md](V4_FACE_FEATURES.md)).

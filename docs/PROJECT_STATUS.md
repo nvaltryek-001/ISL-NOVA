@@ -21,7 +21,7 @@ Legend: ✅ done and tested · ⚠️ done, target not met · 👤 needs people 
 | 8 | Weakest signs | ✅ improved overall | test macro-F1 91.6 % → 94.1 %; per-class F1 in the release `metrics.json` |
 | 8 | ONNX export | ✅ | `export_web --onnx` (LSTM), onnxruntime parity test in CI |
 | 8 | Model in the browser | ✅ | TypeScript runtime for LSTM, GRU, BiLSTM-attention; matches Python to 1e-8; 24/24 agreement in E2E |
-| 8 | Face (non-manual) features | ⏳ not done | needs feature contract v2 and re-extraction of the 56.8 GB INCLUDE videos (several hours of runner time) |
+| 8 | Face (non-manual) features | ✅ done, measured | contract 2.0.0; all 4,257 videos re-extracted (face in 99.94 % of frames, [run 42957883286](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42957883286)); 10 models ([run 42964878980](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42964878980)): mixed effect, not made the default ([V4_FACE_FEATURES.md](../research/V4_FACE_FEATURES.md)) |
 | 9 | Teacher dashboard (classes, join codes, progress, hard signs) | ✅ | pytest + E2E |
 | 9 | Analytics v2 | ✅ | pytest + E2E |
 | 9 | Phrase recognition: signs split at pauses | ✅ | `SignSegmenter` unit tests; Conversation page; shown as a *recognized word sequence* |

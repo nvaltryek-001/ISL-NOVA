@@ -44,6 +44,7 @@
 > | ✅ **Platform** | 17 modules incl. **Practice Coach**, **Text-to-Sign**, **Conversation** (signs split at pauses), **teacher classes**, **analytics**, installable **offline app** with **on-device recognition**; every screen and all 200 sign meanings in **English, हिन्दी and ಕನ್ನಡ**; refresh tokens, sign-out-everywhere, reset codes, **two-factor sign-in**, retention job; optional Redis, S3 storage, Prometheus + Grafana. CI green: **104** Python tests (incl. real Redis, S3 and PostgreSQL), **27** unit tests, **25** end-to-end tests incl. an **axe-core WCAG 2.1 AA scan**. |
 > | ✅ **Real model (v3)** | BiLSTM with attention, trained on genuine INCLUDE recordings, **200 signs**: **95.1 % top-1 · 99.4 % top-5** on the 635-video official test split (v1 91.7 %, v2 92.0 %), selected by validation among 21 candidates. Through the full browser pipeline (held-out clips as a virtual webcam): **84.9 % top-1** (v1 74.0 %; target 85 % missed by one clip). |
 > | ✅ **Says "I don't know"** | A calibrated detector ships with the model: on 31 out-of-vocabulary glosses never used for any choice, **8.8 %** of unknown signs are accepted and **13.2 %** of known signs held back, meeting both targets (v1 accepted 29 %). |
+> | ✅ **Face features (v4)** | Eyebrow, eye and mouth landmarks from all 4,257 videos (face found in 99.94 % of frames), feature contract 2.0.0: +1.3 / +0.7 points for BiLSTM-attention / Transformer, −0.9 for TCN; best single model 97.3 %. Not made the default: it ties the v3 model on validation and misses the unknown-sign target (14.2 %). [Write-up](research/V4_FACE_FEATURES.md) |
 > | ⏸️ **Deployed (v1)** | The free demo at **[isl-nova.onrender.com](https://isl-nova.onrender.com)** still runs v1; switching it to `main` waits for the owner's go-ahead. |
 > | ⚠️ **Hindi / Kannada** | All 200 meanings exist as **machine drafts**, clearly marked; **0 verified by a linguist**. |
 > | ⛔ **Not yet shown** | Accuracy on **new signers** (INCLUDE has no signer IDs, so results are **not signer-independent**) · recognition with **a real person at a webcam** · **linguistic verification** (0 / 200 signs verified) · any user study. |
@@ -317,12 +318,16 @@ INCLUDE has few everyday verbs and no food or question words; closing these gaps
 
 | Model | Idea | Implementation |
 |---|---|---|
-| **LSTM** (selected) | 1-layer LSTM, hidden 128, last + mean-pooled state → softmax; 222k parameters | NumPy with hand-written backprop (gradient-checked), Adam, inverse-√frequency class weights, augmentation, early stopping on validation |
+| **BiLSTM-attention** (default since v3) | Bidirectional LSTM (96 per direction), additive attention pooling + mean pooling → softmax | NumPy with hand-written backprop (gradient-checked), Adam, inverse-√frequency class weights, frame-rate augmentation, early stopping on validation |
+| **Transformer** | 2-layer pre-LayerNorm encoder, 4 heads, learned positions, mean pooling | NumPy, as above |
+| **TCN** | Dilated temporal convolutions (1, 2, 4) with residuals, mean + max pooling | NumPy, as above |
+| **Ensembles** | Mean of calibrated member probabilities | members chosen by validation |
+| **LSTM** (v1/v2 default) | 1-layer LSTM, hidden 128, last + mean-pooled state → softmax; 222k parameters | NumPy, as above |
 | **GRU** | Same shape with gated recurrent units; 179k parameters | NumPy, as above |
 | **Logistic regression** | Mean, std, min, max of each feature over time → linear classifier | scikit-learn |
 | **DTW 1-NN** | Nearest training sequence under dynamic time warping | Batched NumPy DTW with a Sakoe–Chiba window |
 
-All models share the feature contract, select on **validation** only, get **temperature scaling** and a **rejection threshold** fitted on validation, and evaluate the test split **once**. Models trained on synthetic data are flagged and cannot be promoted in production.
+An **unknown-sign detector** (logistic on max-probability, margin, entropy) ships inside the model and decides *recognized / uncertain / unknown*. All models share the feature contract (1.0.0: hands + pose; 2.0.0: + face), select on **validation** only, get **temperature scaling** and a **rejection threshold** fitted on validation, and evaluate the test split **once**. Models trained on synthetic data are flagged and cannot be promoted in production.
 
 ## 📊 Results
 
@@ -339,6 +344,8 @@ Default model [`model-bilstm_attn-20261110T162800Z-s7`](https://github.com/nvalt
 | Unknown signs accepted (shipped rule) | 29.3 % | 34.0 % | **8.8 %** (part B) | < 10 % — **met** |
 | Known signs held back (shipped rule) | 12.1 % | — | **13.2 %** (part B) | ≤ 15 % — **met** |
 | On-device (browser) model | — | — | ✅ matches server, 24/24 | — |
+
+**v4 (face features)** was trained and evaluated too: see [research/V4_FACE_FEATURES.md](research/V4_FACE_FEATURES.md); the default stays the v3 model.
 
 v1/v2 unknown-sign figures use all 62 out-of-vocabulary glosses; v3 uses the 31 glosses of part B, which were never used to fit or choose anything. The best ensemble reached 97.2 % test top-1 but tied with the selected model on validation, so it was not chosen.
 
@@ -432,6 +439,7 @@ Artifacts: model release [`model-lstm-20261104T041414Z-s13`](https://github.com/
 | **v2** · Retention job, Prometheus `/metrics` | ✅ | pytest (dry run, apply, counts; metrics format) | — |
 | **v2** · Automated accessibility scan | ✅ | axe-core WCAG 2.1 A/AA, 18 routes × light/dark; 0 serious/critical after fixes | CI |
 | **v3** · TCN, Transformer, BiLSTM-attention, ensembles, `__other__` class | ✅ | gradient checks; 15 models × held-out test; ensembles | BiLSTM-attention 95.1 % ([V3_MODELS.md](research/V3_MODELS.md)) |
+| **v4** · Face (non-manual) features, contract 2.0.0 | ✅ | Python ↔ TypeScript parity fixture; full re-extraction; 10 models × held-out test | mixed: +0.7 to +1.3 points for attention models, −0.9 for TCN ([write-up](research/V4_FACE_FEATURES.md)) |
 | **v3** · Unknown-sign detector in server and browser | ✅ | fit on val + part A2, evaluated once on part B | FAR 8.8 %, FRR 13.2 % |
 | **v3** · On-device / offline recognition, ONNX export | ✅ | TS vs Python parity (1e-8), 24/24 E2E agreement; onnxruntime parity in CI | — |
 | **v3** · Teacher classes, analytics, spaced repetition, pause segmentation | ✅ | pytest, unit, E2E | — |
@@ -688,11 +696,12 @@ Copy [`.env.example`](.env.example) to `.env` (the Windows setup does this for y
 ## ⚠️ Limitations
 
 * Results are on INCLUDE's **official split, not signer-independent**; INCLUDE has no signer IDs and all signers come from one school.
-* **Unknown-sign rejection is weak**: 29 % of unseen signs are recognized as a vocabulary sign.
+* **Unknown signs**: 8.8 % of unseen out-of-vocabulary signs are still accepted as a vocabulary sign (held-out glosses; v1: 29 %).
+* **Browser pipeline** reaches 84.9 % on held-out clips, one clip short of the 85 % target.
 * **No real-person webcam test** and **no new-signer accuracy** yet.
 * **0 / 200 signs linguistically verified**; the INCLUDE gloss is a label, not a reviewed ISL description.
 * Category gaps (few everyday verbs; no food or question words).
-* Isolated signs only: no continuous signing, grammar or translation; no non-manual features (face).
+* Isolated signs only: no grammar or translation (Conversation shows a *recognized word sequence*). Face (non-manual) features exist as contract 2.0.0 but are not in the default model.
 * CPU NumPy models; the free demo sleeps when idle and loses its data on restart.
 * Not yet tested with Deaf users.
 
@@ -701,10 +710,10 @@ Full list: [research/LIMITATIONS.md](research/LIMITATIONS.md).
 ## 🔬 Research opportunities
 
 * **Signer-independent evaluation** with consented, signer-labelled recordings ([protocol](research/SIGNER_INDEPENDENT_PROTOCOL.md)).
-* **Better unknown-sign detection**: energy scores, an explicit background class, embedding distance ([open-set evaluation](research/OPEN_SET_EVALUATION.md)).
-* **Stronger temporal models**: TCN and Temporal Transformers; feature ablations ([ablation plan](research/ABLATION_STUDY.md)).
+* **Unknown-sign detection** on new signers and everyday non-sign movement ([v3 results](research/V3_MODELS.md)).
+* **Feature ablations** and larger models ([ablation plan](research/ABLATION_STUDY.md)).
 * **Robustness** to lighting, background, distance and camera quality.
-* **Non-manual features** (facial expression, mouthing) and continuous signing.
+* **Non-manual features** for phrases and grammar ([v4 face results](research/V4_FACE_FEATURES.md)) and continuous signing.
 * **Linguistic resources**: verified Hindi/Kannada meanings and regional variants.
 
 Questions, protocols and a paper outline: [research/](research/).

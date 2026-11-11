@@ -42,7 +42,7 @@ probabilities match the server to 1e-8 and decisions agreed on 24/24 held-out sa
 
 ## Intended use, limitations
 As for earlier models: isolated signs only; **not signer-independent**; one school in Chennai;
-no facial features; vocabulary and Hindi/Kannada meanings not linguist-verified; no live-person
+no facial features (a face-feature model exists, see [V4_FACE_FEATURES.md](../research/V4_FACE_FEATURES.md), but is not the default); vocabulary and Hindi/Kannada meanings not linguist-verified; no live-person
 or new-signer evaluation. **Not** for high-stakes interpretation.
 
 ## Install
