@@ -120,6 +120,21 @@ jobs:
         with: { pattern: "landmarks-*", path: parts }
       - name: Merge into versioned landmark dataset
         run: python -m isl_nova_ml.include_pipeline merge --inputs parts --out include-landmarks --version ${{ needs.preflight.outputs.version }}
+      - name: Landmark coverage (hands, pose, face) over all files
+        run: |
+          python - <<'PY' | tee coverage.json
+          import glob, json
+          import numpy as np
+          tot, cov = 0, {"left": 0, "right": 0, "pose": 0, "face": 0}
+          files = glob.glob("include-landmarks/**/*.npz", recursive=True)
+          for f in files:
+              with np.load(f) as z:
+                  n = len(z["left_mask"]); tot += n
+                  for k in cov:
+                      if f"{k}_mask" in z:
+                          cov[k] += int(z[f"{k}_mask"].sum())
+          print(json.dumps({"files": len(files), "frames": tot, **{k: round(v / max(tot, 1), 4) for k, v in cov.items()}}))
+          PY
       - name: Summary
         if: always()
         run: |
