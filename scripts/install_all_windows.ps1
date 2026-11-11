@@ -12,7 +12,7 @@
     3. installs and builds the frontend
     4. creates .env (random secret, local admin account)
     5. prepares the SQLite database (200 vocabulary slots)
-    6. installs the trained 200-class LSTM (SHA-256 verified)
+    6. installs the trained 200-class v3 model, BiLSTM-attention (SHA-256 verified)
     7. downloads the MediaPipe task files (server-side Video Analysis)
     8. downloads the processed INCLUDE dataset (3,370 sequences, 176 MB, no sign-in)
     9. checks recognition end to end (24 held-out sequences through a local server)
