@@ -44,6 +44,8 @@ def main(argv=None) -> int:
     ap.add_argument("--registry", type=Path, default=ROOT / "artifacts" / "models")
     ap.add_argument("--repo", default=REPO)
     ap.add_argument("--promote", action="store_true")
+    ap.add_argument("--keep-active", action="store_true",
+                    help="with --promote: only promote if no model is active yet (reinstalls keep a model you trained)")
     a = ap.parse_args(argv)
     model_id = a.tag.removeprefix("model-")
     base = f"https://github.com/{a.repo}/releases/download/{a.tag}/{model_id}.tar.gz"
@@ -65,11 +67,15 @@ def main(argv=None) -> int:
     reg = Registry(root)
     if not any(m["model_id"] == model_id for m in reg.read()["models"]):
         reg.register(d)
-    if a.promote:
+    active = reg.read().get("active")
+    promote = a.promote and not (a.keep_active and active and active != model_id)
+    if promote:
         reg.promote(model_id, actor="scripts/fetch_model.py")
+    elif a.promote:
+        print(f"keeping the active model {active} (installed {model_id} without promoting it)")
     p = Predictor(d)
     print(json.dumps({"installed": model_id, "kind": p.info["kind"], "classes": len(p.classes),
-                      "synthetic": p.synthetic, "promoted": a.promote, "sha256": got}, indent=2))
+                      "synthetic": p.synthetic, "promoted": promote, "active": reg.read().get("active"), "sha256": got}, indent=2))
     return 0
 
 

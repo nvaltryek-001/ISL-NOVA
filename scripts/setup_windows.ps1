@@ -164,8 +164,8 @@ Ok "database ready ($env:DATABASE_URL)"
 if (-not $SkipModel) {
   Step "Installing the trained model $ModelTag"
   $registry = $env:MODEL_REGISTRY_DIR; if (-not $registry) { $registry = "artifacts\models" }
-  Run $venvPy @("scripts\fetch_model.py", "--tag", $ModelTag, "--registry", $registry, "--promote") "model download/verification"
-  Ok "model installed and promoted in $registry"
+  Run $venvPy @("scripts\fetch_model.py", "--tag", $ModelTag, "--registry", $registry, "--promote", "--keep-active") "model download/verification"
+  Ok "model installed in $registry (activated only if no model was active)"
   & $venvPy scripts\fetch_references.py
   if ($LASTEXITCODE -eq 0) { Ok "sign references installed (Practice Coach, Text-to-Sign)" }
   else { Write-Host "    note: sign references could not be downloaded; Practice Coach will report them missing" -ForegroundColor Yellow }

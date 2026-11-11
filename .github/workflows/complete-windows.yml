@@ -1,0 +1,41 @@
+name: Complete-run script (Windows)
+
+# Runs scripts/complete_windows.ps1 as a user would, on a small real slice of INCLUDE (Colours):
+# install -> (tests skipped: covered by windows-local.yml) -> face-model training on the slice ->
+# promotion -> summary; then checks that a reinstall keeps the newly trained model active.
+on:
+  workflow_dispatch:
+  push:
+    branches: ["run/complete-check"]
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: First install (creates .venv)
+        run: .\scripts\setup_windows.ps1 -Python python -WithMediaPipeTasks
+      - name: Small real face dataset (Colours, 2 parts)
+        run: .venv\Scripts\python scripts\include_local.py --only Colours --workers 2
+      - name: complete_windows.ps1 (no tests, dataset already there, one face model)
+        run: .\scripts\complete_windows.ps1 -SkipTests -SkipDataset -Model bilstm-attn-face
+      - name: Check the trained model is active, the log exists, and a reinstall keeps it
+        shell: pwsh
+        run: |
+          $reg = Get-Content artifacts\models\registry.json -Raw | ConvertFrom-Json
+          "active after training: $($reg.active)"
+          if ($reg.active -like 'bilstm_attn-20261110*') { throw "the trained model was not promoted" }
+          if (-not (Get-ChildItem logs\complete-*.log)) { throw "no log written" }
+          Get-Content (Get-ChildItem logs\complete-*.log | Select-Object -Last 1) -Tail 15
+          .\scripts\setup_windows.ps1 -Python python -SkipFrontend
+          $after = (Get-Content artifacts\models\registry.json -Raw | ConvertFrom-Json).active
+          "active after reinstall: $after"
+          if ($after -ne $reg.active) { throw "reinstall replaced the trained model" }
