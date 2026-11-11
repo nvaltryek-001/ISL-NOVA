@@ -66,9 +66,11 @@ class LandmarkExtractor:
         face_model = face_model or (Path(os.environ["ISL_NOVA_FACE_MODEL"]) if os.environ.get("ISL_NOVA_FACE_MODEL") else None)
         self.face = None
         if face_model and Path(face_model).exists():  # non-manual features (contract 2.0.0)
+            # IMAGE mode on a head crop: in full-body recordings the face is too small for the
+            # short-range face detector, so the crop (from the pose landmarks) is enlarged first.
             self.face = v.FaceLandmarker.create_from_options(v.FaceLandmarkerOptions(
                 base_options=BaseOptions(model_asset_path=str(face_model)),
-                running_mode=v.RunningMode.VIDEO, num_faces=1))
+                running_mode=v.RunningMode.IMAGE, num_faces=1))
 
     def close(self):
         self.hands.close()
@@ -94,6 +96,7 @@ class LandmarkExtractor:
             ok, bgr = cap.read()
             if not ok:
                 break
+            full = bgr
             s = self.max_side / max(bgr.shape[:2])
             if s < 1:  # landmarks are normalised, so downscaling keeps coordinates comparable
                 bgr = cv2.resize(bgr, (round(bgr.shape[1] * s), round(bgr.shape[0] * s)), interpolation=cv2.INTER_AREA)
@@ -111,11 +114,7 @@ class LandmarkExtractor:
                 if pr.pose_landmarks:
                     fr["pose"] = [[p.x, p.y, p.z, getattr(p, "visibility", 1.0) or 0.0] for p in pr.pose_landmarks[0]]
             if self.face is not None:
-                from .contract import FACE_KEEP
-                fl = self.face.detect_for_video(img, ts)
-                if fl.face_landmarks:
-                    pts = fl.face_landmarks[0]
-                    fr["face"] = [[pts[k].x, pts[k].y, pts[k].z] for k in FACE_KEEP]
+                fr["face"] = self._face(full, fr["pose"])
             frames.append(fr)
             self._clock_ms = ts
             i += 1
@@ -124,3 +123,32 @@ class LandmarkExtractor:
             raise ValueError(f"no decodable frames in {path}")
         meta = {"fps": fps, "width": w, "height": h, "frames": len(frames)}
         return frames, (w / h if h else 1.0), meta
+
+    def _face(self, bgr, pose) -> list | None:
+        """22 face points (contract.FACE_KEEP) in full-frame normalised coordinates, or None.
+
+        The head is cropped from the full-resolution frame around the pose nose (side = 1.4 x the
+        shoulder width, at least 1/6 of the frame height) and upscaled to 384 px for the landmarker."""
+        import cv2
+
+        from .contract import FACE_KEEP
+
+        H, W = bgr.shape[:2]
+        if pose is not None:
+            nx, ny = pose[0][0] * W, pose[0][1] * H
+            sw = abs(pose[11][0] - pose[12][0]) * W
+            side = max(1.4 * sw, H / 6)
+        else:
+            nx, ny, side = W / 2, H / 3, H / 2
+        x0, y0 = int(max(nx - side / 2, 0)), int(max(ny - side * 0.55, 0))
+        x1, y1 = int(min(nx + side / 2, W)), int(min(ny + side * 0.45, H))
+        if x1 - x0 < 16 or y1 - y0 < 16:
+            return None
+        crop = cv2.resize(bgr[y0:y1, x0:x1], (384, round(384 * (y1 - y0) / (x1 - x0))), interpolation=cv2.INTER_LINEAR)
+        img = self.mp.Image(image_format=self.mp.ImageFormat.SRGB, data=cv2.cvtColor(crop, cv2.COLOR_BGR2RGB))
+        r = self.face.detect(img)
+        if not r.face_landmarks:
+            return None
+        pts = r.face_landmarks[0]
+        cw, ch = x1 - x0, y1 - y0
+        return [[(x0 + pts[k].x * cw) / W, (y0 + pts[k].y * ch) / H, pts[k].z * cw / W] for k in FACE_KEEP]
