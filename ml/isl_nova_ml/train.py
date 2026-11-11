@@ -103,8 +103,10 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
     log(f"[data] eligible={len(eligible)} excluded={dict(excluded)} classes={len(class_ids)} "
         f"train/val/test={len(tr)}/{len(va)}/{len(te)} synthetic={synthetic}")
     raw_aug = int(cfg.get("raw_aug_copies", 0)) if cfg["model"] in GRADIENT_KINDS else 0
-    Ttr = build_tensors(tr, data_root, cidx, raw_aug_copies=raw_aug, seed=cfg["seed"])
-    Tva, Tte = (build_tensors(s, data_root, cidx) for s in (va, te))
+    version = str(cfg.get("contract_version", C.CONTRACT_VERSION))
+    C.dim_for(version)
+    Ttr = build_tensors(tr, data_root, cidx, raw_aug_copies=raw_aug, seed=cfg["seed"], version=version)
+    Tva, Tte = (build_tensors(s, data_root, cidx, version=version) for s in (va, te))
     if raw_aug:
         log(f"[data] raw-level augmentation: {raw_aug} variant(s) per training sequence -> {len(Ttr.y)} training tensors")
     if len(Tva.y) == 0 or len(Tte.y) == 0:
@@ -122,7 +124,7 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
 
     kind = cfg["model"]
     cls = REGISTRY[kind]
-    D, Cn = C.FEATURE_DIM, len(class_ids)
+    D, Cn = C.dim_for(version), len(class_ids)
     history = []
     t_start = time.perf_counter()
     if kind in GRADIENT_KINDS:
@@ -180,7 +182,8 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
         from .features import extract_features
 
         def unk_proba(ents):
-            Xu = [f.features for f in (extract_features(*load_landmarks(data_root / e["landmarks_path"])) for e in ents)
+            Xu = [f.features for f in (extract_features(*load_landmarks(data_root / e["landmarks_path"]), version)
+                                       for e in ents)
                   if f.status == "ok"]
             return model.predict_proba(np.stack(Xu)) if Xu else np.zeros((0, Cn))
         known_cols = [i for i, c in enumerate(class_ids) if c != OTHER_ID]
@@ -207,7 +210,7 @@ def run(config: dict, manifest_path: Path, data_root: Path, registry_root: Path,
     info = {
         "model_id": model_id, "kind": kind, "created_utc": stamp, "synthetic": synthetic,
         "warning": "SYNTHETIC SMOKE-TEST MODEL - NOT ISL - DO NOT REPORT" if synthetic else None,
-        "contract": {"name": C.CONTRACT_NAME, "version": C.CONTRACT_VERSION, "feature_dim": C.FEATURE_DIM,
+        "contract": {"name": C.name_for(version), "version": version, "feature_dim": C.dim_for(version),
                      "sequence_length": C.SEQUENCE_LENGTH},
         "classes": classes,
         "thresholds": {"tau": tau, "margin": cfg["margin"], "temperature": model.temperature},
@@ -282,7 +285,11 @@ def build_ensemble(member_dirs: list[Path], manifest_path: Path, data_root: Path
     eligible = [e for e in load_manifest(manifest_path) if training_eligible(e)[0]]
     entries = assign_splits(eligible, seed=int(infos[0]["config"].get("seed", 13)))
     split = {sp: [e for e in entries if e.get("split") == sp and e["sign_id"] in cidx] for sp in ("val", "test")}
-    Tva, Tte = build_tensors(split["val"], data_root, cidx), build_tensors(split["test"], data_root, cidx)
+    version = infos[0]["contract"]["version"]
+    if any(i["contract"]["version"] != version for i in infos):
+        raise TrainingError("ensemble members must share one feature contract")
+    Tva = build_tensors(split["val"], data_root, cidx, version=version)
+    Tte = build_tensors(split["test"], data_root, cidx, version=version)
     for d in infos:  # same split as the members were trained with
         if set(Tva.ids) != set(d["lineage"]["val_recording_ids"]) or set(Tte.ids) != set(d["lineage"]["test_recording_ids"]):
             raise TrainingError(f"member {d['model_id']} was trained on a different split")

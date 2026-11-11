@@ -57,7 +57,10 @@ def training_eligible(e: dict) -> tuple[bool, str]:
 def save_landmarks(path: Path, frames: list[dict], aspect: float) -> str:
     n = len(frames)
     arrs = {"aspect": np.array(aspect, dtype=np.float64)}
-    for key, pts, dims in (("left", 21, 3), ("right", 21, 3), ("pose", 33, 4)):
+    keys = [("left", 21, 3), ("right", 21, 3), ("pose", 33, 4)]
+    if any(f.get("face") is not None for f in frames):  # non-manual landmarks (contract 2.0.0)
+        keys.append(("face", 22, 3))
+    for key, pts, dims in keys:
         a = np.zeros((n, pts, dims), dtype=np.float32)
         m = np.zeros(n, dtype=bool)
         for i, f in enumerate(frames):
@@ -78,7 +81,8 @@ def load_landmarks(path: Path) -> tuple[list[dict], float]:
         n = len(z["left_mask"])
         frames = []
         for i in range(n):
-            frames.append({k: (z[k][i].tolist() if z[f"{k}_mask"][i] else None) for k in ("left", "right", "pose")})
+            keys = ("left", "right", "pose", "face") if "face_mask" in z else ("left", "right", "pose")
+            frames.append({k: (z[k][i].tolist() if z[f"{k}_mask"][i] else None) for k in keys})
     return frames, aspect
 
 
@@ -147,7 +151,7 @@ class Tensors:
 
 
 def build_tensors(entries: list[dict], root: Path, class_index: dict[str, int],
-                  raw_aug_copies: int = 0, seed: int = 0) -> Tensors:
+                  raw_aug_copies: int = 0, seed: int = 0, version: str = "1.0.0") -> Tensors:
     """Feature tensors for a split. With raw_aug_copies > 0 (training only), each
     sequence also contributes that many raw-level augmented variants (see
     augment.raw_variant); their ids carry a '#aug<k>' suffix."""
@@ -158,7 +162,7 @@ def build_tensors(entries: list[dict], root: Path, class_index: dict[str, int],
             skipped.append((e["recording_id"], "class not in model vocabulary"))
             continue
         frames, aspect = load_landmarks(root / e["landmarks_path"])
-        fr = extract_features(frames, aspect)
+        fr = extract_features(frames, aspect, version)
         if fr.status != "ok":
             skipped.append((e["recording_id"], "; ".join(fr.reasons)))
             continue
@@ -168,12 +172,12 @@ def build_tensors(entries: list[dict], root: Path, class_index: dict[str, int],
         if raw_aug_copies:
             from .augment import raw_variant
             for k in range(raw_aug_copies):
-                fa = extract_features(raw_variant(frames, rng), aspect)
+                fa = extract_features(raw_variant(frames, rng), aspect, version)
                 if fa.status == "ok":
                     X.append(fa.features)
                     y.append(class_index[e["sign_id"]])
                     ids.append(f"{e['recording_id']}#aug{k}")
     if not X:
-        from .contract import FEATURE_DIM, SEQUENCE_LENGTH
-        return Tensors(np.zeros((0, SEQUENCE_LENGTH, FEATURE_DIM), np.float32), np.zeros(0, int), [], skipped)
+        from .contract import SEQUENCE_LENGTH, dim_for
+        return Tensors(np.zeros((0, SEQUENCE_LENGTH, dim_for(version)), np.float32), np.zeros(0, int), [], skipped)
     return Tensors(np.stack(X), np.array(y), ids, skipped)

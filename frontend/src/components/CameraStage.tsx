@@ -4,6 +4,7 @@ import type { Frame } from '../lib/features';
 import { type CameraState, drawOverlay, type Extractor, listCameras, loadExtractor, openCamera, rememberDelegate } from '../lib/landmarks';
 
 const SLOW_FPS = 5;
+import { useQuery } from '../lib/query';
 import { Icon } from './icons';
 import { Badge, Button, Select } from './ui';
 
@@ -12,6 +13,8 @@ export type StageApi = { frames: React.MutableRefObject<Frame[]>; aspect: number
 export function CameraStage({ onFrame, showPose = true, keep = 90, large, onState, recordStream }:
   { onFrame?: (f: Frame, aspect: number, t: number) => void; showPose?: boolean; keep?: number; large?: boolean; onState?: (s: CameraState, ex: StageApi['extractor']) => void; recordStream?: (s: MediaStream | null) => void }) {
   const video = useRef<HTMLVideoElement>(null);
+  // contract 2.0.0 models also need face landmarks (non-manual features)
+  const needsFace = !!useQuery<{ needs_face?: boolean }>('/model/info').data?.needs_face;
   const canvas = useRef<HTMLCanvasElement>(null);
   const stream = useRef<MediaStream | null>(null);
   const ex = useRef<Extractor | null>(null);
@@ -52,7 +55,7 @@ export function CameraStage({ onFrame, showPose = true, keep = 90, large, onStat
       await v.play();
       setState('live');
       setCams(await listCameras());
-      loadExtractor(showPose).then((e) => { ex.current = e; setExState('ready'); })
+      loadExtractor(showPose, undefined, needsFace).then((e) => { ex.current = e; setExState('ready'); })
         .catch((e) => { setExState('unavailable'); setExError(String(e?.message ?? e)); });
       loop();
     } catch (e) {
@@ -97,7 +100,7 @@ export function CameraStage({ onFrame, showPose = true, keep = 90, large, onStat
           slowSeconds = ex.current?.delegate === 'GPU' && measured < SLOW_FPS ? slowSeconds + 1 : 0;
           if (slowSeconds >= 3 && !switching) {
             switching = true;
-            loadExtractor(showPose, 'CPU').then((cpu) => {
+            loadExtractor(showPose, 'CPU', needsFace).then((cpu) => {
               ex.current = cpu; rememberDelegate('CPU'); setSwitched(true);
             }).catch(() => { /* keep GPU */ });
           }

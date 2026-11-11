@@ -2,24 +2,26 @@
 // from jsDelivr (pinned version). Frames are processed UNMIRRORED so
 // handedness matches the Python extractor (contract isl-nova-fc-1.0.0); the
 // preview is mirrored with CSS only.
-import type { Frame } from './features';
+import { FACE_KEEP, type Frame } from './features';
 
 export const MEDIAPIPE_VERSION = '0.10.14';
 const CDN = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}`;
 export const HAND_MODEL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
 export const POSE_MODEL = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task';
+export const FACE_MODEL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
 
-export type Extractor = { detect: (v: HTMLVideoElement, ts: number) => Frame; close: () => void; withPose: boolean; delegate: string };
+export type Extractor = { detect: (v: HTMLVideoElement, ts: number) => Frame; close: () => void; withPose: boolean; withFace: boolean; delegate: string };
 
 export type Delegate = 'GPU' | 'CPU';
 const loading = new Map<string, Promise<Extractor>>();
 
-/** Load (once per delegate) the MediaPipe hand + pose landmarkers. 'GPU' falls back to 'CPU' if WebGL fails. */
-export function loadExtractor(withPose = true, delegate: Delegate = preferredDelegate()): Promise<Extractor> {
-  const key = `${withPose}:${delegate}`;
+/** Load (once per delegate) the MediaPipe hand + pose (+ face, for contract 2.0.0 models) landmarkers.
+ *  'GPU' falls back to 'CPU' if WebGL fails. */
+export function loadExtractor(withPose = true, delegate: Delegate = preferredDelegate(), withFace = false): Promise<Extractor> {
+  const key = `${withPose}:${delegate}:${withFace}`;
   let p = loading.get(key);
   if (!p) {
-    p = create(withPose, delegate).catch((e) => { loading.delete(key); throw e; });
+    p = create(withPose, delegate, withFace).catch((e) => { loading.delete(key); throw e; });
     loading.set(key, p);
   }
   return p;
@@ -35,7 +37,7 @@ export function rememberDelegate(d: Delegate) {
   try { localStorage.setItem(PREF_KEY, d); } catch { /* storage unavailable */ }
 }
 
-async function create(withPose: boolean, preferred: Delegate): Promise<Extractor> {
+async function create(withPose: boolean, preferred: Delegate, withFace: boolean): Promise<Extractor> {
   const url = `${CDN}/vision_bundle.mjs`;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const vision: any = await import(/* @vite-ignore */ url);
@@ -56,8 +58,15 @@ async function create(withPose: boolean, preferred: Delegate): Promise<Extractor
       pose = (await make(vision.PoseLandmarker, { runningMode: 'VIDEO', numPoses: 1 }, POSE_MODEL)).task;
     } catch { pose = null; }
   }
+  let face: any = null;
+  if (withFace) {  // non-manual features: only when the active model was trained with them
+    try {
+      face = (await make(vision.FaceLandmarker, { runningMode: 'VIDEO', numFaces: 1 }, FACE_MODEL)).task;
+    } catch { face = null; }
+  }
   return {
     withPose: !!pose,
+    withFace: !!face,
     delegate: h.delegate,
     detect(v, ts) {
       const r = hands.detectForVideo(v, ts);
@@ -72,9 +81,14 @@ async function create(withPose: boolean, preferred: Delegate): Promise<Extractor
         const p = pr.landmarks?.[0];
         if (p) f.pose = p.map((q: { x: number; y: number; z: number; visibility?: number }) => [q.x, q.y, q.z, q.visibility ?? 1]);
       }
+      if (face) {
+        const fr = face.detectForVideo(v, ts);
+        const pts = fr.faceLandmarks?.[0];
+        if (pts) f.face = FACE_KEEP.map((k) => [pts[k].x, pts[k].y, pts[k].z]);
+      }
       return f;
     },
-    close() { hands.close?.(); pose?.close?.(); },
+    close() { hands.close?.(); pose?.close?.(); face?.close?.(); },
   };
 }
 

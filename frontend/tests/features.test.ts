@@ -35,3 +35,17 @@ test('empty and hand-less input is insufficient', () => {
   assert.equal(r.handRatio, 0);
   assert.equal(windowQuality(blank).hands, 0);
 });
+
+test('contract 2.0.0 face block matches Python', async () => {
+  const { extractFeaturesFor, CONTRACT_V2, FACE_DIM } = await import('../src/lib/features.ts');
+  const fx2 = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'feature_parity_v2.json'), 'utf8'));
+  assert.equal(fx2.contract, CONTRACT_V2);
+  assert.equal(fx2.face_dim, FACE_DIM);
+  for (const c of fx2.cases) {
+    const r = extractFeaturesFor(CONTRACT_V2, c.frames, c.aspect);
+    assert.equal(r.features[0].length, DIM + FACE_DIM);
+    c.face_features.forEach((row: number[], t: number) => row.forEach((v, j) => {
+      assert.ok(Math.abs(r.features[t][DIM + j] - v) < 2e-5, `${c.name} t=${t} j=${j}: ${r.features[t][DIM + j]} vs ${v}`);
+    }));
+  }
+});

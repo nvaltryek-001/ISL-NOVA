@@ -49,3 +49,29 @@ def test_fixture_matches_python_features():
     assert stored["contract"] == C.CONTRACT_NAME, "contract changed: regenerate fixture"
     for a, b in zip(stored["cases"], cases, strict=True):
         assert np.allclose(np.array(a["features"]), np.array(b["features"]), atol=2e-5), a["name"]
+
+
+FIXTURE_V2 = FIXTURE.parent / "feature_parity_v2.json"
+
+
+def test_fixture_v2_face_block_matches_python():
+    """Contract 2.0.0 parity: same frames plus faces (with gaps) -> the 51 face columns."""
+    rng = np.random.default_rng(7)
+    cases = []
+    for name, frames, aspect in _cases()[:2]:
+        fr = []
+        for i, f in enumerate(frames):
+            g = {k: (None if v is None else np.round(np.array(v), 6).tolist()) for k, v in f.items()}
+            if i % 6 != 5:
+                pts = rng.normal(0.5, 0.03, (22, 3))
+                g["face"] = np.round(pts, 6).tolist()
+            fr.append(g)
+        r = extract_features(fr, aspect, C.CONTRACT_V2_VERSION)
+        cases.append({"name": name, "aspect": aspect, "frames": fr,
+                      "face_features": np.round(r.features[:, C.FEATURE_DIM:].astype(np.float64), 6).tolist()})
+    payload = {"contract": C.CONTRACT_V2_NAME, "face_dim": C.FACE_DIM, "cases": cases}
+    if os.environ.get("ISL_NOVA_WRITE_FIXTURE") or not FIXTURE_V2.exists():
+        FIXTURE_V2.write_text(json.dumps(payload, separators=(",", ":")))
+    stored = json.loads(FIXTURE_V2.read_text())
+    for a, b in zip(stored["cases"], cases, strict=True):
+        np.testing.assert_allclose(np.array(a["face_features"]), np.array(b["face_features"]), atol=1e-5)

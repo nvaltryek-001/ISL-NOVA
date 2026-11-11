@@ -190,7 +190,8 @@ def cmd_extract_part(a) -> int:
         z.extractall(work / "x")
     zpath.unlink()
     idx, voc = split_index(), vocab()
-    ex = LandmarkExtractor(Path(a.hand_model), Path(a.pose_model), max_side=a.max_side)
+    ex = LandmarkExtractor(Path(a.hand_model), Path(a.pose_model), max_side=a.max_side,
+                           face_model=Path(a.face_model) if getattr(a, "face_model", None) else None)
     entries, reserve, failures, unmatched, outside_vocab = [], [], [], [], 0
     duplicates: list[dict] = []
     seen_listed: dict[str, str] = {}
@@ -368,7 +369,8 @@ def cmd_fetch_test_videos(a) -> int:
     meta = {f["key"]: f for f in files}
     idx, voc = split_index(), vocab()
     pred = Predictor.from_registry(Path(a.registry))
-    ex = LandmarkExtractor(Path(a.hand_model), Path(a.pose_model))
+    ex = LandmarkExtractor(Path(a.hand_model), Path(a.pose_model),
+                           face_model=Path(a.face_model) if getattr(a, "face_model", None) else None)
     items = []
     try:
         for part in [x for x in a.parts.split(",") if x]:
@@ -447,7 +449,6 @@ def cmd_open_set(a) -> int:
     import numpy as np
 
     from .data import load_landmarks
-    from .features import extract_features
     from .inference import Predictor
     from .metrics import auroc
 
@@ -460,7 +461,7 @@ def cmd_open_set(a) -> int:
     for g, ents in groups.items():
         for e in ents:
             frames, aspect = load_landmarks(Path(a.data_root) / e["landmarks_path"])
-            fr = extract_features(frames, aspect)
+            fr = pred.features(frames, aspect)
             out = pred.predict(frames, aspect, 5)
             p1 = pred.known_max(pred.predict_features(fr.features)) if fr.status == "ok" else None
             if p1 is not None:
@@ -514,7 +515,6 @@ def cmd_open_set_v2(a) -> int:
     import numpy as np
 
     from .data import load_landmarks
-    from .features import extract_features
     from .inference import Predictor
     from .openset import CentroidScorer, base_scores, evaluate, gloss_half, pooled, unknown_part
 
@@ -527,7 +527,7 @@ def cmd_open_set_v2(a) -> int:
         P, Z, keep = [], [], []
         for e in entries:
             frames, aspect = load_landmarks(Path(a.data_root) / e["landmarks_path"])
-            fr = extract_features(frames, aspect)
+            fr = pred.features(frames, aspect)
             if fr.status != "ok":
                 continue
             F = np.asarray(fr.features, dtype=np.float64)
@@ -583,11 +583,10 @@ def _probs(a, pred, entries):
     import numpy as np
 
     from .data import load_landmarks
-    from .features import extract_features
 
     P, keep = [], []
     for e in entries:
-        fr = extract_features(*load_landmarks(Path(a.data_root) / e["landmarks_path"]))
+        fr = pred.features(*load_landmarks(Path(a.data_root) / e["landmarks_path"]))
         if fr.status != "ok":
             continue
         P.append(pred.predict_features(np.asarray(fr.features, dtype=np.float64)))
@@ -720,6 +719,7 @@ def main(argv=None) -> int:
     p.add_argument("--hand-model", required=True)
     p.add_argument("--pose-model", required=True)
     p.add_argument("--max-side", type=int, default=960)
+    p.add_argument("--face-model", help="face_landmarker.task: also store 22 face points per frame (contract 2.0.0)")
     p.add_argument("--include-reserve", action="store_true", help="also extract the 63 reserve glosses as open-set unknowns")
     p = sub.add_parser("merge")
     p.add_argument("--inputs", required=True)
@@ -736,6 +736,7 @@ def main(argv=None) -> int:
     p.add_argument("--hand-model", required=True)
     p.add_argument("--pose-model", required=True)
     p.add_argument("--limit", type=int, default=0)
+    p.add_argument("--face-model")
     p = sub.add_parser("verify")
     p.add_argument("--registry", required=True)
     p.add_argument("--manifest", required=True)

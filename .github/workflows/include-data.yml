@@ -30,6 +30,7 @@ concurrency:
 env:
   HAND_MODEL_URL: https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
   POSE_MODEL_URL: https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task
+  FACE_MODEL_URL: https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
   PYTHONPATH: ml
 
 jobs:
@@ -40,6 +41,7 @@ jobs:
       parts: ${{ steps.parts.outputs.parts }}
       max_parallel: ${{ steps.cfg.outputs.max_parallel }}
       reserve: ${{ steps.cfg.outputs.reserve }}
+      face: ${{ steps.cfg.outputs.face }}
       version: ${{ steps.cfg.outputs.version }}
     steps:
       - uses: actions/checkout@v4
@@ -56,6 +58,7 @@ jobs:
           par = "${{ inputs.max_parallel }}" if "${{ github.event_name }}" == "workflow_dispatch" else str(cfg.get("max_parallel", 8))
           print(f"only={only}"); print(f"max_parallel={par}")
           print("reserve=" + str(cfg.get("include_reserve", False)).lower()); print("version=" + cfg.get("version", "include-official-v1"))
+          print("face=" + str(cfg.get("face", False)).lower())
           PY
       - name: Runner resources
         run: |
@@ -90,13 +93,16 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libgl1
       - run: pip install -r backend/requirements.txt
       - name: MediaPipe models
-        run: curl -fsSL -o hand.task "$HAND_MODEL_URL" && curl -fsSL -o pose.task "$POSE_MODEL_URL"
+        run: |
+          curl -fsSL -o hand.task "$HAND_MODEL_URL" && curl -fsSL -o pose.task "$POSE_MODEL_URL"
+          ${{ needs.preflight.outputs.face == 'true' && 'curl -fsSL -o face.task "$FACE_MODEL_URL"' || 'true' }}
       - id: name
         run: echo "safe=$(echo '${{ matrix.part }}' | tr -c 'A-Za-z0-9._-' '_')" >> "$GITHUB_OUTPUT"
       - name: Download, verify, extract landmarks (raw video deleted afterwards)
         run: |
           python -m isl_nova_ml.include_pipeline extract-part --part "${{ matrix.part }}" \
-            --out out --work "$RUNNER_TEMP/work" --hand-model hand.task --pose-model pose.task ${{ needs.preflight.outputs.reserve == 'true' && '--include-reserve' || '' }}
+            --out out --work "$RUNNER_TEMP/work" --hand-model hand.task --pose-model pose.task ${{ needs.preflight.outputs.reserve == 'true' && '--include-reserve' || '' }} \
+            ${{ needs.preflight.outputs.face == 'true' && '--face-model face.task' || '' }}
       - uses: actions/upload-artifact@v4
         with: { name: "landmarks-${{ steps.name.outputs.safe }}", path: out, retention-days: 14 }
 

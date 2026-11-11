@@ -2,6 +2,7 @@
   "only": "",
   "max_parallel": 8,
   "include_reserve": true,
-  "version": "include-official-v2",
-  "purpose": "re-extract all parts including the 63 reserve glosses as held-out unknown classes for open-set evaluation"
+  "face": true,
+  "version": "include-face-v1",
+  "purpose": "contract 2.0.0: re-extract all parts (incl. the reserve glosses) with 22 FaceLandmarker points per frame for non-manual features"
 }

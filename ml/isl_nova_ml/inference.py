@@ -27,9 +27,10 @@ class Predictor:
     def __init__(self, model_dir: Path):
         self.dir = Path(model_dir)
         self.info = json.loads((self.dir / "model.json").read_text())
-        if self.info["contract"]["version"] != C.CONTRACT_VERSION:
+        self.contract_version = self.info["contract"]["version"]
+        if self.contract_version not in C.SUPPORTED:
             raise ModelUnavailable(
-                f"model contract {self.info['contract']['version']} != runtime {C.CONTRACT_VERSION}"
+                f"model contract {self.contract_version} is not supported by this runtime ({sorted(C.SUPPORTED)})"
             )
         verify_integrity(self.dir)
         self.model = load_model(self.dir)
@@ -54,12 +55,20 @@ class Predictor:
         except (RegistryError, FileNotFoundError, KeyError, ValueError) as exc:
             raise ModelUnavailable(str(exc)) from exc
 
+    @property
+    def needs_face(self) -> bool:
+        return self.contract_version == C.CONTRACT_V2_VERSION
+
+    def features(self, frames: list[dict], aspect: float = 1.0):
+        """Feature tensor in this model's contract (1.0.0, or 2.0.0 with the face block)."""
+        return extract_features(frames, aspect, self.contract_version)
+
     def predict_features(self, feats: np.ndarray) -> np.ndarray:
         return self.model.predict_proba(feats[None].astype(np.float64))[0]
 
     def predict(self, frames: list[dict], aspect: float = 1.0, top_k: int = 5) -> dict:
         t0 = time.perf_counter()
-        fr = extract_features(frames, aspect)
+        fr = self.features(frames, aspect)
         quality = {"raw_frames": fr.raw_frames, "hand_frame_ratio": round(fr.hand_frame_ratio, 3),
                    "pose_frame_ratio": round(fr.pose_frame_ratio, 3)}
         if fr.status != "ok":
@@ -104,7 +113,7 @@ class Predictor:
 
     def describe(self) -> dict:
         return {"model_id": self.info["model_id"], "synthetic": self.synthetic,
-                "contract": self.info["contract"]["name"],
+                "contract": self.info["contract"]["name"], "needs_face": self.needs_face,
                 "decision_rule": "open_set_detector" if self.detector else "max_probability"}
 
 

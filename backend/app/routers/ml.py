@@ -20,6 +20,7 @@ class FrameIn(BaseModel):
     left: list[Point] | None = None
     right: list[Point] | None = None
     pose: list[Point] | None = None
+    face: list[Point] | None = None  # 22 FaceLandmarker points (contract 2.0.0); ignored by 1.0.0 models
 
     @field_validator("left", "right")
     @classmethod
@@ -35,6 +36,13 @@ class FrameIn(BaseModel):
             raise ValueError("pose must have 33 points of [x, y, z(, visibility)]")
         return v
 
+    @field_validator("face")
+    @classmethod
+    def _face(cls, v):
+        if v is not None and (len(v) != 22 or any(len(p) < 3 for p in v)):
+            raise ValueError("face must have the 22 contract points of [x, y, z]")
+        return v
+
 
 class PredictIn(BaseModel):
     frames: list[FrameIn] = Field(max_length=300)
@@ -45,14 +53,14 @@ class PredictIn(BaseModel):
 
 class ExperimentIn(BaseModel):
     name: str = Field(min_length=3, max_length=120)
-    model_kind: str = Field(pattern="^(lstm|gru|pooled_logreg|dtw_1nn)$")
+    model_kind: str = Field(pattern="^(lstm|gru|tcn|transformer|bilstm_attn|pooled_logreg|dtw_1nn)$")
     dataset_version_id: int | None = None
     config: dict = Field(default_factory=dict)
 
 
 SAFE_CONFIG_KEYS = {"hidden", "epochs", "batch_size", "lr", "weight_decay", "patience", "lr_decay", "lr_patience",
                     "augment", "seed", "min_train_samples", "class_weighting", "tau_keep", "margin", "dtw_window",
-                    "logreg_C"}
+                    "logreg_C", "contract_version", "raw_aug_copies", "other_class"}
 
 
 def _info(ctx: Ctx) -> dict:
@@ -68,6 +76,8 @@ def _info(ctx: Ctx) -> dict:
     return {"available": True, "state": "ready", "model_id": info["model_id"], "kind": info["kind"],
             "synthetic": p.synthetic, "warning": info.get("warning"), "created_utc": info["created_utc"],
             "classes": info["classes"], "n_classes": len(info["classes"]), "thresholds": info["thresholds"],
+            "contract": info["contract"], "needs_face": p.needs_face,
+            "classes_vocabulary": len(p.vocabulary), "decision_rule": p.describe()["decision_rule"],
             "lineage": {k: info["lineage"].get(k) for k in ("dataset_version", "split_counts", "split_policy")},
             "metrics_summary": info.get("metrics_summary"), **base}
 

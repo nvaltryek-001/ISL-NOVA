@@ -174,8 +174,60 @@ def _ok(p, key: str) -> bool:
     raise KeyError(key)
 
 
-def extract_features(frames: list[dict], aspect: float = 1.0) -> FeatureResult:
-    """Compute the contract feature tensor for one sign attempt."""
+# --------------------------------------------------------------------------- face block (contract 2.0.0)
+_FI = {n: i for i, n in enumerate(C.FACE_NAMES)}
+
+
+def face_static(face) -> np.ndarray | None:
+    """One frame's face block without presence: 22 points (x, y) around the nose tip, scaled by the
+    eye-corner distance, then 6 derived measures. ``face`` is the 22-point subset (already aspect-corrected)."""
+    if face is None:
+        return None
+    f = face[:, :2]
+    iod = float(max(np.linalg.norm(f[_FI["l_eye_out"]] - f[_FI["r_eye_out"]]), EPS))
+    pts = ((f - f[_FI["nose_tip"]]) / iod).reshape(-1)
+
+    def d(a, b):
+        return float(np.linalg.norm(f[_FI[a]] - f[_FI[b]]) / iod)
+    derived = [d("lip_top_in", "lip_bottom_in"), d("mouth_l", "mouth_r"), d("l_brow_mid", "l_eye_top"),
+               d("r_brow_mid", "r_eye_top"), d("l_eye_top", "l_eye_bottom"), d("r_eye_top", "r_eye_bottom")]
+    return np.concatenate([pts, derived])
+
+
+def face_block(frames: list[dict], aspect: float, T: int) -> tuple[np.ndarray, float]:
+    """[T, FACE_DIM] face features resampled like the other blocks; returns also the face frame ratio."""
+    n = len(frames)
+    k = C.FACE_DIM - 1
+    raw, pres = np.zeros((n, k)), np.zeros(n, dtype=bool)
+    for i, fr in enumerate(frames):
+        a = _arr(fr.get("face"), len(C.FACE_KEEP))
+        if a is not None:
+            a[:, 0] *= aspect
+            raw[i], pres[i] = face_static(a), True
+    out = np.zeros((T, C.FACE_DIM))
+    for t in range(T):
+        s = t * (n - 1) / (T - 1) if n > 1 else 0.0
+        i0 = int(np.floor(s))
+        i1 = min(i0 + 1, n - 1)
+        w = s - i0
+        if pres[i0] and pres[i1]:
+            out[t, :k] = (1 - w) * raw[i0] + w * raw[i1]
+        elif pres[i0]:
+            out[t, :k] = raw[i0]
+        elif pres[i1]:
+            out[t, :k] = raw[i1]
+        out[t, k] = 1.0 if (pres[i0] or pres[i1]) else 0.0
+    return out, float(pres.mean()) if n else 0.0
+
+
+def extract_features(frames: list[dict], aspect: float = 1.0, version: str = C.CONTRACT_VERSION) -> FeatureResult:
+    """Compute the feature tensor of contract ``version`` (1.0.0, or 2.0.0 with the face block)."""
+    if version == C.CONTRACT_V2_VERSION:
+        base = extract_features(frames, aspect, C.CONTRACT_VERSION)
+        fb, _ = face_block(frames, aspect, C.SEQUENCE_LENGTH) if frames else (np.zeros((C.SEQUENCE_LENGTH, C.FACE_DIM)), 0.0)
+        return FeatureResult(np.concatenate([base.features, fb.astype(np.float32)], axis=1), base.raw_frames,
+                             base.hand_frame_ratio, base.pose_frame_ratio, base.status, base.reasons)
+    C.dim_for(version)
     if aspect <= 0:
         raise ValueError("aspect must be positive")
     T = C.SEQUENCE_LENGTH

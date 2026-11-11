@@ -5,7 +5,7 @@ import { Icon } from '../components/icons';
 import { Badge, Button, Card, Dialog, Empty, Field, Input, Notice, PageHeader, Select, StatusBadge, Tabs } from '../components/ui';
 import { api, qs } from '../lib/api';
 import type { Frame } from '../lib/features';
-import { extractFeatures, windowQuality } from '../lib/features';
+import { extractFeaturesFor, windowQuality } from '../lib/features';
 import { ApiError } from '../lib/api';
 import { loadWebModel } from '../lib/webModel';
 import { useT } from '../i18n';
@@ -48,7 +48,7 @@ export function LivePage() {
   /** Recognition on this device with the exported model (works offline once loaded). */
   const predictOnDevice = useCallback(async (frames: { f: Frame; a: number }[]): Promise<Prediction> => {
     const m = await loadWebModel();
-    const fr = extractFeatures(frames.map((x) => x.f), frames[frames.length - 1].a);
+    const fr = extractFeaturesFor(m.header.contract, frames.map((x) => x.f), frames[frames.length - 1].a);
     if (fr.status !== 'ok') return { state: 'insufficient_input', top: [], reasons: fr.reasons, model_id: m.header.model_id };
     const t0 = performance.now();
     const d = m.decide(m.predictProba(fr.features), 5);

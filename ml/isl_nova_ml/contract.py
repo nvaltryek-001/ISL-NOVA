@@ -93,3 +93,31 @@ def as_dict() -> dict:
 
 
 assert len(feature_names()) == FEATURE_DIM
+
+
+# --------------------------------------------------------------------------- contract 2.0.0: + face
+# isl-nova-fc-2.0.0 = the 204 features of 1.0.0 followed by a non-manual (face) block.
+# Frames carry ``face``: the 22 MediaPipe FaceLandmarker points below, in this order.
+CONTRACT_V2_VERSION = "2.0.0"
+CONTRACT_V2_NAME = f"{CONTRACT_ID}-{CONTRACT_V2_VERSION}"
+FACE_MODEL = "mediapipe-tasks-vision FaceLandmarker (478 points; 22 kept)"
+FACE_KEEP = [1, 70, 105, 107, 336, 334, 300, 33, 133, 159, 145, 362, 263, 386, 374, 61, 291, 0, 17, 13, 14, 152]
+FACE_NAMES = ["nose_tip", "l_brow_out", "l_brow_mid", "l_brow_in", "r_brow_out", "r_brow_mid", "r_brow_in",
+              "l_eye_out", "l_eye_in", "l_eye_top", "l_eye_bottom", "r_eye_in", "r_eye_out", "r_eye_top",
+              "r_eye_bottom", "mouth_l", "mouth_r", "lip_top_out", "lip_bottom_out", "lip_top_in", "lip_bottom_in",
+              "chin"]
+# derived measures, all divided by the eye-corner distance (l_eye_out..r_eye_out)
+FACE_DERIVED = ["mouth_open", "mouth_width", "l_brow_raise", "r_brow_raise", "l_eye_open", "r_eye_open"]
+FACE_DIM = len(FACE_KEEP) * 2 + len(FACE_DERIVED) + 1  # x,y per point + derived + face presence
+SUPPORTED = {CONTRACT_VERSION: FEATURE_DIM, CONTRACT_V2_VERSION: FEATURE_DIM + FACE_DIM}
+
+
+def dim_for(version: str) -> int:
+    if version not in SUPPORTED:
+        raise ValueError(f"unsupported feature contract {version!r}; supported: {sorted(SUPPORTED)}")
+    return SUPPORTED[version]
+
+
+def name_for(version: str) -> str:
+    dim_for(version)
+    return f"{CONTRACT_ID}-{version}"

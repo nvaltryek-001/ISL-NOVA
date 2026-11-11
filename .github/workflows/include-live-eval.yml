@@ -17,6 +17,7 @@ env:
   PYTHONPATH: backend:ml
   HAND_MODEL_URL: https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
   POSE_MODEL_URL: https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task
+  FACE_MODEL_URL: https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
 
 jobs:
   live-eval:
@@ -40,11 +41,12 @@ jobs:
       - name: Install the released model
         run: python scripts/fetch_model.py --tag "${{ steps.cfg.outputs.model_tag }}" --registry models --promote
       - name: MediaPipe models (server-side offline comparison)
-        run: curl -fsSL -o hand.task "$HAND_MODEL_URL" && curl -fsSL -o pose.task "$POSE_MODEL_URL"
+        run: curl -fsSL -o hand.task "$HAND_MODEL_URL" && curl -fsSL -o pose.task "$POSE_MODEL_URL" && curl -fsSL -o face.task "$FACE_MODEL_URL"
       - name: Prepare held-out test videos (Y4M) + offline predictions
         run: |
           python -m isl_nova_ml.include_pipeline fetch-test-videos --parts "${{ steps.cfg.outputs.parts }}" \
             --out videos --work "$RUNNER_TEMP/work" --registry models --hand-model hand.task --pose-model pose.task \
+            $(python -c "import json,glob;print('--face-model face.task' if any(json.load(open(f))['contract']['version']=='2.0.0' for f in glob.glob('models/*/model.json')) else '')") \
             --limit "${{ steps.cfg.outputs.limit }}"
       - name: Build frontend
         working-directory: frontend

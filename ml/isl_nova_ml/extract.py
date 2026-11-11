@@ -1,8 +1,10 @@
 """Video -> landmark sequence using MediaPipe Tasks (HandLandmarker + PoseLandmarker).
 
 Model files are NOT bundled. Download them from Google's MediaPipe model page
-(hand_landmarker.task and pose_landmarker_lite.task) and pass their paths, or
-set ISL_NOVA_HAND_MODEL / ISL_NOVA_POSE_MODEL.
+(hand_landmarker.task, pose_landmarker_lite.task and, for contract 2.0.0,
+face_landmarker.task) and pass their paths, or set ISL_NOVA_HAND_MODEL /
+ISL_NOVA_POSE_MODEL / ISL_NOVA_FACE_MODEL. With a face model each frame also
+carries ``face``: the 22 FaceLandmarker points in ``contract.FACE_KEEP``.
 
 Frames are passed to MediaPipe unmirrored, so handedness labels follow the
 same convention as the browser extractor (contract isl-nova-fc-1.0.0).
@@ -17,6 +19,8 @@ HAND_MODEL_URL = ("https://storage.googleapis.com/mediapipe-models/hand_landmark
                   "float16/1/hand_landmarker.task")
 POSE_MODEL_URL = ("https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/"
                   "float16/1/pose_landmarker_lite.task")
+FACE_MODEL_URL = ("https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/"
+                  "float16/1/face_landmarker.task")
 
 
 class ExtractorUnavailable(RuntimeError):
@@ -37,7 +41,8 @@ class LandmarkExtractor:
     starts one second after the previous one ended).
     """
 
-    def __init__(self, hand_model: Path | None = None, pose_model: Path | None = None, max_side: int = 960):
+    def __init__(self, hand_model: Path | None = None, pose_model: Path | None = None, max_side: int = 960,
+                 face_model: Path | None = None):
         hd, pd = default_model_paths()
         hand_model, pose_model = hand_model or hd, pose_model or pd
         if not hand_model or not Path(hand_model).exists():
@@ -58,11 +63,19 @@ class LandmarkExtractor:
             self.pose = v.PoseLandmarker.create_from_options(v.PoseLandmarkerOptions(
                 base_options=BaseOptions(model_asset_path=str(pose_model)),
                 running_mode=v.RunningMode.VIDEO, num_poses=1))
+        face_model = face_model or (Path(os.environ["ISL_NOVA_FACE_MODEL"]) if os.environ.get("ISL_NOVA_FACE_MODEL") else None)
+        self.face = None
+        if face_model and Path(face_model).exists():  # non-manual features (contract 2.0.0)
+            self.face = v.FaceLandmarker.create_from_options(v.FaceLandmarkerOptions(
+                base_options=BaseOptions(model_asset_path=str(face_model)),
+                running_mode=v.RunningMode.VIDEO, num_faces=1))
 
     def close(self):
         self.hands.close()
         if self.pose:
             self.pose.close()
+        if self.face:
+            self.face.close()
 
     def video(self, path: Path, max_frames: int = 300) -> tuple[list[dict], float, dict]:
         import cv2
@@ -97,6 +110,12 @@ class LandmarkExtractor:
                 pr = self.pose.detect_for_video(img, ts)
                 if pr.pose_landmarks:
                     fr["pose"] = [[p.x, p.y, p.z, getattr(p, "visibility", 1.0) or 0.0] for p in pr.pose_landmarks[0]]
+            if self.face is not None:
+                from .contract import FACE_KEEP
+                fl = self.face.detect_for_video(img, ts)
+                if fl.face_landmarks:
+                    pts = fl.face_landmarks[0]
+                    fr["face"] = [[pts[k].x, pts[k].y, pts[k].z] for k in FACE_KEEP]
             frames.append(fr)
             self._clock_ms = ts
             i += 1

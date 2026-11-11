@@ -43,6 +43,8 @@ def augment_batch(X: np.ndarray, rng: np.random.Generator, noise: float = 0.01,
             X[b] = np.roll(X[b], shift, axis=0)
         mask = np.ones(X.shape[2], dtype=bool)
         mask[PRESENCE_OFFSET: PRESENCE_OFFSET + 3] = False
+        if X.shape[2] > C.FEATURE_DIM:  # contract 2.0.0: last column is face presence
+            mask[-1] = False
         X[b][:, mask] += rng.normal(0, noise, (T, int(mask.sum()))).astype(X.dtype)
     return X
 

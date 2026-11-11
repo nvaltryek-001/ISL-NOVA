@@ -24,7 +24,7 @@ const SEGMENTS: [number, number, string][] = [
 ];
 
 export type Pt = number[];
-export type Frame = { left: Pt[] | null; right: Pt[] | null; pose: Pt[] | null };
+export type Frame = { left: Pt[] | null; right: Pt[] | null; pose: Pt[] | null; face?: Pt[] | null };
 export type FeatureResult = { features: number[][]; rawFrames: number; handRatio: number; poseRatio: number; status: 'ok' | 'insufficient_input'; reasons: string[] };
 
 type V3 = [number, number, number];
@@ -96,6 +96,57 @@ function frameStatic(lh: V3[] | null, rh: V3[] | null, po: V3[] | null, o: V3, s
 }
 
 const ok = (p: [boolean, boolean, boolean], g: string) => (g === 'L' ? p[0] : g === 'R' ? p[1] : g === 'P' ? p[2] : p[0] && p[1]);
+
+// ---- contract isl-nova-fc-2.0.0: the 204 features above + a 51-value face block ----
+export const CONTRACT_V2 = 'isl-nova-fc-2.0.0';
+/** MediaPipe FaceLandmarker indices kept (order = contract.FACE_KEEP). */
+export const FACE_KEEP = [1, 70, 105, 107, 336, 334, 300, 33, 133, 159, 145, 362, 263, 386, 374, 61, 291, 0, 17, 13, 14, 152];
+const FN = ['nose_tip', 'l_brow_out', 'l_brow_mid', 'l_brow_in', 'r_brow_out', 'r_brow_mid', 'r_brow_in', 'l_eye_out', 'l_eye_in',
+  'l_eye_top', 'l_eye_bottom', 'r_eye_in', 'r_eye_out', 'r_eye_top', 'r_eye_bottom', 'mouth_l', 'mouth_r', 'lip_top_out',
+  'lip_bottom_out', 'lip_top_in', 'lip_bottom_in', 'chin'];
+const FI = Object.fromEntries(FN.map((n, i) => [n, i])) as Record<string, number>;
+export const FACE_DIM = FACE_KEEP.length * 2 + 6 + 1;
+
+function faceStatic(f: number[][]): number[] {
+  const d2 = (a: number[], b: number[]) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+  const iod = Math.max(d2(f[FI.l_eye_out], f[FI.r_eye_out]), EPS);
+  const nose = f[FI.nose_tip];
+  const out: number[] = [];
+  for (const p of f) out.push((p[0] - nose[0]) / iod, (p[1] - nose[1]) / iod);
+  const d = (a: string, b: string) => d2(f[FI[a]], f[FI[b]]) / iod;
+  out.push(d('lip_top_in', 'lip_bottom_in'), d('mouth_l', 'mouth_r'), d('l_brow_mid', 'l_eye_top'), d('r_brow_mid', 'r_eye_top'),
+    d('l_eye_top', 'l_eye_bottom'), d('r_eye_top', 'r_eye_bottom'));
+  return out;
+}
+
+function faceBlock(frames: Frame[], aspect: number): number[][] {
+  const n = frames.length;
+  const k = FACE_DIM - 1;
+  const raw = frames.map((f) => {
+    const a = parse(f.face ?? null, FACE_KEEP.length, aspect);
+    return a ? faceStatic(a) : null;
+  });
+  const out = Array.from({ length: SEQ }, () => new Array(FACE_DIM).fill(0));
+  for (let t = 0; t < SEQ; t++) {
+    const pos = n > 1 ? (t * (n - 1)) / (SEQ - 1) : 0;
+    const i0 = Math.floor(pos);
+    const i1 = Math.min(i0 + 1, n - 1);
+    const w = pos - i0;
+    const a = raw[i0];
+    const b = raw[i1];
+    for (let j = 0; j < k; j++) out[t][j] = a && b ? (1 - w) * a[j] + w * b[j] : a ? a[j] : b ? b[j] : 0;
+    out[t][k] = a || b ? 1 : 0;
+  }
+  return out;
+}
+
+/** Features for the contract a model was trained with (1.0.0 or 2.0.0 with the face block). */
+export function extractFeaturesFor(contract: string, frames: Frame[], aspect = 1): FeatureResult {
+  const base = extractFeatures(frames, aspect);
+  if (contract !== CONTRACT_V2) return base;
+  const fb = frames.length ? faceBlock(frames, aspect) : Array.from({ length: SEQ }, () => new Array(FACE_DIM).fill(0));
+  return { ...base, features: base.features.map((r, t) => [...r, ...Array.from(Float32Array.from(fb[t]))]) };
+}
 
 export function extractFeatures(frames: Frame[], aspect = 1): FeatureResult {
   const n = frames.length;
