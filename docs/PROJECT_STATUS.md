@@ -32,7 +32,7 @@ Legend: ✅ done and tested · ⚠️ done, target not met · 👤 needs people 
 | 10 | Load test | ✅ | ~90 req/s on 2 vCPU, 0 errors ([LOAD_TEST.md](LOAD_TEST.md)) |
 | 10 | Grafana dashboard | ✅ | `monitoring/`; test checks its queries against the app's metrics |
 | 11 | README, model card, results, report chapter 11 | ✅ | this commit |
-| 11 | Install checks | ✅ Windows + Ubuntu | runs [42859318362](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42859318362), [42859313452](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42859313452); macOS job cancelled by GitHub before start (no runner) |
+| 11 | Install checks | ✅ Windows, Ubuntu, **macOS** | one-command installer on all three, 24/24 held-out samples each: [run 42958100565](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/42958100565) (the earlier macOS failures were GitHub retiring the macos-14 image) |
 | 11 | Release v2.0.0 | ✅ | [release v2.0.0](https://github.com/nvaltryek-001/ISL-NOVA/releases/tag/v2.0.0) (tag created by the release workflow) |
 | 11 | Update the live demo | 💳 | needs the owner's go-ahead; the demo still runs v1 |
 

@@ -15,7 +15,7 @@
 #>
 [CmdletBinding()]
 param(
-  [ValidateSet("lstm", "lstm-fps", "gru", "gru-fps", "pooled-logreg", "dtw-1nn", "all")][string]$Model = "lstm",
+  [ValidateSet("lstm", "lstm-fps", "gru", "gru-fps", "bilstm-attn", "transformer", "tcn", "pooled-logreg", "dtw-1nn", "all")][string]$Model = "lstm",
   [string]$Data = "",
   [int]$Epochs = 0,
   [switch]$Promote
