@@ -51,7 +51,7 @@ export function ResearchPage() {
       </PageHeader>
 
       <Card title="Benchmark results" subtitle={t('INCLUDE official test split · 635 sequences · 200 signs')}>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={t('Benchmark results')}>
           <table className="w-full text-left text-sm">
             <thead className="text-xs uppercase tracking-wider text-ink-400">
               <tr><th className="py-2 pr-4 font-medium">{t('Model')}</th><th className="px-3 py-2 text-right font-medium">Top-1</th><th className="px-3 py-2 text-right font-medium">Top-5</th><th className="py-2 pl-3 text-right font-medium">Macro-F1</th></tr>

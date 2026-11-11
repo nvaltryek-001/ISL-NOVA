@@ -37,6 +37,10 @@ describe('axe-core WCAG 2.1 AA scan', { skip: axeSource ? false : 'axe-core not 
         await page.getByRole('heading', { level: 1 }).or(page.getByRole('heading', { level: 2 })).first().waitFor();
         assert.equal(await page.evaluate(() => document.documentElement.classList.contains('dark')), theme === 'dark');
         await page.waitForTimeout(300);
+        // scan the settled page: wait for entrance animations (finite ones) to finish so contrast is
+        // measured on the final colours users read, not on half-faded text
+        await page.evaluate(() => Promise.all(document.getAnimations()
+          .filter((a) => a.effect?.getTiming().iterations !== Infinity).map((a) => a.finished.catch(() => null))));
         await page.addScriptTag({ content: axeSource });
         const res = await page.evaluate(async () => {
           const r = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] } });
