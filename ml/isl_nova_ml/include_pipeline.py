@@ -617,6 +617,12 @@ def cmd_calibrate_open_set(a) -> int:
     if pred.detector:
         print("active model already has an open_set_detector; refitting")
     by, parts = _entries_and_parts(a, pred)
+    short = [k for k in ("A2", "B") if not parts.get(k)]
+    if short or not by.get("val") or not by.get("test"):
+        print(f"calibrate-open-set: not enough data (unknown parts without sequences: {short or 'none'}; "
+              f"validation {len(by.get('val', []))}, test {len(by.get('test', []))}). Extract all INCLUDE parts, "
+              "including the reserve glosses, to fit the unknown-sign detector. The model keeps its max-probability rule.")
+        return 2
     feats = lambda P: detector_features(P, pred.known_cols, pred.other_col)  # noqa: E731
     Pv, _ = _probs(a, pred, by["val"])
     Pa2, _ = _probs(a, pred, parts["A2"])
