@@ -38,3 +38,6 @@ dataset/references/*.npz
 dataset/references/*.sha256
 monitoring/metrics_token
 monitoring/s3.json
+
+# npm lock files are generated locally, not tracked
+frontend/package-lock.json

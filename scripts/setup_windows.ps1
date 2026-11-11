@@ -95,7 +95,13 @@ if (-not $SkipFrontend) {
   Step "Installing and building the frontend"
   Push-Location frontend
   try {
-    if (Test-Path package-lock.json) { & npm ci --no-audit --no-fund } else { & npm install --no-audit --no-fund }
+    $installed = $false
+    if (Test-Path package-lock.json) {
+      & npm ci --no-audit --no-fund
+      if ($LASTEXITCODE -eq 0) { $installed = $true }
+      else { Write-Host "    package-lock.json is out of date; refreshing it with npm install" -ForegroundColor Yellow }
+    }
+    if (-not $installed) { & npm install --no-audit --no-fund }
     if ($LASTEXITCODE -ne 0) { Fail "npm install failed" }
     & npm run build
     if ($LASTEXITCODE -ne 0) { Fail "frontend build failed" }

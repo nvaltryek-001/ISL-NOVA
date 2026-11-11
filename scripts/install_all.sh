@@ -50,7 +50,7 @@ VPY="$ROOT/.venv/bin/python"
 c_ok "packages installed in .venv"
 
 step 3 "Frontend"
-( cd frontend && { [ -f package-lock.json ] && npm ci --no-audit --no-fund || npm install --no-audit --no-fund; } && npm run build )
+( cd frontend && { { [ -f package-lock.json ] && npm ci --no-audit --no-fund; } || { echo "package-lock.json missing or out of date; using npm install"; npm install --no-audit --no-fund; }; } && npm run build )
 c_ok "frontend/dist built"
 
 step 4 ".env"
