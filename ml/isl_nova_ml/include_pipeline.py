@@ -218,6 +218,8 @@ def cmd_extract_part(a) -> int:
             except Exception as exc:  # noqa: BLE001 - recorded per video
                 failures.append({"recording_id": rid, "path": n, "reason": str(exc)[:300]})
                 continue
+            if ex.face is not None:
+                vmeta["face_frame_ratio"] = round(sum(f.get("face") is not None for f in frames) / max(len(frames), 1), 3)
             rel = f"landmarks/{gloss}__{p.stem}.npz"
             sha = save_landmarks(out / rel, frames, aspect)
             q = extract_features(frames, aspect)
@@ -230,8 +232,10 @@ def cmd_extract_part(a) -> int:
                                                                "hand_frame_ratio": round(q.hand_frame_ratio, 3),
                                                                "pose_frame_ratio": round(q.pose_frame_ratio, 3),
                                                                **vmeta}})
-            if (len(entries) + len(reserve)) % 25 == 0:
-                print(f"{a.part}: {len(entries)} videos processed", flush=True)
+            if (len(entries) + len(reserve)) % 25 == 0 or len(entries) + len(reserve) == 1:
+                print(f"{a.part}: {len(entries)} videos processed; last: {len(frames)} frames, "
+                      f"face frames {sum(f.get('face') is not None for f in frames)}, face task={ex.face is not None}",
+                      flush=True)
     finally:
         ex.close()
         shutil.rmtree(work / "x", ignore_errors=True)
