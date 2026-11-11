@@ -39,3 +39,18 @@ jobs:
           $after = (Get-Content artifacts\models\registry.json -Raw | ConvertFrom-Json).active
           "active after reinstall: $after"
           if ($after -ne $reg.active) { throw "reinstall replaced the trained model" }
+      - name: password_windows.ps1 changes the password in the app's database
+        shell: pwsh
+        run: |
+          .\scripts\password_windows.ps1
+          $admin = ((Get-Content .env | Select-String '^BOOTSTRAP_ADMIN_EMAIL=') -split '=', 2)[1].Trim()
+          $env:ISL_NOVA_NEW_PASSWORD = 'changed-in-ci-123'
+          .\scripts\password_windows.ps1 -Email $admin
+          if ($LASTEXITCODE -ne 0) { throw "set-password failed" }
+          Remove-Item Env:ISL_NOVA_NEW_PASSWORD
+          $p = Start-Process powershell -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','scripts\start_windows.ps1','-Port','8011' -PassThru
+          for ($i = 0; $i -lt 60; $i++) { try { Invoke-RestMethod http://127.0.0.1:8011/api/v1/health | Out-Null; break } catch { Start-Sleep 2 } }
+          $ok = Invoke-WebRequest -UseBasicParsing -Method Post -ContentType 'application/json' -Uri http://127.0.0.1:8011/api/v1/auth/login -Body (@{ email = $admin; password = 'changed-in-ci-123' } | ConvertTo-Json) -SkipHttpErrorCheck
+          "login with new password: $($ok.StatusCode)"
+          if ($ok.StatusCode -ne 200) { throw "new password rejected" }
+          Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'uvicorn' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
