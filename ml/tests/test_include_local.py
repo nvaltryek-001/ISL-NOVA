@@ -72,3 +72,39 @@ def test_download_verify_and_resume(tmp_path, monkeypatch):
     assert ("Animals_1of2.zip", 123) in calls and ("Adjectives_1of8.zip", 0) in calls
     for f in files:
         assert (z / f["key"]).read_bytes() == blobs[f["key"]]
+
+
+def test_delete_zips_streams_part_by_part(tmp_path, monkeypatch):
+    blobs = {f"Part{i}_1of1.zip": bytes([i]) * 400 for i in range(5)}
+    files = [{"key": k, "size": len(v), "checksum": "md5:" + hashlib.md5(v).hexdigest(), "url": f"https://x/{k}"}  # noqa: S324
+             for k, v in blobs.items()]
+    downloads, extracted, on_disk = [], [], []
+    root = tmp_path / "include"
+
+    def fake_urlopen(req, timeout=0):
+        key = req.full_url.rsplit("/", 1)[1]
+        downloads.append(key)
+        return _Resp(blobs[key], 200)
+
+    def fake_extract(p, zips, parts, work, tasks, face, max_side):
+        on_disk.append(len(list(zips.glob("*.zip"))))
+        assert (zips / p["key"]).read_bytes() == blobs[p["key"]]
+        out = parts / p["key"]
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "part_manifest.json").write_text("{}")
+        extracted.append(p["key"])
+        return "ok"
+
+    monkeypatch.setattr(ip, "zenodo_files", lambda: ({}, files))
+    monkeypatch.setattr(il.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(il, "extract_part", fake_extract)
+    monkeypatch.setattr(il.subprocess, "run", lambda *a, **k: type("R", (), {"returncode": 1})())  # stop at merge
+    (tmp_path / "artifacts").mkdir()
+    monkeypatch.setattr(il, "TASKS", {})
+    il.main(["--root", str(root), "--delete-zips", "--workers", "2"])
+    assert sorted(extracted) == sorted(blobs) and sorted(downloads) == sorted(blobs)
+    assert list((root / "zips").glob("*.zip")) == []          # every zip deleted after extraction
+    assert max(on_disk) <= 3                                   # never more than workers + 1 zips at once
+    downloads.clear()
+    il.main(["--root", str(root), "--delete-zips", "--workers", "2"])
+    assert downloads == []                                     # rerun: extracted parts are skipped

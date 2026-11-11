@@ -4,6 +4,7 @@
     python scripts/include_local.py --download-only    # only fetch and verify the 56.8 GB of zips
     python scripts/include_local.py --workers 4        # more parallel extraction processes (CPU cores)
     python scripts/include_local.py --only Adjectives  # a subset (zip names or category prefixes)
+    python scripts/include_local.py --delete-zips      # low disk: download, extract, delete one part at a time (~15 GB)
 
 What it does, in order (each step is resumable: rerun after an interruption and finished work is skipped):
   1. reads the Zenodo record of INCLUDE (doi:10.1145/3394171.3413528, CC BY 4.0) and checks free disk space
@@ -188,51 +189,89 @@ def main(argv=None) -> int:
         log("no parts match --only")
         return 1
     total = sum(p["size"] for p in allp)
-    missing = sum(p["size"] for p in allp if not verified(zips / p["key"], p["size"], p["checksum"]))
+    done = [p for p in allp if (parts / p["key"].replace(" ", "_") / "part_manifest.json").exists()]
+    todo = [p for p in allp if p not in done]
+    have = [p for p in todo if verified(zips / p["key"], p["size"], p["checksum"])]
+    missing = sum(p["size"] for p in todo if p not in have)
     largest = max(p["size"] for p in allp)
-    need = missing + largest * 1.3 * a.workers + 2 * GB  # zips still to fetch + unpacked videos being processed + output
+    streaming = a.delete_zips and not a.download_only
+    if streaming:  # at most workers+1 zips (plus their unpacked videos) on disk at any time
+        need = largest * 2.3 * (a.workers + 1) + 3 * GB
+    else:
+        need = missing + largest * 1.3 * a.workers + 2 * GB
     free = shutil.disk_usage(a.root).free
-    log(f"{len(allp)} parts, {total / GB:.1f} GB in total, {missing / GB:.1f} GB still to download; "
-        f"free on this drive {free / GB:.1f} GB, needed about {need / GB:.1f} GB")
+    log(f"{len(allp)} parts ({total / GB:.1f} GB): {len(done)} already extracted, {len(have)} downloaded and waiting, "
+        f"{len(todo) - len(have)} still to download ({missing / GB:.1f} GB)")
+    log(f"free on this drive {free / GB:.1f} GB, needed about {need / GB:.1f} GB"
+        + ("  [--delete-zips: each zip is removed right after its landmarks are extracted]" if streaming else ""))
     if free < need:
-        log("ERROR  not enough free space. Free some space, use --only for a subset, or --workers 1.")
+        log("ERROR  not enough free space. Use --delete-zips, fewer --workers, or --only for a subset.")
         return 1
 
-    # 1. download sequentially (polite to Zenodo); resumable per part
-    for i, p in enumerate(allp, 1):
-        log(f"download {i}/{len(allp)} {p['key']} ({p['size'] / GB:.2f} GB) ...")
-        log(f"  {fetch_part(p, zips)}")
-    log(f"all {len(allp)} zips present and checksum-verified in {zips}")
-    if a.download_only:
-        return 0
+    # MediaPipe task files
+    if not a.download_only:
+        for name, url in TASKS.items():
+            if name == "face_landmarker.task" and a.no_face:
+                continue
+            dest = tasks / name
+            if not dest.exists():
+                log(f"downloading {name} ...")
+                req = urllib.request.Request(url, headers={"User-Agent": "isl-nova-include-local"})  # noqa: S310 - fixed https URL
+                with urllib.request.urlopen(req, timeout=300) as r, dest.open("wb") as fh:  # noqa: S310
+                    shutil.copyfileobj(r, fh)
 
-    # 2. MediaPipe task files
-    for name, url in TASKS.items():
-        if name == "face_landmarker.task" and a.no_face:
-            continue
-        dest = tasks / name
-        if not dest.exists():
-            log(f"downloading {name} ...")
-            req = urllib.request.Request(url, headers={"User-Agent": "isl-nova-include-local"})  # noqa: S310 - fixed https URL
-            with urllib.request.urlopen(req, timeout=300) as r, dest.open("wb") as fh:  # noqa: S310
-                shutil.copyfileobj(r, fh)
-
-    # 3. extract in parallel
-    log(f"extracting landmarks with {a.workers} worker(s), face={'off' if a.no_face else 'on'} "
-        f"(this is the long step: expect several hours for all parts on a laptop CPU)")
-    failed = []
+    failed: list[str] = []
     t0 = time.time()
-    with ThreadPoolExecutor(max_workers=a.workers) as pool:
-        futs = {pool.submit(extract_part, p, zips, parts, work, tasks, not a.no_face, a.max_side): p for p in allp}
-        for n, fut in enumerate(as_completed(futs), 1):
-            p = futs[fut]
-            try:
-                log(f"extract {n}/{len(allp)} {p['key']}: {fut.result()}")
-                if a.delete_zips:
-                    (zips / p["key"]).unlink(missing_ok=True)
-            except Exception as exc:  # noqa: BLE001 - reported, others continue
-                failed.append(p["key"])
-                log(f"extract {n}/{len(allp)} {p['key']}: FAILED {exc}")
+    counter = {"n": len(done)}
+
+    def finish(fut, p):
+        try:
+            log(f"extract {counter['n'] + 1}/{len(allp)} {p['key']}: {fut.result()}")
+            if a.delete_zips:
+                (zips / p["key"]).unlink(missing_ok=True)
+                (zips / (p["key"] + ".ok")).unlink(missing_ok=True)
+        except Exception as exc:  # noqa: BLE001 - reported, others continue
+            failed.append(p["key"])
+            log(f"extract {counter['n'] + 1}/{len(allp)} {p['key']}: FAILED {exc}")
+        counter["n"] += 1
+
+    if streaming:
+        # download one part, hand it to an extraction worker, download the next; delete each zip when done
+        import threading
+        slots = threading.BoundedSemaphore(a.workers + 1)
+        log(f"download + extract part by part with {a.workers} worker(s), face={'off' if a.no_face else 'on'} "
+            f"(the long step: expect many hours for all parts on a laptop)")
+        with ThreadPoolExecutor(max_workers=a.workers) as pool:
+            futs = []
+            for i, p in enumerate(todo, 1):
+                slots.acquire()
+                try:
+                    log(f"download {len(done) + i}/{len(allp)} {p['key']} ({p['size'] / GB:.2f} GB) ...")
+                    log(f"  {fetch_part(p, zips)}")
+                except Exception as exc:  # noqa: BLE001
+                    slots.release()
+                    failed.append(p["key"])
+                    log(f"  download FAILED {exc}; rerun later to retry this part")
+                    continue
+                fut = pool.submit(extract_part, p, zips, parts, work, tasks, not a.no_face, a.max_side)
+                fut.add_done_callback(lambda f, p=p: (finish(f, p), slots.release()))
+                futs.append(fut)
+            for f in futs:
+                f.exception()  # wait
+    else:
+        # 1. download sequentially (polite to Zenodo); resumable per part
+        for i, p in enumerate(todo, 1):
+            log(f"download {i}/{len(todo)} {p['key']} ({p['size'] / GB:.2f} GB) ...")
+            log(f"  {fetch_part(p, zips)}")
+        log(f"all {len(todo)} remaining zips present and checksum-verified in {zips}")
+        if a.download_only:
+            return 0
+        log(f"extracting landmarks with {a.workers} worker(s), face={'off' if a.no_face else 'on'} "
+            f"(the long step: expect several hours for all parts on a laptop CPU)")
+        with ThreadPoolExecutor(max_workers=a.workers) as pool:
+            futs = {pool.submit(extract_part, p, zips, parts, work, tasks, not a.no_face, a.max_side): p for p in todo}
+            for fut in as_completed(futs):
+                finish(fut, futs[fut])
     log(f"extraction finished in {(time.time() - t0) / 3600:.2f} h")
     if failed:
         log(f"ERROR  {len(failed)} part(s) failed: {failed}. Rerun the same command to retry only those.")

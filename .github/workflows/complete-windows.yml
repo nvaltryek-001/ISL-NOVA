@@ -24,7 +24,7 @@ jobs:
       - name: First install (creates .venv)
         run: .\scripts\setup_windows.ps1 -Python python -WithMediaPipeTasks
       - name: Small real face dataset (Colours, 2 parts)
-        run: .venv\Scripts\python scripts\include_local.py --only Colours --workers 2
+        run: .venv\Scripts\python scripts\include_local.py --only Colours --workers 2 --delete-zips; if ((Get-ChildItem data\include\zips\*.zip).Count -ne 0) { throw 'zips not deleted' }
       - name: complete_windows.ps1 (no tests, dataset already there, one face model)
         run: .\scripts\complete_windows.ps1 -SkipTests -SkipDataset -Model bilstm-attn-face
       - name: Check the trained model is active, the log exists, and a reinstall keeps it

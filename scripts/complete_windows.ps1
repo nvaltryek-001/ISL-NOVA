@@ -22,6 +22,8 @@
 .PARAMETER SkipDataset   Skip step 3 (and 4 unless the face dataset already exists).
 .PARAMETER SkipTraining  Skip step 4.
 .PARAMETER Start         Start the app at the end.
+.PARAMETER KeepZips      Keep the 56.8 GB of video zips (default: each zip is deleted right after its
+                         landmarks are extracted, so the run needs only about 15 GB free).
 #>
 [CmdletBinding()]
 param(
@@ -30,7 +32,8 @@ param(
   [switch]$SkipTests,
   [switch]$SkipDataset,
   [switch]$SkipTraining,
-  [switch]$Start
+  [switch]$Start,
+  [switch]$KeepZips
 )
 
 $ErrorActionPreference = "Stop"
@@ -66,7 +69,8 @@ try {
 
   if (-not $SkipDataset) {
     Step 3 "Full INCLUDE dataset: download, extract, merge (hours; resumable)"
-    Run "dataset" { & $py scripts\include_local.py --workers $Workers } | Out-Null
+    $zipArg = @(); if (-not $KeepZips) { $zipArg = @("--delete-zips") }
+    Run "dataset" { & $py scripts\include_local.py --workers $Workers @zipArg } | Out-Null
   } else { $status["dataset"] = "skipped" }
 
   if (-not $SkipTraining -and (Test-Path (Join-Path $face "manifest.json"))) {
