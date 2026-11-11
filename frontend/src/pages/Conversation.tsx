@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CameraStage } from '../components/CameraStage';
 import { SignAnimation } from '../components/SignAnimation';
-import { Badge, Button, Card, Notice, PageHeader, Select } from '../components/ui';
+import { Icon } from '../components/icons';
+import { Badge, Button, Card, PageHeader, Select } from '../components/ui';
 import { LANG_NAMES, type Lang, SPEECH_LANG, useT } from '../i18n';
 import { api } from '../lib/api';
 import { type Frame, windowQuality } from '../lib/features';
@@ -111,13 +112,13 @@ export function ConversationPage() {
 
   return (
     <div>
-      <PageHeader kicker="NOVA Conversation" title="Conversation"
+      <PageHeader title="Conversation"
         actions={<Select aria-label={t('Output language')} value={lang} onChange={(e) => setLang(e.target.value as Lang)} className="w-auto">
           {(Object.keys(LANG_NAMES) as Lang[]).map((l) => <option key={l} value={l}>{LANG_NAMES[l]}</option>)}
         </Select>}>
         {t('The signer signs one word at a time; recognised signs appear as text and are spoken. The speaker talks; their words appear as text with matching signs.')}
       </PageHeader>
-      <div className="mb-5"><Notice tone="warn" title="Word-by-word assistance, not interpretation">{t('Recognition is isolated-sign only and can be wrong. Hindi and Kannada meanings are drafts. For important conversations, use a qualified ISL interpreter.')}</Notice></div>
+      <p className="-mt-2 mb-5 flex items-center gap-1.5 text-xs text-ink-400"><Icon name="info" size={14} />{t('Word-by-word assistance, not interpretation')}. {t('For important conversations, use a qualified ISL interpreter.')}</p>
       <div className="grid gap-5 xl:grid-cols-2">
         <Card title="Signer" action={<div className="flex flex-wrap items-center gap-2">
             <Select aria-label={t('How signs are separated')} value={mode} onChange={(e) => setMode(e.target.value as 'pauses' | 'window')} className="w-auto">

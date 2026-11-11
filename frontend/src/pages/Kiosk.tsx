@@ -66,7 +66,7 @@ export function KioskPage() {
         </div>
         <div className="space-y-4">
           <section className="rounded-3xl border-2 border-fg p-6" aria-live="polite">
-            {!model.data?.available ? <p className="text-2xl">Sign recognition is not available on this kiosk yet. Please use the phrases below.</p>
+            {!model.data?.available ? <p className="text-2xl">Sign recognition is switched off on this kiosk. Please use the phrases below.</p>
               : !pred ? <p className="text-2xl text-ink-200">Your result will appear here.</p>
               : <>
                   <StatusBadge status={pred.state} />

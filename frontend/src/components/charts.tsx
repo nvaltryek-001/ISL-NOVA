@@ -12,7 +12,7 @@ export function HBars({ data, max, unit = '', label }: { data: { label: string; 
           <li key={d.label} className="grid grid-cols-[minmax(0,10rem)_1fr_auto] items-center gap-3 text-sm">
             <span className="truncate text-ink-300" title={d.label}>{d.label}</span>
             <span className="relative h-2.5 overflow-hidden rounded-full bg-ink-700/70">
-              <span className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${(d.value / m) * 100}%`, background: PALETTE[i % PALETTE.length] }} />
+              <span className="bar-grow absolute inset-y-0 left-0 rounded-full" style={{ width: `${(d.value / m) * 100}%`, background: PALETTE[i % PALETTE.length], animationDelay: `${i * 40}ms` }} />
               {d.secondary !== undefined && d.secondary > 0 && <span className="absolute inset-y-0 left-0 rounded-full bg-emerald-400" style={{ width: `${(d.secondary / m) * 100}%` }} />}
             </span>
             <span className="tabular-nums text-ink-200">{d.value}{unit}{d.secondary !== undefined && <span className="ml-1 text-emerald-300">/{d.secondary}</span>}</span>

@@ -11,8 +11,8 @@ export function AdminPage() {
   const [tab, setTab] = useState<'users' | 'feedback' | 'audit'>('users');
   return (
     <div className="space-y-5">
-      <PageHeader kicker="NOVA Admin" title="Administration" actions={<Tabs value={tab} onChange={setTab} tabs={[{ id: 'users', label: 'Users & roles' }, { id: 'feedback', label: 'Feedback inbox' }, { id: 'audit', label: 'Audit log' }]} />}>
-        Roles are enforced server-side on every request. Changes here are written to the audit log.
+      <PageHeader title="Administration" actions={<Tabs value={tab} onChange={setTab} tabs={[{ id: 'users', label: 'Users & roles' }, { id: 'feedback', label: 'Feedback inbox' }, { id: 'audit', label: 'Audit log' }]} />}>
+        Manage users, roles and feedback. Every change is recorded in the audit log.
       </PageHeader>
       {tab === 'users' && <Users />}
       {tab === 'feedback' && <Feedback />}

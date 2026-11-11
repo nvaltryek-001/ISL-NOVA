@@ -1,11 +1,23 @@
 # ISL NOVA: project status
 
-_Branch `main`. Updated 2026-11-10._ Scope: **200 signs** (`ISL001`–`ISL200`) in **English, Hindi
+_Branch `main`. Updated 2026-11-11._ Scope: **200 signs** (`ISL001`–`ISL200`) in **English, Hindi
 and Kannada**; the vocabulary is fixed (`VOCABULARY_LIMIT=200`). Every result below was produced by
 a command that ran (GitHub Actions run or local test, linked). Targets are listed separately from
 results. Earlier detail: [V2_AUDIT.md](V2_AUDIT.md), [V2_STATUS.md](V2_STATUS.md).
 
 Legend: ✅ done and tested · ⚠️ done, target not met · 👤 needs people · 💳 needs the owner's approval or money
+
+## Interface refresh (2026-11-11)
+
+| Item | Status | Evidence |
+|---|---|---|
+| New dashboard: animated hero, count-up highlights, quick-action tiles; dataset and system details only for staff | ✅ | E2E `startup and truthful empty state` |
+| Page transitions, staggered card entrances, hover lift, animated bars and drawer; all off under reduced motion | ✅ | `styles.css` motion block |
+| Sign detail shows the animated reference sign with a *Practise this sign* button | ✅ | screenshot `sign-detail.png` |
+| Academy lessons and a practice quiz (reference animation, four choices) for all 200 signs; reviewer-verified signs highlighted | ✅ | pytest `include_unverified` quiz; E2E |
+| Internal status text removed from user pages; draft translation markers and the "not yet verified" line kept | ✅ | E2E Hindi/Kannada test checks the draft marker |
+| Login and Research no longer imply signer-independent evaluation (INCLUDE has no signer IDs) | ✅ | Research page note |
+| Local full-dataset download with resume (`scripts/include_local.py`) | ✅ | Windows run, Zenodo download interrupted and resumed |
 
 ## Remaining-work phases (7–11), all done in code
 

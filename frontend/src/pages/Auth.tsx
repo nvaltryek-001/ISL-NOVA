@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from 'react';
+import { HandArt } from '../components/HandArt';
 import { Icon } from '../components/icons';
 import { Button, ErrorNote, Field, Input } from '../components/ui';
 import { api, type ApiError } from '../lib/api';
@@ -55,15 +56,16 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
     <div className="grid min-h-dvh lg:grid-cols-2">
       <div className="relative hidden overflow-hidden border-r border-ink-800 bg-ink-950 lg:block">
         <div className="grid-bg absolute inset-0 opacity-60" />
-        <div className="absolute -left-24 top-1/4 size-[28rem] rounded-full bg-nova-600/20 blur-3xl" />
-        <div className="absolute bottom-0 right-0 size-72 rounded-full bg-cyan-500/10 blur-3xl" />
+        <span className="orb -left-24 top-1/4 size-[28rem] bg-nova-600/25" aria-hidden />
+        <span className="orb bottom-0 right-0 size-72 bg-cyan-500/20 [animation-delay:-7s]" aria-hidden />
+        <HandArt className="absolute -bottom-6 -right-8 w-[300px] opacity-60" />
         <div className="relative flex h-full flex-col justify-between p-12">
-          <div className="flex items-center gap-3"><img src="/favicon.svg" alt="" className="size-10" /><span className="font-display text-xl font-semibold">ISL NOVA</span></div>
-          <div className="max-w-md">
-            <h1 className="font-display text-4xl font-semibold leading-tight text-fg">Beyond gestures.<br /><span className="bg-gradient-to-r from-nova-300 to-signal bg-clip-text text-transparent">Towards understanding.</span></h1>
-            <p className="mt-4 text-ink-300">An open platform for Indian Sign Language recognition, learning and consent-first dataset building.</p>
+          <div className="flex items-center gap-3"><img src="/favicon.svg" alt="" className="float size-10" /><span className="font-display text-xl font-semibold">ISL NOVA</span></div>
+          <div className="stagger max-w-md">
+            <h1 className="font-display text-4xl font-semibold leading-tight text-fg">Beyond gestures.<br /><span className="text-gradient">Towards understanding.</span></h1>
+            <p className="mt-4 text-ink-300">Recognise, learn and practise Indian Sign Language in English, हिन्दी and ಕನ್ನಡ.</p>
             <ul className="mt-8 space-y-3 text-sm text-ink-300">
-              {['200 vocabulary slots with traceable, licensed sources', 'Signer-independent evaluation, no fabricated accuracy', 'Video stays on your device during live recognition'].map((t) => (
+              {['200 signs with meanings in three languages', 'Default model: 95.1 % top-1 on the INCLUDE test split', 'Your camera video stays on your device'].map((t) => (
                 <li key={t} className="flex gap-2"><Icon name="check" className="mt-0.5 text-signal" />{t}</li>
               ))}
             </ul>
@@ -72,7 +74,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
         </div>
       </div>
       <div className="flex items-center justify-center p-6">
-        <form onSubmit={submit} className="w-full max-w-sm space-y-5" noValidate>
+        <form onSubmit={submit} className="page-enter w-full max-w-sm space-y-5" noValidate>
           <div>
             <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm text-ink-400 hover:text-fg lg:hidden"><img src="/favicon.svg" alt="" className="size-7" />ISL NOVA</Link>
             <h2 className="font-display text-2xl font-semibold text-fg">{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2>

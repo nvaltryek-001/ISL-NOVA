@@ -233,6 +233,9 @@ def test_history_feedback_learning_phrases(app_env):
     assert les["verified_signs"] == 0 and les["lessons"] == []
     assert len(c.get(f"{A}/learning/lessons", params={"include_unverified": True}).json()["lessons"]) == 12
     assert c.get(f"{A}/learning/quiz").json()["available"] is False
+    pq = c.get(f"{A}/learning/quiz", params={"n": 4, "include_unverified": True}).json()  # practice quiz, flagged
+    assert pq["available"] and pq["unverified"] is True and len(pq["questions"]) == 4
+    assert all(len(qq["options"]) == 4 and qq["sign_id"] in {o["sign_id"] for o in qq["options"]} for qq in pq["questions"])
     for sid, word in (("ISL020", "Hello"), ("ISL021", "How are you")):
         verify_sign(c, sid, ling)
         c.put(f"{A}/signs/{sid}/translations/en", json={"text": word, "status": "verified"}, headers=ling)

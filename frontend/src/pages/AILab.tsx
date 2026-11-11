@@ -13,9 +13,9 @@ export function AILabPage() {
   const [tab, setTab] = useState<Tab>('model');
   return (
     <div className="space-y-5">
-      <PageHeader kicker="NOVA AI Laboratory" title="AI Laboratory"
+      <PageHeader title="AI Laboratory"
         actions={<Tabs value={tab} onChange={setTab} tabs={[{ id: 'model', label: 'Active model' }, { id: 'evaluation', label: 'Evaluation' }, { id: 'newsigners', label: 'New signers' }, { id: 'registry', label: 'Registry' }, { id: 'experiments', label: 'Experiments' }, { id: 'contract', label: 'Feature contract' }]} />}>
-        Models, experiments and held-out evaluation. Metrics shown here are read from the artefacts written by the training pipeline. None are typed in by hand.
+        Models, experiments and held-out evaluation.
       </PageHeader>
       {tab === 'model' && <ActiveModel />}
       {tab === 'evaluation' && <Evaluation />}
@@ -223,7 +223,7 @@ function NewSigners() {
         <ErrorNote error={start.error} />
       </Card>
       <Card title="Evaluation runs">
-        {!runs.data?.length ? <Empty icon="user" title="No new-signer evaluations yet">There are no results to show until recordings from new signers exist.</Empty> : (
+        {!runs.data?.length ? <Empty icon="user" title="No new-signer evaluations">Choose a dataset version with recordings from new signers and press Evaluate.</Empty> : (
           <Table head={['#', 'Model', 'Dataset', 'Status', 'Recordings', 'Signers', 'Top-1', 'Top-5', '']}>
             {runs.data.map((r) => (
               <tr key={r.id}>

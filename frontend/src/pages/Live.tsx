@@ -146,14 +146,14 @@ export function LivePage() {
 
   return (
     <div>
-      <PageHeader kicker="NOVA Live Recognition Studio" title="Live Recognition"
+      <PageHeader title="Live Recognition"
         actions={<Tabs value={mode} onChange={(m) => { setMode(m); setRunning(false); }} tabs={[{ id: 'capture', label: 'Capture one sign' }, { id: 'continuous', label: 'Continuous' }]} />}>
-        Isolated-sign recognition from hand and upper-body landmarks. Video never leaves your device; only landmark coordinates are sent.
+        {t('Sign in front of your camera and see what it means. Video stays on your device.')}
       </PageHeader>
 
       {unavailable && (
         <div className="mb-5"><Notice tone="warn" title="Model unavailable: no predictions will be shown">
-          No model trained on authentic ISL recordings has been promoted. Camera, hand tracking and quality checks still work so you can verify your setup. {model.data?.reason && <span className="opacity-75">({model.data.reason})</span>}
+          {t('Camera, hand tracking and quality checks still work, so you can check your setup.')}
         </Notice></div>
       )}
       {model.data?.synthetic && <div className="mb-5"><Notice tone="warn" title="Synthetic smoke-test model">{model.data.warning}</Notice></div>}
@@ -166,23 +166,27 @@ export function LivePage() {
             {countdown === -1 && <div className="pointer-events-none absolute right-3 top-3"><Badge tone="bad"><span className="live-dot size-2 rounded-full bg-rose-400" />Capturing…</Badge></div>}
             {countdown === -2 && <div className="pointer-events-none absolute right-3 top-3" role="status"><Badge tone="nova">Classifying…</Badge></div>}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="card flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
             {mode === 'capture'
-              ? <Button variant="primary" size="lg" icon="record" disabled={!ready || countdown !== 0} onClick={startCapture}>{useCountdown ? 'Capture sign (3-2-1)' : 'Capture sign now'}</Button>
-              : <Button variant={running ? 'danger' : 'primary'} size="lg" icon={running ? 'pause' : 'play'} disabled={!ready} onClick={() => setRunning(!running)}>{running ? 'Pause' : 'Start continuous'}</Button>}
-            <p className="muted text-sm">{!ready ? (cam.s !== 'live' ? 'Start the camera first.' : 'Waiting for hand tracking…') : mode === 'capture' ? `Sign once after the countdown (${captureSec} s window).` : `Classifying the last ${WINDOW_MS / 1000} s every ${INTERVAL_MS} ms.`}</p>
-            {mode === 'capture' && (
-              <Select aria-label="Capture length" value={captureSec} onChange={(e) => setCaptureSec(Number(e.target.value))} className="h-9 w-auto py-0 text-sm">
-                {CAPTURE_OPTIONS.map((s) => <option key={s} value={s}>{s} s window</option>)}
-              </Select>
-            )}
-            {mode === 'capture' && (
-              <label className="flex items-center gap-2 text-sm text-ink-300"><input type="checkbox" className="accent-nova-500" checked={useCountdown} onChange={(e) => setUseCountdown(e.target.checked)} />3-second countdown</label>
-            )}
-            <Select aria-label="Where recognition runs" value={where} onChange={(e) => setWhere(e.target.value as 'server' | 'device')} className="h-9 w-auto py-0 text-sm">
-              <option value="server">{t('On the server')}</option>
-              <option value="device">{t('On this device (offline)')}</option>
-            </Select>
+              ? <Button variant="primary" size="lg" icon="record" disabled={!ready || countdown !== 0} onClick={startCapture} className="shrink-0">{useCountdown ? 'Capture sign (3-2-1)' : 'Capture sign now'}</Button>
+              : <Button variant={running ? 'danger' : 'primary'} size="lg" icon={running ? 'pause' : 'play'} disabled={!ready} onClick={() => setRunning(!running)} className="shrink-0">{running ? 'Pause' : 'Start continuous'}</Button>}
+            <div className="min-w-0 flex-1 space-y-2">
+              <p className="text-sm text-ink-300">{!ready ? (cam.s !== 'live' ? t('Start the camera first.') : t('Waiting for hand tracking…')) : mode === 'capture' ? `${t('Sign once after the countdown')} (${captureSec} s)` : `${t('Classifying the last')} ${WINDOW_MS / 1000} s`}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                {mode === 'capture' && (
+                  <Select aria-label="Capture length" value={captureSec} onChange={(e) => setCaptureSec(Number(e.target.value))} className="h-8 w-auto py-0 text-xs">
+                    {CAPTURE_OPTIONS.map((s) => <option key={s} value={s}>{s} s window</option>)}
+                  </Select>
+                )}
+                <Select aria-label="Where recognition runs" value={where} onChange={(e) => setWhere(e.target.value as 'server' | 'device')} className="h-8 w-auto py-0 text-xs">
+                  <option value="server">{t('On the server')}</option>
+                  <option value="device">{t('On this device (offline)')}</option>
+                </Select>
+                {mode === 'capture' && (
+                  <label className="flex items-center gap-2 text-xs text-ink-300"><input type="checkbox" className="accent-nova-500" checked={useCountdown} onChange={(e) => setUseCountdown(e.target.checked)} />{t('3-second countdown')}</label>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -194,12 +198,12 @@ export function LivePage() {
               <div className="space-y-4">
                 <div>
                   <p className="label">{pred.state === 'recognized' ? 'Recognised sign' : 'Best guess (uncertain)'}</p>
-                  <p className="mt-1 font-display text-4xl font-semibold text-fg">{top?.label}</p>
+                  <p key={`${top?.sign_id}-${session.length}`} className="pop mt-1 font-display text-4xl font-semibold text-fg">{top?.label}</p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Select aria-label="Meaning language" value={lang} onChange={(e) => setLang(e.target.value as keyof typeof LANGS)} className="h-8 w-auto py-0 text-xs">
                       {Object.entries(LANGS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                     </Select>
-                    {meaning?.text ? <><span className="text-lg text-cyan-200" lang={lang}>{meaning.text}</span><StatusBadge status={meaning.status} /></> : <span className="text-sm italic text-ink-500">No {LANGS[lang]} meaning recorded yet</span>}
+                    {meaning?.text ? <><span className="text-lg text-cyan-200" lang={lang}>{meaning.text}</span><StatusBadge status={meaning.status} /></> : null}
                   </div>
                 </div>
                 {pred.state === 'uncertain' && <p className="text-sm text-amber-200">{pred.reasons[0]}</p>}

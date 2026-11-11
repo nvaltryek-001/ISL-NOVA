@@ -72,9 +72,9 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { user } = useAuth();
   const t = useT();
   return (
-    <nav aria-label="Main" className="flex h-full flex-col gap-6 overflow-y-auto px-3 py-5">
+    <nav aria-label="Main" className="flex h-full flex-col gap-5 overflow-y-auto px-3 py-5">
       <Link to="/" className="flex items-center gap-3 px-2" onClick={onNavigate}>
-        <img src="/favicon.svg" alt="" className="size-9" />
+        <img src="/favicon.svg" alt="" className="float size-9 drop-shadow-[0_6px_14px_rgba(124,58,237,.35)]" />
         <span>
           <span className="block font-display text-[17px] font-semibold tracking-tight text-fg">ISL NOVA</span>
           <span className="block text-[11px] text-ink-400">{t('Beyond gestures. Towards understanding.')}</span>
@@ -85,7 +85,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         if (!items.length) return null;
         return (
           <div key={g.group}>
-            <p className="label mb-1.5 px-3 text-[10px]">{t(g.group)}</p>
+            <p className="label mb-1 px-3 text-[10px]">{t(g.group)}</p>
             <ul className="space-y-0.5">
               {items.map((i) => (
                 <li key={i.to}><Link to={i.to} className="nav-link" onClick={onNavigate}><Icon name={i.icon} />{t(i.label)}</Link></li>
@@ -94,9 +94,9 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           </div>
         );
       })}
-      <div className="mt-auto rounded-xl border border-ink-700 bg-ink-800 p-3 text-xs text-ink-400">
-        {t('Vocabulary entries are derived from the INCLUDE dataset (CC BY 4.0) and await qualified ISL review.')}
-      </div>
+      <p className="mt-auto px-3 text-[11px] leading-relaxed text-ink-500">
+        ISL NOVA v2 · {t('Sign data')}: <a className="hover:text-ink-300 hover:underline" href="https://doi.org/10.1145/3394171.3413528" target="_blank" rel="noreferrer">INCLUDE</a>, CC BY 4.0
+      </p>
     </nav>
   );
 }
@@ -158,6 +158,7 @@ function UserMenu() {
 }
 
 function Shell({ children }: { children: ReactNode }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
   useEffect(() => setOpen(false), [pathname]);
@@ -167,19 +168,19 @@ function Shell({ children }: { children: ReactNode }) {
       <aside className="sticky top-0 hidden h-dvh border-r border-ink-700 bg-ink-850/70 backdrop-blur lg:block"><Sidebar /></aside>
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation">
-          <div className="absolute inset-0 bg-ink-950/60" onClick={() => setOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-72 border-r border-ink-700 bg-ink-850"><Sidebar onNavigate={() => setOpen(false)} /></aside>
+          <div className="backdrop-enter absolute inset-0 bg-ink-950/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
+          <aside className="drawer-enter absolute inset-y-0 left-0 w-72 border-r border-ink-700 bg-ink-850 shadow-[var(--shadow-pop)]"><Sidebar onNavigate={() => setOpen(false)} /></aside>
         </div>
       )}
       <div className="min-w-0">
         <header className="surface-glass sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-ink-700 px-4 md:px-8">
           <button className="rounded-lg p-2 text-ink-300 hover:bg-ink-800 lg:hidden" onClick={() => setOpen(true)} aria-label="Open navigation"><Icon name="menu" /></button>
           <button onClick={() => navigate('/signs')} className="flex h-9 min-w-0 max-w-sm flex-1 items-center gap-2 rounded-lg border border-ink-700 bg-ink-850 px-3 text-sm text-ink-400 shadow-sm hover:border-ink-600">
-            <Icon name="search" size={16} /><span className="truncate">Search signs in English, हिन्दी, ಕನ್ನಡ…</span>
+            <Icon name="search" size={16} /><span className="truncate">{t('Search signs in English, हिन्दी, ಕನ್ನಡ…')}</span>
           </button>
           <div className="ml-auto flex shrink-0 items-center gap-2"><OnlineBadge /><ModelPill /><LanguageSwitcher /><ThemeToggle /><UserMenu /></div>
         </header>
-        <main id="main" className="mx-auto max-w-[1400px] px-4 py-6 md:px-8 md:py-8">{children}</main>
+        <main id="main" className="mx-auto max-w-[1400px] px-4 py-6 md:px-8 md:py-8"><div key={pathname} className="page-enter">{children}</div></main>
       </div>
     </div>
   );

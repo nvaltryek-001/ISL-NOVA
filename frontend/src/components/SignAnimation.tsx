@@ -47,7 +47,7 @@ export function SignAnimation({ signId, size = 'md', speed = 1, onLoaded }: { si
           {playing ? t('Pause') : t('Play')}
         </button>
       </div>
-      <figcaption className="muted text-xs">{t('Landmarks from an INCLUDE recording (CC BY 4.0), mirrored. Not yet verified by an ISL reviewer.')}</figcaption>
+      <figcaption className="muted text-xs">{t('Landmarks from an INCLUDE recording (CC BY 4.0), mirrored.')}</figcaption>
     </figure>
   );
 }

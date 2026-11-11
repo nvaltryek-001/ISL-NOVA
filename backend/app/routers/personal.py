@@ -48,6 +48,7 @@ class LessonsQuery(BaseModel):
 class QuizQuery(BaseModel):
     category: str | None = None
     n: int = Field(default=5, ge=1, le=20)
+    include_unverified: bool = False  # practice quiz over signs with a licensed reference; flagged in the response
 
 
 class PhraseIn(BaseModel):
@@ -165,9 +166,14 @@ def lessons(ctx: Ctx):
 def quiz(ctx: Ctx):
     q: QuizQuery = ctx.query
     params: list = [False]
-    sql = ("SELECT s.sign_id, s.canonical_sign_name, s.category, s.linguistic_description FROM signs s "
-           "JOIN translations t ON t.sign_id = s.sign_id AND t.language = 'en' AND t.status = 'verified' "
-           "WHERE s.verification_status = 'verified' AND s.retired = ?")
+    if q.include_unverified:  # English source glosses of signs that have a reference recording
+        sql = ("SELECT s.sign_id, s.canonical_sign_name, s.category, s.linguistic_description FROM signs s "
+               "JOIN translations t ON t.sign_id = s.sign_id AND t.language = 'en' AND t.text IS NOT NULL AND t.text <> '' "
+               "WHERE s.verification_status IN ('verified', 'reference_found', 'review_pending') AND s.retired = ?")
+    else:
+        sql = ("SELECT s.sign_id, s.canonical_sign_name, s.category, s.linguistic_description FROM signs s "
+               "JOIN translations t ON t.sign_id = s.sign_id AND t.language = 'en' AND t.status = 'verified' "
+               "WHERE s.verification_status = 'verified' AND s.retired = ?")
     if q.category:
         sql += " AND s.category = ?"
         params.append(q.category)
@@ -186,7 +192,7 @@ def quiz(ctx: Ctx):
         qs.append({"sign_id": s["sign_id"], "prompt": s["linguistic_description"] or "Identify the meaning of this sign",
                    "reference": refs.get(s["sign_id"]),
                    "options": [{"sign_id": o["sign_id"], "text": tr[o["sign_id"]]["en"]["text"]} for o in opts]})
-    return {"available": True, "questions": qs}
+    return {"available": True, "unverified": q.include_unverified, "questions": qs}
 
 
 @router.get("/learning/progress", summary="My learning progress")

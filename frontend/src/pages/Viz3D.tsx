@@ -86,8 +86,8 @@ export function VizPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader kicker="NOVA 3D Visualisation · experimental" title="3D Landmark Viewer">
-        Inspect real hand and pose landmarks in 3D. Drag to orbit, step through frames and compare trajectories. MediaPipe depth (z) is relative and approximate.
+      <PageHeader title="3D Landmark Viewer">
+        Explore hand and body landmarks in 3D. Drag to rotate and step through the frames.
       </PageHeader>
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
         <Card title="Source">

@@ -71,7 +71,7 @@ export function PracticePage() {
   const meaning = sign?.translations?.[language]?.text || sign?.canonical_sign_name;
   return (
     <div>
-      <PageHeader kicker="NOVA Practice Coach" title="Practice Coach">
+      <PageHeader title="Practice Coach">
         {t('Watch the reference, then sign it yourself. The coach compares your hand shape, position and movement with INCLUDE reference recordings and tells you what to adjust.')}
       </PageHeader>
       {status.data && !status.data.available && <div className="mb-5"><Notice tone="warn" title="Reference data not installed">{t('Run scripts/fetch_references.py (the setup scripts do this) to enable the Practice Coach.')}</Notice></div>}

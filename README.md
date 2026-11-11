@@ -180,24 +180,25 @@ Roles (enforced on the server): `admin`, `linguist`, `data_curator`, `researcher
 
 ## 📸 Screenshots
 
-All screenshots were captured by Playwright from the running application.
+All screenshots were captured by Playwright from the running application with the trained v3 model active (`frontend/tests/e2e/readme_shots.mjs`).
 
 | | |
 |---|---|
-| ![AI Laboratory with the trained LSTM's held-out metrics](docs/screenshots/ai-laboratory-model.png) **AI Laboratory.** Held-out metrics read from the model's own `metrics.json`. | ![Per-class F1 and 200-class confusion matrix](docs/screenshots/evaluation.png) **Evaluation.** Per-class F1 and the 200 × 200 confusion matrix. |
-| ![Verification dialog with the three-item checklist](docs/screenshots/verification-checklist.png) **Verification.** Document the sign and tick all three checks; Confirm stays disabled until then. | ![New-signer evaluation tab](docs/screenshots/ai-laboratory-new-signers.png) **New signers.** Evaluate the live model on consented recordings from people outside INCLUDE (no such data yet). |
-| ![Sign detail with licensed reference and review workflow](docs/screenshots/sign-detail.png) **Sign detail.** Licensed source, pending meanings, review log. | ![Dataset Lab readiness funnel](docs/screenshots/dataset-lab.png) **Dataset Lab.** Readiness funnel and per-class table. |
-| ![Communication composer](docs/screenshots/communication.png) **Communication.** Composer with unverified-meaning warnings. | ![Kiosk mode](docs/screenshots/kiosk.png) **Kiosk.** High contrast, large targets. |
+| ![Sign detail with the animated reference sign and meanings in three languages](docs/screenshots/sign-detail.png) **Sign detail.** Animated reference sign, meanings in English, हिन्दी and ಕನ್ನಡ, practise button. | ![Learning Academy lessons by topic](docs/screenshots/academy.png) **Learning Academy.** Lessons for all 200 signs by topic, quizzes, streaks and badges. |
+| ![Sign Explorer](docs/screenshots/sign-explorer.png) **Sign Explorer.** Search by meaning in three languages; draft meanings carry a small marker. | ![Live Recognition](docs/screenshots/live-recognition.png) **Live Recognition.** Capture one sign or run continuously, on the server or on the device. |
+| ![AI Laboratory with the active model's held-out metrics](docs/screenshots/ai-laboratory-model.png) **AI Laboratory.** Held-out metrics read from the model's own `metrics.json`. | ![Per-class F1 and 200-class confusion matrix](docs/screenshots/evaluation.png) **Evaluation.** Per-class F1 and the 200 × 200 confusion matrix. |
+| ![Research Centre results table](docs/screenshots/research.png) **Research Centre.** Recorded results for every model. | ![Communication composer](docs/screenshots/communication.png) **Communication.** Build a message from signs, then speak or share it. |
+| ![Sign-in page](docs/screenshots/login.png) **Sign in.** | ![Kiosk mode](docs/screenshots/kiosk.png) **Kiosk.** High contrast, large targets. |
 
-<details><summary><b>More: dark theme · Live Recognition · Sign Explorer · mobile</b></summary>
+<details><summary><b>More: dark theme · Dataset Lab · mobile</b></summary>
 
 <img src="docs/screenshots/dashboard-dark.png" alt="Dashboard in dark theme" width="100%" />
 
-<img src="docs/screenshots/live-recognition.png" alt="Live recognition page" width="49%" /> <img src="docs/screenshots/sign-explorer.png" alt="Sign explorer grid" width="49%" />
+<img src="docs/screenshots/dataset-lab.png" alt="Dataset Lab" width="49%" /> <img src="docs/screenshots/ai-laboratory-new-signers.png" alt="New-signer evaluation tab" width="49%" />
 
-<img src="docs/screenshots/mobile-dashboard.png" alt="Mobile dashboard" width="30%" /> <img src="docs/screenshots/mobile-dataset.png" alt="Mobile Dataset Lab at 360 px" width="30%" />
+<img src="docs/screenshots/mobile-dashboard.png" alt="Mobile dashboard" width="30%" /> <img src="docs/screenshots/mobile-dataset.png" alt="Mobile Dataset Lab" width="30%" />
 
-The Live Recognition capture was taken in the offline build sandbox, before a model was installed and without access to the MediaPipe CDN; the page says so instead of pretending.
+The camera is left off in the Live capture: the build machine cannot reach the MediaPipe CDN, which a normal computer loads automatically.
 </details>
 
 ## 🏗 Architecture
@@ -382,7 +383,7 @@ Samples used: 2,448 train / 272 val / 635 test (15 insufficient-input sequences 
 
 **End-to-end check.** The released LSTM loaded through `isl_nova_ml.inference.Predictor` (the code the API uses) reproduced **91.65 % top-1 / 98.27 % top-5** on all 635 test sequences, with 556 *recognized*, 57 *uncertain* and 22 *unknown* answers, **24 ms median** per call including feature extraction (36 ms p95).
 
-<p align="center"><img src="docs/screenshots/ai-laboratory-model.png" alt="AI Laboratory showing the trained LSTM's held-out metrics" width="49%" /> <img src="docs/screenshots/evaluation.png" alt="Per-class F1 and 200-class confusion matrix" width="49%" /></p>
+<p align="center"><img src="docs/screenshots/ai-laboratory-model.png" alt="AI Laboratory showing the active model's held-out metrics" width="49%" /> <img src="docs/screenshots/evaluation.png" alt="Per-class F1 and 200-class confusion matrix" width="49%" /></p>
 
 ### Unknown signs (open set)
 

@@ -34,8 +34,8 @@ export function CommunicatePage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader kicker="NOVA Communication Workspace" title="Communication">
-        Compose a message from isolated sign meanings, edit it into natural language, then speak, copy or share it.
+      <PageHeader title="Communication">
+        Build a message from signs, edit it, then speak, copy or share it.
       </PageHeader>
       <Notice title="This is a word-by-word composer, not an ISL translator">
         ISL has its own grammar. Joining isolated sign meanings does not produce a grammatical translation; edit the text before relying on it.

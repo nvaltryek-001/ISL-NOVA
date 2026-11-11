@@ -28,7 +28,7 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader kicker="NOVA Core" title="Settings & activity" />
+      <PageHeader title="Settings & activity" />
       <div className="grid gap-5 xl:grid-cols-3">
         <Card title="Profile">
           <div className="space-y-4">

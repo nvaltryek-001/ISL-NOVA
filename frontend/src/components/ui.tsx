@@ -2,7 +2,7 @@
 import clsx from 'clsx';
 import {
   type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes,
-  type TextareaHTMLAttributes, useEffect, useId, useRef,
+  type TextareaHTMLAttributes, useEffect, useId, useRef, useState,
 } from 'react';
 import type { ApiError } from '../lib/api';
 import { toasts, useStore } from '../lib/store';
@@ -201,6 +201,20 @@ export function Skeleton({ className }: { className?: string }) {
 
 export function Loading({ rows = 3 }: { rows?: number }) {
   return <div className="space-y-2" role="status" aria-label="Loading">{Array.from({ length: rows }, (_, i) => <Skeleton key={i} className="h-10" />)}</div>;
+}
+
+/** Animates from 0 to `value` once (ease-out, ~0.9 s); final value immediately under reduced motion. */
+export function CountUp({ value, decimals = 0, suffix = '' }: { value: number; decimals?: number; suffix?: string }) {
+  const [v, setV] = useState(0);
+  useEffect(() => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('reduce-motion');
+    if (reduce || !Number.isFinite(value)) { setV(value); return; }
+    let raf = 0; const t0 = performance.now();
+    const step = (t: number) => { const k = Math.min(1, (t - t0) / 900); setV(value * (1 - (1 - k) ** 3)); if (k < 1) raf = requestAnimationFrame(step); };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <span data-value={value} aria-label={`${value.toFixed(decimals)}${suffix}`}>{v.toFixed(decimals)}{suffix}</span>;
 }
 
 export function Stat({ label, value, sub, tone = 'neutral', icon }: { label: string; value: ReactNode; sub?: ReactNode; tone?: 'neutral' | 'nova' | 'signal' | 'ok' | 'warn'; icon?: IconName }) {

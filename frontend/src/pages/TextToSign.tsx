@@ -21,7 +21,7 @@ export function TextToSignPage() {
 
   return (
     <div>
-      <PageHeader kicker="NOVA Text to Sign" title="Text to Sign">
+      <PageHeader title="Text to Sign">
         {t('Type words in English, Hindi or Kannada to see the matching signs from the 200-sign vocabulary.')}
       </PageHeader>
       <div className="mb-5"><Notice tone="warn" title="A sequence of signs, not an ISL translation">{t('ISL has its own grammar and word order. This tool shows individual vocabulary signs for the words it recognises; it does not translate sentences.')}</Notice></div>

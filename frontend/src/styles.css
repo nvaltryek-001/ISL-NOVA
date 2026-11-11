@@ -116,7 +116,7 @@
       focus:ring-4 focus:ring-nova-500/15 disabled:opacity-50;
   }
   .dark .field { @apply bg-ink-900; }
-  .nav-link { @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-ink-300 transition-colors hover:bg-ink-800 hover:text-fg; }
+  .nav-link { @apply flex items-center gap-3 rounded-lg px-3 py-[7px] text-sm text-ink-300 transition-colors hover:bg-ink-800 hover:text-fg; }
   .nav-link[aria-current="page"] {
     @apply font-medium text-fg;
     background: color-mix(in oklab, var(--color-nova-500) 11%, transparent);
@@ -149,3 +149,44 @@
   background: linear-gradient(90deg, var(--color-ink-800) 25%, var(--color-ink-700) 50%, var(--color-ink-800) 75%);
   background-size: 200% 100%; animation: shimmer 1.4s linear infinite;
 }
+
+/* ------------------------------------------------------------------ motion
+   Entrance, stagger, hover lift, page transitions. All of it collapses to
+   ~1 ms under prefers-reduced-motion or the "reduce motion" preference.   */
+@keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide-in-left { from { transform: translateX(-100%); } to { transform: none; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes drift { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(24px, -18px) scale(1.08); } 100% { transform: translate(0, 0) scale(1); } }
+@keyframes twinkle { 0%, 100% { opacity: .35; r: 2.2; } 50% { opacity: 1; r: 3.4; } }
+@keyframes dash { to { stroke-dashoffset: 0; } }
+@keyframes gradient-pan { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+
+.page-enter { animation: fade-up 420ms cubic-bezier(.2,.7,.2,1) both; }
+.stagger > * { animation: fade-up 480ms cubic-bezier(.2,.7,.2,1) both; }
+.stagger > *:nth-child(1) { animation-delay: 30ms; }  .stagger > *:nth-child(2) { animation-delay: 80ms; }
+.stagger > *:nth-child(3) { animation-delay: 130ms; } .stagger > *:nth-child(4) { animation-delay: 180ms; }
+.stagger > *:nth-child(5) { animation-delay: 230ms; } .stagger > *:nth-child(6) { animation-delay: 280ms; }
+.stagger > *:nth-child(7) { animation-delay: 330ms; } .stagger > *:nth-child(8) { animation-delay: 380ms; }
+.stagger > *:nth-child(n+9) { animation-delay: 420ms; }
+.lift { transition: transform 220ms cubic-bezier(.2,.7,.2,1), box-shadow 220ms, border-color 220ms; }
+.lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-pop); border-color: color-mix(in oklab, var(--color-nova-500) 35%, var(--color-ink-700)); }
+.drawer-enter { animation: slide-in-left 260ms cubic-bezier(.2,.7,.2,1) both; }
+.backdrop-enter { animation: fade-in 200ms ease both; }
+.float { animation: float 5s ease-in-out infinite; }
+.orb { position: absolute; border-radius: 9999px; filter: blur(48px); opacity: .55; pointer-events: none; animation: drift 14s ease-in-out infinite; }
+.twinkle { animation: twinkle 2.4s ease-in-out infinite; }
+.draw { stroke-dasharray: 400; stroke-dashoffset: 400; animation: dash 1.8s 200ms cubic-bezier(.2,.7,.2,1) forwards; }
+.text-gradient {
+  background: linear-gradient(90deg, var(--color-nova-500), var(--color-signal), var(--color-nova-500));
+  background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: gradient-pan 6s linear infinite;
+}
+.tile-icon { transition: transform 260ms cubic-bezier(.2,.7,.2,1); }
+.lift:hover .tile-icon { transform: scale(1.08) rotate(-4deg); }
+.nav-link svg { transition: transform 200ms; }
+.nav-link:hover svg { transform: translateX(2px); }
+@keyframes bar-grow { from { transform: scaleX(0); } to { transform: none; } }
+.bar-grow { transform-origin: left; animation: bar-grow 900ms cubic-bezier(.2,.7,.2,1) both; }
+@keyframes pop { 0% { opacity: 0; transform: scale(.92) translateY(6px); } 60% { opacity: 1; transform: scale(1.03); } 100% { transform: none; } }
+.pop { animation: pop 420ms cubic-bezier(.2,.7,.2,1) both; }

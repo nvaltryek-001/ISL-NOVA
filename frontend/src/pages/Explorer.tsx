@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Icon } from '../components/icons';
+import { SignAnimation } from '../components/SignAnimation';
 import { TranslationsPanel } from '../components/TranslationsPanel';
 import { Badge, Button, Card, Dialog, Empty, ErrorNote, Field, Input, Loading, Notice, PageHeader, Select, StatusBadge, Textarea, fmt } from '../components/ui';
 import { api, qs } from '../lib/api';
@@ -7,6 +8,7 @@ import { invalidate, useMutation, useQuery } from '../lib/query';
 import { Link, navigate, useLocation } from '../lib/router';
 import { speak } from '../lib/speech';
 import { auth, can, toast, useAuth, usePrefs } from '../lib/store';
+import { useT } from '../i18n';
 import type { Category, SignDetail, SignSummary } from '../lib/types';
 
 const LANG_LABEL: Record<string, string> = { en: 'English', hi: 'हिन्दी', kn: 'ಕನ್ನಡ' };
@@ -19,6 +21,8 @@ function useDebounced<T>(v: T, ms = 250) {
 
 export function ExplorerPage() {
   const { user } = useAuth();
+  const t = useT();
+  const reviewer = can(user, 'signs:review');
   const { search } = useLocation();
   const [q, setQ] = useState(search.get('q') ?? '');
   const [category, setCategory] = useState(search.get('category') ?? '');
@@ -34,7 +38,7 @@ export function ExplorerPage() {
 
   return (
     <div>
-      <PageHeader kicker="NOVA Sign Explorer" title="Sign Explorer"
+      <PageHeader title="Sign Explorer"
         actions={<>
           {can(user, 'signs:review') && <Button icon="download" onClick={async () => {
             const r = await fetch('/api/v1/signs/review-sheet.csv', { headers: { Authorization: `Bearer ${auth.get().token}` } });
@@ -43,10 +47,10 @@ export function ExplorerPage() {
           }}>Review sheet (CSV)</Button>}
           {can(user, 'signs:write') && <Button variant="primary" icon="plus" onClick={() => setCreating(true)}>New sign</Button>}
         </>}>
-        Search the 200-slot ISL NOVA vocabulary in English, Hindi or Kannada. Status badges show how far each entry is through qualified review.
+        {t('Search all 200 signs by meaning in English, हिन्दी or ಕನ್ನಡ.')}
       </PageHeader>
-      <div className="mb-5"><TranslationsPanel /></div>
-      <div className="mb-5 grid gap-3 md:grid-cols-[1fr_auto_auto]">
+      {(reviewer || can(user, 'translations:write')) && <div className="mb-5"><TranslationsPanel /></div>}
+      <div className={`mb-5 grid gap-3 ${reviewer ? 'md:grid-cols-[1fr_auto_auto]' : 'md:grid-cols-[1fr_auto]'}`}>
         <label className="relative">
           <span className="sr-only">Search signs</span>
           <Icon name="search" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
@@ -56,10 +60,10 @@ export function ExplorerPage() {
           <option value="">All categories</option>
           {cats.data?.map((c) => <option key={c.category} value={c.category}>{c.label} ({c.slots})</option>)}
         </Select>
-        <Select aria-label="Verification status" value={status} onChange={(e) => setStatus(e.target.value)}>
+        {reviewer && <Select aria-label="Verification status" value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="">Any status</option>
           {['proposed', 'reference_found', 'review_pending', 'verified', 'rejected'].map((s) => <option key={s} value={s}>{s.replaceAll('_', ' ')}</option>)}
-        </Select>
+        </Select>}
       </div>
       <ErrorNote error={error} retry={refetch} />
       {loading && !data && <Loading rows={6} />}
@@ -69,22 +73,26 @@ export function ExplorerPage() {
           {data.items.length === 0 ? (
             <Card><Empty icon="search" title="No signs match">Try a different word, or clear the filters.</Empty></Card>
           ) : (
-            <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            <ul key={key} className="stagger grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
               {data.items.map((s) => (
                 <li key={s.sign_id}>
-                  <Link to={`/signs/${s.sign_id}`} className="card group flex h-full flex-col gap-3 p-4 transition-colors hover:border-nova-500/50 hover:bg-ink-800">
+                  <Link to={`/signs/${s.sign_id}`} className="card lift group flex h-full flex-col gap-2 p-4">
                     <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="font-mono text-[11px] text-ink-500">{s.sign_id}</p>
-                        <p className="mt-0.5 font-display text-lg font-semibold text-fg">{s.canonical_sign_name}</p>
+                      <div className="min-w-0">
+                        <p className="font-display text-lg font-semibold text-fg">{s.canonical_sign_name}</p>
+                        <p className="mt-0.5 text-xs text-ink-400">{s.category_label}</p>
                       </div>
-                      {s.bookmarked && <Icon name="bookmark" className="text-nova-300" label="Bookmarked" />}
+                      {s.bookmarked ? <Icon name="bookmark" className="shrink-0 text-nova-300" label="Bookmarked" />
+                        : <Icon name="chevron" size={16} className="mt-1 shrink-0 text-ink-500 transition-transform group-hover:translate-x-1" />}
                     </div>
-                    <p className="text-xs text-ink-400">{s.category_label}</p>
-                    <div className="mt-auto flex flex-wrap gap-1.5">
-                      <StatusBadge status={s.verification_status} />
-                      {['hi', 'kn'].map((l) => s.translations[l]?.status === 'verified' && <Badge key={l} tone="ok">{LANG_LABEL[l]}</Badge>)}
+                    <div className="mt-auto flex flex-wrap gap-x-3 gap-y-1 pt-1 text-sm text-ink-300">
+                      {(['hi', 'kn'] as const).map((l) => s.translations[l]?.text && (
+                        <span key={l} lang={l} className="inline-flex items-center gap-1">{s.translations[l].text}
+                          {s.translations[l].status !== 'verified' && <span className="size-1.5 rounded-full bg-amber-400" title={t('Draft translation')} />}
+                        </span>
+                      ))}
                     </div>
+                    {reviewer && <div className="flex flex-wrap items-center gap-1.5"><span className="font-mono text-[11px] text-ink-500">{s.sign_id}</span><StatusBadge status={s.verification_status} /></div>}
                   </Link>
                 </li>
               ))}
@@ -155,6 +163,7 @@ const NEXT: Record<string, string[]> = {
 
 export function SignDetailPage({ id }: { id: string }) {
   const { user } = useAuth();
+  const tt = useT();
   const prefs = usePrefs();
   const key = `/signs/${id}`;
   const { data: s, error, loading, refetch } = useQuery<SignDetail>(key);
@@ -178,6 +187,7 @@ export function SignDetailPage({ id }: { id: string }) {
   if (error) return <ErrorNote error={error} retry={refetch} />;
   if (!s) return null;
   const canWrite = can(user, 'signs:write');
+  const reviewer = can(user, 'signs:review');
 
   return (
     <div className="space-y-5">
@@ -189,24 +199,26 @@ export function SignDetailPage({ id }: { id: string }) {
           {canWrite && <Button icon="edit" onClick={() => setEditing(true)}>Edit sign</Button>}
           {canWrite && <Button variant="ghost" icon={s.retired ? 'undo' : 'trash'} onClick={() => retireM.mutate(!s.retired)} loading={retireM.pending}>{s.retired ? 'Restore' : 'Retire'}</Button>}
         </>}>
-        <span className="flex flex-wrap items-center gap-2"><StatusBadge status={s.verification_status} /><StatusBadge status={s.data_readiness} />{s.retired && <Badge tone="bad">Retired</Badge>}</span>
+        {(reviewer || s.retired) && <span className="flex flex-wrap items-center gap-2">{reviewer && <><StatusBadge status={s.verification_status} /><StatusBadge status={s.data_readiness} /></>}{s.retired && <Badge tone="bad">Retired</Badge>}</span>}
       </PageHeader>
       <ErrorNote error={retireM.error} />
       {s.verification_status !== 'verified' && (
-        <Notice tone="warn" title="Not yet verified by a qualified ISL reviewer">
-          The English gloss comes from the source dataset folder name. The ISL form, regional variants and non-manual features have not been confirmed.
-        </Notice>
+        <p className="-mt-2 flex items-center gap-1.5 text-xs text-ink-400"><Icon name="info" size={14} />{tt('Not yet verified by a qualified ISL reviewer')}</p>
       )}
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <Card className="xl:col-span-2" title="Meanings" subtitle="Only reviewer-verified translations are used in quizzes and quick phrases">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,340px)_1fr]">
+        <Card title="How to sign it" action={<Button size="sm" variant="primary" icon="hand" onClick={() => navigate(`/practice?sign=${s.sign_id}`)}>Practise this sign</Button>}>
+          <SignAnimation signId={s.sign_id} />
+        </Card>
+        <div className="space-y-4">
+        <Card title="Meanings" subtitle="English · हिन्दी · ಕನ್ನಡ">
           <ul className="divide-y divide-ink-700">
             {(['en', 'hi', 'kn'] as const).map((l) => {
               const t = s.translations[l];
               return (
                 <li key={l} className="flex flex-wrap items-center gap-3 py-3">
                   <span className="w-20 text-sm text-ink-400">{LANG_LABEL[l]}</span>
-                  <span className={`flex-1 text-lg ${t?.text ? 'text-fg' : 'text-ink-500 italic'}`}>{t?.text || 'Pending review'}</span>
+                  <span lang={l} className={`flex-1 text-lg ${t?.text ? 'text-fg' : 'text-ink-500'}`}>{t?.text || '—'}</span>
                   <StatusBadge status={t?.status ?? 'pending'} />
                   {t?.text && <Button size="sm" variant="ghost" icon="speaker" aria-label={`Speak ${LANG_LABEL[l]} meaning`} onClick={() => { const r = speak(t.text, l, prefs.speechRate); if (r.reason) toast(r.reason, 'info'); }} />}
                   {can(user, 'translations:write') && <Button size="sm" icon="edit" aria-label={`Edit ${LANG_LABEL[l]} meaning`} onClick={() => setTr({ lang: l, text: t?.text ?? '', status: t?.status === 'verified' ? 'verified' : 'draft' })}>Edit</Button>}
@@ -216,7 +228,44 @@ export function SignDetailPage({ id }: { id: string }) {
           </ul>
         </Card>
 
-        <Card title="Review workflow">
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-3">
+        {(() => {
+          const rows = ([['Description', s.linguistic_description], ['Hands', s.hands_required], ['Movement', s.movement_type], ['Dominant hand', s.dominant_hand], ['Body movement', s.body_movement], ['Non-manual cue', s.non_manual_cue], ['Regional variation', s.regional_variation], ['Notes', s.annotation_notes]] as const).filter(([, v]) => v || canWrite);
+          return rows.length > 0 && (
+            <Card title="Linguistic description">
+              <dl className="space-y-3 text-sm">
+                {rows.map(([k, v]) => <div key={k}><dt className="label">{k}</dt><dd className={v ? 'mt-0.5 text-ink-100' : 'mt-0.5 text-ink-500'}>{v || '—'}</dd></div>)}
+              </dl>
+            </Card>
+          );
+        })()}
+        <Card title="Reference sources" subtitle="Licence and training permission per source">
+          <ul className="space-y-3 text-sm">
+            {s.references.map((r) => (
+              <li key={r.id} className="rounded-lg border border-ink-700 p-3">
+                <p className="font-medium text-fg">{r.source_name} <Badge tone="signal">{r.license}</Badge></p>
+                {r.notes && <p className="muted mt-1 text-xs">{r.notes}</p>}
+                {r.training_permitted && <p className="mt-1 text-xs text-ink-300">Training: {r.training_permitted}</p>}
+                {r.source_url && <a href={r.source_url} target="_blank" rel="noreferrer noopener" className="mt-1 inline-block text-xs text-nova-300 hover:underline">{r.doi ? `doi:${r.doi}` : r.source_url}</a>}
+              </li>
+            ))}
+          </ul>
+          <p className="muted mt-3 text-xs">{tt('The animation is drawn from the landmarks of this reference recording.')}</p>
+        </Card>
+        <Card title="Related signs">
+          {reviewer && <dl className="mb-4 space-y-2 text-sm">
+            <div className="flex justify-between"><dt className="text-ink-400">External videos (train/val/test)</dt><dd>{s.external_train_videos}/{s.external_val_videos}/{s.external_test_videos}</dd></div>
+            {Object.entries(s.recordings).map(([k, v]) => <div key={k} className="flex justify-between"><dt className="text-ink-400">Local · {k.replaceAll('_', ' ')}</dt><dd>{v}</dd></div>)}
+          </dl>}
+          <div className="flex flex-wrap gap-1.5">{s.related.map((r) => <Link key={r.sign_id} to={`/signs/${r.sign_id}`} className="rounded-full border border-ink-600 px-2.5 py-1 text-xs text-ink-200 transition-colors hover:border-nova-400 hover:text-fg">{r.canonical_sign_name}</Link>)}</div>
+        </Card>
+      </div>
+
+      {reviewer && <div className="grid gap-4 xl:grid-cols-3">
+        <Card title="Review workflow" className="xl:col-span-3">
           <ol className="relative space-y-3 border-l border-ink-700 pl-4 text-sm">
             {s.verification_events.length === 0 && <li className="muted">No events yet.</li>}
             {s.verification_events.map((e, i) => (
@@ -238,39 +287,7 @@ export function SignDetailPage({ id }: { id: string }) {
             </div>
           )}
         </Card>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-3">
-        <Card title="Linguistic description">
-          <dl className="space-y-3 text-sm">
-            {([['Description', s.linguistic_description], ['Hands', s.hands_required], ['Movement', s.movement_type], ['Dominant hand', s.dominant_hand], ['Body movement', s.body_movement], ['Non-manual cue', s.non_manual_cue], ['Regional variation', s.regional_variation], ['Notes', s.annotation_notes]] as const).map(([k, v]) => (
-              <div key={k}><dt className="label">{k}</dt><dd className={v ? 'mt-0.5 text-ink-100' : 'mt-0.5 italic text-ink-500'}>{v || 'Not yet documented'}</dd></div>
-            ))}
-          </dl>
-        </Card>
-        <Card title="Reference sources" subtitle="Licence and training permission per source">
-          <ul className="space-y-3 text-sm">
-            {s.references.map((r) => (
-              <li key={r.id} className="rounded-lg border border-ink-700 p-3">
-                <p className="font-medium text-fg">{r.source_name} <Badge tone="signal">{r.license}</Badge></p>
-                {r.notes && <p className="muted mt-1 text-xs">{r.notes}</p>}
-                {r.training_permitted && <p className="mt-1 text-xs text-ink-300">Training: {r.training_permitted}</p>}
-                {r.source_url && <a href={r.source_url} target="_blank" rel="noreferrer noopener" className="mt-1 inline-block text-xs text-nova-300 hover:underline">{r.doi ? `doi:${r.doi}` : r.source_url}</a>}
-              </li>
-            ))}
-          </ul>
-          <p className="muted mt-3 text-xs">Reference videos are not mirrored here. Open the source to view them under its licence.</p>
-        </Card>
-        <Card title="Data">
-          <dl className="space-y-2 text-sm">
-            <div className="flex justify-between"><dt className="text-ink-400">External videos (train/val/test)</dt><dd>{s.external_train_videos}/{s.external_val_videos}/{s.external_test_videos}</dd></div>
-            {Object.entries(s.recordings).map(([k, v]) => <div key={k} className="flex justify-between"><dt className="text-ink-400">Local · {k.replaceAll('_', ' ')}</dt><dd>{v}</dd></div>)}
-          </dl>
-          {!Object.keys(s.recordings).length && <p className="muted mt-2 text-xs">No local recordings yet.</p>}
-          <p className="label mb-2 mt-5">Related signs</p>
-          <div className="flex flex-wrap gap-1.5">{s.related.map((r) => <Link key={r.sign_id} to={`/signs/${r.sign_id}`} className="rounded-full border border-ink-600 px-2.5 py-1 text-xs text-ink-200 hover:border-nova-400 hover:text-fg">{r.canonical_sign_name}</Link>)}</div>
-        </Card>
-      </div>
+      </div>}
 
       <SignForm open={editing} onClose={() => setEditing(false)} sign={s} categories={cats.data ?? []} />
       <Dialog open={!!review} onClose={() => setReview(null)} title={`Move to "${review?.replaceAll('_', ' ')}"`}

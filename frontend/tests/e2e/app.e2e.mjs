@@ -66,7 +66,7 @@ describe('screenshots (E2E_SCREENSHOTS=1)', { skip: !SHOTS }, () => {
     await ctx.close();
     const m = await newPage(browser, srv.base, { viewport: { width: 390, height: 844 } });
     await m.page.goto('/');
-    await m.page.getByText('Class slots').waitFor();
+    await m.page.getByText('Signs in the vocabulary').waitFor();
     await m.page.waitForTimeout(600);
     await m.page.screenshot({ path: `${shotsDir}/mobile-dashboard.png` });
     await m.ctx.close();
@@ -86,9 +86,9 @@ describe('startup and truthful empty state', () => {
     const { page, errors, ctx } = await newPage(browser, srv.base);
     await page.goto('/');
     await page.getByText('No trained recognition model is active').waitFor();
-    const slots = page.locator('.card', { hasText: 'Class slots' }).first();
-    assert.match(await slots.innerText(), /200/);
-    assert.match(await page.locator('.card', { hasText: 'Verified signs' }).first().innerText(), /\b0\b/);
+    // counts animate up to their real values; data-value carries the final number
+    await page.locator('.card', { hasText: 'Signs in the vocabulary' }).locator('[data-value="200"]').waitFor();
+    assert.equal(await page.getByText('Workspace', { exact: true }).count(), 0); // staff-only section hidden from visitors
     assert.equal(await page.getByRole('heading', { level: 1 }).count(), 1);
     assert.deepEqual(errors, []);
     await ctx.close();
@@ -279,7 +279,7 @@ describe('vocabulary', () => {
     await page.goto('/signs');
     await page.getByPlaceholder('Search by meaning, gloss or ID…').fill('mother');
     await page.getByText('2 signs', { exact: true }).waitFor(); // Mother, Grandmother
-    await page.getByRole('link', { name: /^ISL\d{3}\s*Mother/ }).click();
+    await page.getByRole('link', { name: /^Mother/ }).click();
     await page.getByRole('heading', { name: 'Mother' }).waitFor();
     await page.getByText('Not yet verified by a qualified ISL reviewer').waitFor();
     await page.getByRole('button', { name: 'Bookmark' }).click();
@@ -494,7 +494,8 @@ describe('modules render with real data', () => {
     await page.getByRole('heading', { level: 1, name: 'संकेत खोज' }).waitFor();
     assert.equal(await page.evaluate(() => document.documentElement.lang), 'hi');
     await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'लाइव पहचान' }).waitFor();
-    await page.getByText('अनुवाद कवरेज').waitFor();
+    await page.getByText('सभी 200 संकेतों को English, हिन्दी या ಕನ್ನಡ में अर्थ से खोजें।').waitFor(); // page description translated
+    await page.locator('[title="मसौदा अनुवाद"]').first().waitFor(); // draft meanings stay marked on every card
     await page.reload();
     await page.getByRole('heading', { level: 1, name: 'संकेत खोज' }).waitFor();
     await page.getByLabel('इंटरफ़ेस भाषा').selectOption('kn');

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Icon } from '../components/icons';
-import { Badge, Button, Card, Empty, ErrorNote, Loading, Meter, Notice, PageHeader, StatusBadge, Tabs } from '../components/ui';
+import { SignAnimation } from '../components/SignAnimation';
+import { Badge, Button, Card, Empty, ErrorNote, Loading, Meter, PageHeader, StatusBadge, Tabs } from '../components/ui';
 import { useT } from '../i18n';
 import { api } from '../lib/api';
 import { useQuery } from '../lib/query';
@@ -8,47 +9,48 @@ import { Link } from '../lib/router';
 import { toast, useAuth } from '../lib/store';
 
 type Lessons = { verified_signs: number; include_unverified: boolean; lessons: { category: string; label: string; signs: { sign_id: string; canonical_sign_name: string; verification_status: string; attempts: number; correct: number }[] }[] };
-type Quiz = { available: boolean; reason?: string; questions: { sign_id: string; prompt: string; reference?: { source_name: string; source_url: string } | null; options: { sign_id: string; text: string }[] }[] };
+type Quiz = { available: boolean; unverified?: boolean; reason?: string; questions: { sign_id: string; prompt: string; reference?: { source_name: string; source_url: string } | null; options: { sign_id: string; text: string }[] }[] };
 type Progress = { signs_practised: number; attempts: number; correct: number; accuracy: number | null; difficult: { sign_id: string; canonical_sign_name: string; attempts: number; correct: number }[] };
 
 export function AcademyPage() {
   const { user } = useAuth();
   const [tab, setTab] = useState<'lessons' | 'quiz' | 'progress'>('lessons');
-  const [preview, setPreview] = useState(false);
-  const lessons = useQuery<Lessons>(`/learning/lessons?include_unverified=${preview}`);
+  const t = useT();
+  // All 200 signs have a licensed reference recording; reviewer-verified ones are highlighted.
+  const lessons = useQuery<Lessons>('/learning/lessons?include_unverified=true');
+  const unverified = lessons.data?.lessons.some((l) => l.signs.some((s) => s.verification_status !== 'verified'));
   return (
     <div className="space-y-5">
-      <PageHeader kicker="NOVA Learning Academy" title="Learning Academy"
+      <PageHeader title="Learning Academy"
         actions={<Tabs value={tab} onChange={setTab} tabs={[{ id: 'lessons', label: 'Lessons' }, { id: 'quiz', label: 'Quiz' }, { id: 'progress', label: 'My progress' }]} />}>
-        Lessons and quizzes use only reviewer-verified signs and meanings. The Academy records your answers but does not score your signing; that would need validated assessment.
+        Learn signs step by step with lessons, quizzes, streaks and badges.
       </PageHeader>
       {tab === 'lessons' && (
         <>
-          {lessons.data && lessons.data.verified_signs === 0 && !preview && (
-            <Card><Empty icon="cap" title="No verified lessons yet" action={<Button onClick={() => setPreview(true)}>Preview unverified vocabulary</Button>}>
-              Lessons open as qualified ISL reviewers verify signs. You can preview the unverified vocabulary, clearly labelled.
-            </Empty></Card>
-          )}
-          {preview && <Notice tone="warn" title="Previewing unverified vocabulary">These entries are not confirmed by an ISL reviewer. Use the reference source to see the sign. <button className="underline" onClick={() => setPreview(false)}>Hide unverified</button></Notice>}
           <ErrorNote error={lessons.error} />
           {lessons.loading && !lessons.data && <Loading rows={4} />}
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="stagger grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {lessons.data?.lessons.map((l, i) => {
               const practised = l.signs.filter((s) => s.attempts > 0).length;
               return (
-                <Card key={l.category} title={<span className="flex items-center gap-2"><span className="grid size-7 place-items-center rounded-lg bg-nova-500/15 text-xs text-nova-300">{i + 1}</span>{l.label}</span>}>
-                  <Meter label="Practised" value={practised} max={l.signs.length} tone="signal" />
+                <div key={l.category} className="card lift p-5">
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-nova-500/20 to-cyan-500/10 font-display text-sm font-semibold text-nova-300">{i + 1}</span>
+                    <h2 className="text-[15px] font-semibold text-fg">{l.label}</h2>
+                  </div>
+                  <Meter label={t('Practised')} value={practised} max={l.signs.length} tone="signal" />
                   <ul className="mt-4 flex flex-wrap gap-1.5">
                     {l.signs.map((s) => (
-                      <li key={s.sign_id}><Link to={`/signs/${s.sign_id}`} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs hover:text-fg ${s.verification_status === 'verified' ? 'border-emerald-500/40 text-emerald-200' : 'border-ink-600 text-ink-300'}`}>
+                      <li key={s.sign_id}><Link to={`/practice?sign=${s.sign_id}`} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition-colors hover:border-nova-400 hover:text-fg ${s.verification_status === 'verified' ? 'border-emerald-500/40 text-emerald-200' : 'border-ink-600 text-ink-300'}`}>
                         {s.canonical_sign_name}{s.attempts > 0 && <span className="text-ink-500">{s.correct}/{s.attempts}</span>}
                       </Link></li>
                     ))}
                   </ul>
-                </Card>
+                </div>
               );
             })}
           </div>
+          {unverified && <p className="muted text-xs">{t('Lesson signs come from INCLUDE reference recordings; green signs are confirmed by a qualified ISL reviewer.')}</p>}
         </>
       )}
       {tab === 'quiz' && <QuizView signedIn={!!user} />}
@@ -58,12 +60,15 @@ export function AcademyPage() {
 }
 
 function QuizView({ signedIn }: { signedIn: boolean }) {
-  const quiz = useQuery<Quiz>('/learning/quiz?n=5', { staleMs: 0 });
+  const t = useT();
+  const verified = useQuery<Quiz>('/learning/quiz?n=5', { staleMs: 0 });
+  const practice = useQuery<Quiz>(verified.data && !verified.data.available ? '/learning/quiz?n=5&include_unverified=true' : null, { staleMs: 0 });
+  const quiz = verified.data && !verified.data.available ? practice : verified;
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [score, setScore] = useState(0);
-  if (quiz.loading && !quiz.data) return <Loading />;
-  if (!quiz.data?.available) return <Card><Empty icon="cap" title="Quiz not available yet">{quiz.data?.reason}</Empty></Card>;
+  if (!quiz.data) return <Loading />;
+  if (!quiz.data.available) return <Card><Empty icon="cap" title="Quiz not available yet">{quiz.data.reason}</Empty></Card>;
   const qs = quiz.data.questions;
   if (i >= qs.length) return (
     <Card className="text-center"><p className="font-display text-4xl font-semibold text-fg">{score} / {qs.length}</p><p className="muted mt-2">Answers recorded{signedIn ? ' to your progress' : ''}.</p>
@@ -79,15 +84,20 @@ function QuizView({ signedIn }: { signedIn: boolean }) {
   };
   return (
     <Card title={`Question ${i + 1} of ${qs.length}`} action={<Badge tone="nova">Score {score}</Badge>}>
-      <p className="text-lg text-fg">{q.prompt}</p>
-      {q.reference && <a className="mt-1 inline-block text-sm text-nova-300 hover:underline" href={q.reference.source_url} target="_blank" rel="noreferrer noopener">View reference ({q.reference.source_name})</a>}
-      <div className="mt-5 grid gap-2 md:grid-cols-2">
+      <div className="grid items-start gap-5 md:grid-cols-[minmax(0,280px)_1fr]">
+        <div key={q.sign_id} className="pop"><SignAnimation signId={q.sign_id} size="sm" /></div>
+        <div>
+          <p className="text-lg text-fg">{t('Which sign is this?')}</p>
+          {quiz.data.unverified && <p className="muted mt-1 text-xs">{t('Practice quiz from INCLUDE reference recordings.')}</p>}
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
         {q.options.map((o) => {
           const state = !picked ? '' : o.sign_id === q.sign_id ? 'border-emerald-500 bg-emerald-500/10' : o.sign_id === picked ? 'border-rose-500 bg-rose-500/10' : 'opacity-60';
-          return <button key={o.sign_id} disabled={!!picked} onClick={() => answer(o.sign_id)} className={`rounded-xl border border-ink-600 px-4 py-3 text-left transition-colors hover:border-nova-400 ${state}`}>{o.text}</button>;
+          return <button key={o.sign_id} disabled={!!picked} onClick={() => answer(o.sign_id)} className={`rounded-xl border border-ink-600 px-4 py-3 text-left transition-all hover:-translate-y-0.5 hover:border-nova-400 ${state}`}>{o.text}</button>;
         })}
       </div>
       {picked && <div className="mt-4 flex justify-end"><Button variant="primary" onClick={() => { setI(i + 1); setPicked(null); }}>Next</Button></div>}
+        </div>
+      </div>
     </Card>
   );
 }

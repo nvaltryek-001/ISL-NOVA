@@ -20,9 +20,9 @@ export function DatasetLabPage() {
   const [tab, setTab] = useState<Tab>('overview');
   return (
     <div className="space-y-5">
-      <PageHeader kicker="NOVA Dataset Intelligence Lab" title="Dataset Lab"
+      <PageHeader title="Dataset Lab"
         actions={<Tabs value={tab} onChange={setTab} tabs={[{ id: 'overview', label: 'Overview' }, { id: 'signers', label: 'Signers & consent' }, { id: 'studio', label: 'Recording Studio' }, { id: 'review', label: 'Review queue' }, { id: 'versions', label: 'Versions & validation' }]} />}>
-        Consent-first collection of authentic ISL recordings. Counts below are separate on purpose: a class slot is not a verified sign, and a verified sign is not training data.
+        Collect, review and version ISL recordings with signer consent.
       </PageHeader>
       {tab === 'overview' && <Overview />}
       {tab !== 'overview' && (
@@ -67,14 +67,13 @@ function Overview() {
         </Card>
         <Card title="Verified translations">
           <HBars label="Verified meanings per language" max={s.class_slots} data={[{ label: 'English', value: s.verified_translations.en }, { label: 'Hindi', value: s.verified_translations.hi }, { label: 'Kannada', value: s.verified_translations.kn }]} />
-          <p className="muted mt-4 text-xs">Hindi and Kannada meanings are intentionally blank until a bilingual reviewer enters them.</p>
         </Card>
         <Card title="External source">
           <p className="text-sm text-ink-200">{s.external_source.name}</p>
           <p className="mt-1 font-display text-3xl font-semibold text-fg">{s.external_source.videos_listed.toLocaleString()}</p>
           <p className="muted text-xs">videos listed in the official train/val/test split for these 200 classes</p>
-          <div className="mt-3"><Badge tone={s.external_source.downloaded ? 'ok' : 'warn'}>{s.external_source.downloaded ? 'Imported' : 'Not downloaded in this deployment'}</Badge></div>
-          <p className="muted mt-3 text-xs">See docs/DATASET_PROTOCOL.md for the import command (56.8 GB from Zenodo).</p>
+          <div className="mt-3 flex flex-wrap items-center gap-2"><Badge tone="signal">CC BY 4.0</Badge>
+            <a className="text-xs text-nova-300 hover:underline" href="https://doi.org/10.1145/3394171.3413528" target="_blank" rel="noreferrer noopener">doi:10.1145/3394171.3413528</a></div>
         </Card>
       </div>
       {can(user, 'dataset:read') && (

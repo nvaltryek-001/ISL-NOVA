@@ -32,8 +32,8 @@ export function VideoAnalysisPage() {
   const r = job.data?.result;
   return (
     <div className="space-y-5">
-      <PageHeader kicker="NOVA Video Analysis" title="Video Analysis">
-        Upload a short recording of a single sign. The server validates the file, extracts landmarks and runs the active model in sliding windows. Uploads are deleted automatically after 24 hours.
+      <PageHeader title="Video Analysis">
+        Upload a short video of a sign and see what it means. Uploads are deleted after 24 hours.
       </PageHeader>
       <Card>
         <div onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); pick(e.dataTransfer.files[0]); }}
