@@ -47,7 +47,7 @@ $status = [ordered]@{}
 function Step($n, $msg) { Write-Host "`n================ [$n/5] $msg ================" -ForegroundColor Magenta }
 function Run($name, [scriptblock]$body) {
   $s = Get-Date
-  & $body
+  & $body | Out-Host   # show (and log) everything the step prints; only the result goes back to the caller
   $ok = ($LASTEXITCODE -eq 0)
   $script:status[$name] = "{0} ({1:N0} min)" -f $(if ($ok) { "OK" } else { "FAILED" }), ((Get-Date) - $s).TotalMinutes
   if (-not $ok) { Write-Host "    $name failed (see above). Continuing with the next step." -ForegroundColor Red }

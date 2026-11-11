@@ -34,6 +34,8 @@ jobs:
           "active after training: $($reg.active)"
           if ($reg.active -like 'bilstm_attn-20261110*') { throw "the trained model was not promoted" }
           if (-not (Get-ChildItem logs\complete-*.log)) { throw "no log written" }
+          $logText = Get-Content (Get-ChildItem logs\complete-*.log | Select-Object -Last 1) -Raw
+          if ($logText -notmatch '\| bilstm-attn-face') { throw "step output (training table) missing from the screen/log" }
           Get-Content (Get-ChildItem logs\complete-*.log | Select-Object -Last 1) -Tail 15
           .\scripts\setup_windows.ps1 -Python python -SkipFrontend
           $after = (Get-Content artifacts\models\registry.json -Raw | ConvertFrom-Json).active
