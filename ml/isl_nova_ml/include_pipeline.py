@@ -176,9 +176,13 @@ def cmd_extract_part(a) -> int:
     work.mkdir(parents=True, exist_ok=True)
     _, files = zenodo_files()
     meta = next(f for f in files if f["key"] == a.part)
-    zpath = work / a.part
+    local_zip = getattr(a, "zip", None)
+    zpath = Path(local_zip) if local_zip else work / a.part
     report: dict = {"part": a.part, "zenodo_size": meta["size"], "zenodo_checksum": meta["checksum"]}
-    report["download"] = download(meta["url"], zpath, meta["checksum"])
+    if local_zip:  # already downloaded and checksum-verified by the caller (scripts/include_local.py); kept
+        report["download"] = {"local_zip": str(zpath), "bytes": zpath.stat().st_size}
+    else:
+        report["download"] = download(meta["url"], zpath, meta["checksum"])
     t0 = time.time()
     with zipfile.ZipFile(zpath) as z:
         bad = z.testzip()
@@ -188,7 +192,8 @@ def cmd_extract_part(a) -> int:
         report["videos_in_zip"] = len(names)
         report["zip_layout_example"] = names[:3]
         z.extractall(work / "x")
-    zpath.unlink()
+    if not local_zip:
+        zpath.unlink()
     idx, voc = split_index(), vocab()
     ex = LandmarkExtractor(Path(a.hand_model), Path(a.pose_model), max_side=a.max_side,
                            face_model=Path(a.face_model) if getattr(a, "face_model", None) else None)
@@ -727,6 +732,7 @@ def main(argv=None) -> int:
     p.add_argument("--max-side", type=int, default=960)
     p.add_argument("--face-model", help="face_landmarker.task: also store 22 face points per frame (contract 2.0.0)")
     p.add_argument("--include-reserve", action="store_true", help="also extract the 63 reserve glosses as open-set unknowns")
+    p.add_argument("--zip", help="use this already-downloaded, verified zip instead of downloading (it is kept)")
     p = sub.add_parser("merge")
     p.add_argument("--inputs", required=True)
     p.add_argument("--out", required=True)

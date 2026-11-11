@@ -569,6 +569,15 @@ python scripts/train_local.py --model lstm          # or gru, pooled-logreg, dtw
 
 Checked on a Windows runner ([run 41961463214](https://github.com/nvaltryek-001/ISL-NOVA/actions/runs/41961463214)): `train_windows.ps1 -Model pooled-logreg` downloaded the landmarks and trained in 4.7 minutes, reproducing the CI result exactly (89.1 % top-1, 98.3 % top-5, 88.8 % macro-F1). On a Linux machine the same command gave 89.3 % / 98.3 % / 88.9 %: expect small differences between computers. The LSTM took about 8.5 minutes on a 4-vCPU Linux runner in CI; expect similar or longer on a laptop.
 
+**Full INCLUDE videos on your own computer (56.8 GB, resumable).** `scripts/include_local.py` downloads every Zenodo part (MD5-verified, kept in `data/include/zips`), extracts hands, pose and 22 face points per frame in parallel, including the 63 reserve glosses used only as open-set "unknown sign" data, and merges them into `data/include/landmarks-face-v1`. Rerunning it skips finished parts. It needs about 60 GB free while it runs (`--delete-zips` lowers that). Extraction takes several hours on a laptop CPU.
+
+```powershell
+.venv\Scripts\python scripts\include_local.py --workers 4
+.venv\Scripts\python scripts\train_local.py --data data\include\landmarks-face-v1 --model all-face --promote
+```
+
+`--promote` also fits the unknown-sign detector (validation + reserve part A2) and reports FAR/FRR on test + part B.
+
 **Or from the raw INCLUDE videos** on your disk:
 
 ```bash

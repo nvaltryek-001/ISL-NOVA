@@ -1,0 +1,40 @@
+name: Local INCLUDE download + extraction (Windows)
+
+# Runs scripts/include_local.py exactly as a user would on Windows, on one small part:
+# real Zenodo download (MD5-verified), MediaPipe extraction with face points, merge, rerun (resume).
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Parts to process (zip names or category prefixes)"
+        required: false
+        default: "Colours"
+  push:
+    branches: ["run/include-local"]
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: pip install -r backend/requirements.txt
+      - name: Download, verify, extract (face on), merge
+        shell: pwsh
+        run: python scripts/include_local.py --only "${{ inputs.only || 'Colours' }}" --workers 2
+      - name: Rerun is a no-op (resume)
+        shell: pwsh
+        run: python scripts/include_local.py --only "${{ inputs.only || 'Colours' }}" --workers 2
+      - name: Summary
+        shell: pwsh
+        run: |
+          python -c "import json;m=json.load(open('data/include/landmarks-face-v1/manifest.json'));print(m['feature_contract']);print(json.dumps(m['summary'],indent=1))" | Tee-Object -FilePath summary.txt
+          "## Local INCLUDE extraction`n``````n$(Get-Content summary.txt -Raw)``````" >> $env:GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: include-local-logs, path: "data/include/parts/**/extract.log", retention-days: 14 }

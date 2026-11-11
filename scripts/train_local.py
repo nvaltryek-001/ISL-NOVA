@@ -24,6 +24,7 @@ import argparse
 import hashlib
 import io
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -43,6 +44,22 @@ RELEASE = "dataset-include-landmarks-v1"
 CONFIGS = {"lstm": "lstm_baseline.json", "lstm-fps": "lstm_fps_aug.json", "gru": "gru.json", "gru-fps": "gru_fps_aug.json",
            "bilstm-attn": "bilstm-attn_fps_aug.json", "transformer": "transformer_fps_aug.json", "tcn": "tcn_fps_aug.json",
            "pooled-logreg": "pooled-logreg.json", "dtw-1nn": "dtw-1nn.json"}
+# need a dataset extracted with face points (scripts/include_local.py); not part of --model all on the 176 MB release
+FACE_CONFIGS = {"lstm-face": "lstm_fps_aug_face.json", "bilstm-attn-face": "bilstm-attn_fps_aug_face.json",
+                "transformer-face": "transformer_fps_aug_face.json", "tcn-face": "tcn_fps_aug_face.json"}
+# need open-set (reserve gloss) entries in the manifest: train an extra "__other__" class
+OTHER_CONFIGS = {"lstm-other": "lstm_fps_aug_other.json", "transformer-other": "transformer_fps_aug_other.json"}
+ALL_CONFIGS = {**CONFIGS, **FACE_CONFIGS, **OTHER_CONFIGS}
+
+
+def has_face(data: Path, manifest: dict) -> bool:
+    import numpy as np
+
+    e = (manifest.get("entries") or [{}])[0]
+    if not e.get("landmarks_path"):
+        return False
+    with np.load(data / e["landmarks_path"]) as z:
+        return "face_mask" in z
 
 
 def fail(msg: str) -> None:
@@ -101,7 +118,8 @@ def ensure_data(data: Path, run_id: str) -> Path:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--model", default="lstm", choices=[*CONFIGS, "all"])
+    ap.add_argument("--model", default="lstm", choices=[*ALL_CONFIGS, "all", "all-face"],
+                    help="all = the 9 hands+pose models; all-face = the 4 face models (needs a face dataset)")
     ap.add_argument("--data", type=Path, default=ROOT / "data" / ARTIFACT, help="folder containing manifest.json")
     ap.add_argument("--run-id", default=DATA_RUN, help="GitHub Actions run that produced the landmarks")
     ap.add_argument("--registry", type=Path, default=ROOT / "artifacts" / "models")
@@ -115,7 +133,8 @@ def main(argv=None) -> int:
     from isl_nova_ml.train import run
 
     data = ensure_data(a.data, a.run_id)
-    summary = json.loads((data / "manifest.json").read_text()).get("summary", {})
+    manifest = json.loads((data / "manifest.json").read_text())
+    summary = manifest.get("summary", {})
     if summary:
         print(f"data: {summary.get('usable_landmark_sequences')} sequences, {summary.get('classes_with_data')} classes, "
               f"split {summary.get('by_split')}")
@@ -123,10 +142,14 @@ def main(argv=None) -> int:
     if a.download_only:
         print("data: ready (download only, no training)")
         return 0
-    kinds = list(CONFIGS) if a.model == "all" else [a.model]
+    kinds = list(CONFIGS) if a.model == "all" else list(FACE_CONFIGS) if a.model == "all-face" else [a.model]
+    if any(k in FACE_CONFIGS for k in kinds) and not has_face(data, manifest):
+        fail(f"{data} has no face landmarks. Extract them first with: python scripts/include_local.py")
+    if any(k in OTHER_CONFIGS for k in kinds) and not manifest.get("open_set_entries"):
+        fail(f"{data} has no open-set (reserve gloss) entries. Extract them with: python scripts/include_local.py")
     results = []
     for kind in kinds:
-        cfg = json.loads((ROOT / "ml" / "configs" / CONFIGS[kind]).read_text())
+        cfg = json.loads((ROOT / "ml" / "configs" / ALL_CONFIGS[kind]).read_text())
         if a.epochs:
             cfg["epochs"] = a.epochs
         if a.seed is not None:
@@ -149,7 +172,23 @@ def main(argv=None) -> int:
     if a.promote:
         best = max(results, key=lambda r: r["val_macro_f1"])  # select on validation, never on test
         Registry(a.registry).promote(best["model_id"], actor="train_local")
-        print(f"\npromoted {best['model_id']}. Restart the server to load it; roll back in AI Laboratory -> Registry.")
+        print(f"\npromoted {best['model_id']}.")
+        if manifest.get("open_set_entries"):
+            # fit the unknown-sign detector exactly as CI does (known validation + unknown part A2),
+            # then evaluate it once on known test + unknown part B
+            print("fitting the unknown-sign detector (calibrate-open-set) ...")
+            out = a.registry / best["model_id"] / "open_set_report"
+            r = subprocess.run([sys.executable, "-m", "isl_nova_ml.include_pipeline", "calibrate-open-set",  # noqa: S603
+                                "--registry", str(a.registry), "--manifest", str(data / "manifest.json"),
+                                "--data-root", str(data), "--out", str(out)], cwd=ROOT,
+                               env={**os.environ, "PYTHONPATH": os.pathsep.join([str(ROOT / 'ml'), str(ROOT / 'backend')])})
+            if r.returncode == 0:
+                rep = json.loads((out / "open_set_v3.json").read_text())["open_set_detector_rule"]
+                print(f"unknown signs accepted (FAR) {rep['false_acceptance']:.1%}, known signs held back (FRR) "
+                      f"{rep['false_rejection']:.1%}  (targets: FAR < 10 %, FRR <= 15 %)")
+            else:
+                print("calibration failed; the model still works with its max-probability rule")
+        print("Restart the server to load it; roll back in AI Laboratory -> Registry.")
     else:
         print("\nNew models are registered but not active. Promote one in AI Laboratory -> Registry, "
               "or rerun with --promote.")
