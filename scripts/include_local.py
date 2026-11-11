@@ -28,6 +28,7 @@ import shutil
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -61,9 +62,55 @@ def verified(zp: Path, size: int, checksum: str) -> bool:
     return zp.exists() and zp.stat().st_size == size and ok.exists() and ok.read_text().strip() == checksum
 
 
-def fetch_part(meta: dict, zips: Path) -> str:
-    from isl_nova_ml.include_pipeline import download
+def download_resumable(url: str, tmp: Path, size: int, checksum: str, attempts: int = 40) -> dict:
+    """Download into tmp, continuing from its current size with an HTTP Range request after any
+    dropped connection (also across runs: an interrupted .partial file is picked up next time).
+    The whole file is checked against Zenodo's MD5 at the end; a mismatch restarts from zero."""
+    from isl_nova_ml.include_pipeline import UA, _https
 
+    algo, _, want = checksum.partition(":")
+    t0, start_bytes = time.time(), (tmp.stat().st_size if tmp.exists() else 0)
+    for attempt in range(1, attempts + 1):
+        have = tmp.stat().st_size if tmp.exists() else 0
+        if have > size:
+            tmp.unlink()
+            have = 0
+        if have < size:
+            headers = {"User-Agent": UA}
+            if have:
+                headers["Range"] = f"bytes={have}-"
+            try:
+                req = urllib.request.Request(_https(url), headers=headers)  # noqa: S310 - https enforced by _https
+                with urllib.request.urlopen(req, timeout=120) as r:  # noqa: S310
+                    mode = "ab" if have and r.status == 206 else "wb"  # 200 = server ignored Range: start over
+                    if mode == "wb" and have:
+                        log("  server does not support resume; restarting this part")
+                    with tmp.open(mode) as out:
+                        last = time.time()
+                        while chunk := r.read(1 << 22):
+                            out.write(chunk)
+                            if time.time() - last > 30:
+                                done = out.tell()
+                                log(f"  {done / GB:.2f} / {size / GB:.2f} GB")
+                                last = time.time()
+            except (OSError, urllib.error.URLError) as exc:  # dropped connection, timeout, reset ...
+                wait = min(60, 5 * attempt)
+                got = tmp.stat().st_size if tmp.exists() else 0
+                log(f"  connection problem ({exc}); have {got / GB:.2f} GB, resuming in {wait} s "
+                    f"(attempt {attempt}/{attempts})")
+                time.sleep(wait)
+                continue
+        if tmp.stat().st_size == size:
+            got = file_hash(tmp, algo or "md5")
+            if not want or got == want:
+                secs = max(time.time() - t0, 1e-3)
+                return {"bytes": size, "mb_per_s": round((size - start_bytes) / 1e6 / secs, 2)}
+            log(f"  checksum mismatch ({got} != {want}); downloading this part again")
+            tmp.unlink()
+    raise RuntimeError(f"gave up after {attempts} attempts; rerun the same command to continue")
+
+
+def fetch_part(meta: dict, zips: Path) -> str:
     zp = zips / meta["key"]
     if verified(zp, meta["size"], meta["checksum"]):
         return "already verified"
@@ -75,7 +122,9 @@ def fetch_part(meta: dict, zips: Path) -> str:
             return "verified existing file"
         zp.unlink()
     tmp = zp.with_suffix(zp.suffix + ".partial")
-    r = download(meta["url"], tmp, meta["checksum"])  # MD5-checked while streaming; retries with back-off
+    if tmp.exists():
+        log(f"  continuing an interrupted download ({tmp.stat().st_size / GB:.2f} GB already here)")
+    r = download_resumable(meta["url"], tmp, meta["size"], meta["checksum"])
     tmp.replace(zp)
     zp.with_suffix(zp.suffix + ".ok").write_text(meta["checksum"])
     return f"downloaded {r['bytes'] / GB:.2f} GB at {r['mb_per_s']} MB/s"
@@ -210,4 +259,8 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except KeyboardInterrupt:
+        print("\nstopped. Rerun the same command to continue where it left off.")
+        raise SystemExit(130) from None

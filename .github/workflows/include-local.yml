@@ -24,6 +24,15 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.13", cache: pip, cache-dependency-path: backend/requirements.txt }
       - run: pip install -r backend/requirements.txt
+      - name: Interrupt a real download after 40 s, then check that it resumes (HTTP Range)
+        shell: pwsh
+        run: |
+          $p = Start-Process python -ArgumentList "scripts/include_local.py","--only","${{ inputs.only || 'Colours' }}","--download-only" -PassThru -NoNewWindow
+          Start-Sleep 40; Stop-Process -Id $p.Id -Force
+          Get-ChildItem data/include/zips | Format-Table Name, Length
+          python scripts/include_local.py --only "${{ inputs.only || 'Colours' }}" --download-only 2>&1 | Tee-Object resume.log
+          if (-not (Select-String -Path resume.log -Pattern "continuing an interrupted download" -Quiet)) { throw "no partial file was resumed" }
+          if (Select-String -Path resume.log -Pattern "does not support resume" -Quiet) { throw "Zenodo ignored the Range request" }
       - name: Download, verify, extract (face on), merge
         shell: pwsh
         run: python scripts/include_local.py --only "${{ inputs.only || 'Colours' }}" --workers 2
