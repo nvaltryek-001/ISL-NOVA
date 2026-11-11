@@ -22,7 +22,7 @@ jobs:
         with: { node-version: "22" }
       - run: pip install -r backend/requirements.txt
       - working-directory: frontend
-        run: npm install --no-audit --no-fund && npm run build && npx playwright install --with-deps chromium
+        run: npm install --no-audit --no-fund && npm run build && (npx playwright install --with-deps chromium || npx playwright install chromium)
       - name: Start ISL NOVA
         run: |
           (cd backend && DATABASE_URL=sqlite:///$RUNNER_TEMP/db.sqlite STORAGE_DIR=$RUNNER_TEMP/obj MODEL_REGISTRY_DIR=$RUNNER_TEMP/m \

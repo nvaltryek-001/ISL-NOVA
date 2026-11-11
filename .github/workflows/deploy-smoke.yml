@@ -28,7 +28,7 @@ jobs:
           mkdir sample && curl -fsSL -o s.tgz "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ steps.cfg.outputs.tag }}/include_test_landmark_sample.tar.gz"
           tar -xzf s.tgz -C sample
       - working-directory: frontend
-        run: npm install --no-audit --no-fund && npx playwright install --with-deps chromium
+        run: npm install --no-audit --no-fund && (npx playwright install --with-deps chromium || npx playwright install chromium)
       - name: Smoke test
         working-directory: frontend
         run: node tests/deploy/smoke.mjs "${{ steps.cfg.outputs.url }}" ../sample ../smoke.json

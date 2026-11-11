@@ -50,7 +50,7 @@ jobs:
             --limit "${{ steps.cfg.outputs.limit }}"
       - name: Build frontend
         working-directory: frontend
-        run: npm install --no-audit --no-fund && npm run build && npx playwright install --with-deps chromium
+        run: npm install --no-audit --no-fund && npm run build && (npx playwright install --with-deps chromium || npx playwright install chromium)
       - name: Start ISL NOVA with the model
         run: |
           (cd backend && DATABASE_URL=sqlite:///$RUNNER_TEMP/db.sqlite STORAGE_DIR=$RUNNER_TEMP/obj MODEL_REGISTRY_DIR=$GITHUB_WORKSPACE/models \
