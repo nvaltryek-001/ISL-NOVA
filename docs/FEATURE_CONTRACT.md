@@ -31,3 +31,21 @@ Defined in `ml/isl_nova_ml/contract.py` and implemented twice, kept equal by tes
 | 9 | wrists_velocity | 6 | Δ wrists_body between resampled steps |
 
 **Change rule:** any change to order, size, normalisation or sequence length bumps the version. The predictor refuses to load a model trained on a different contract version, and the parity fixture must be regenerated (`ISL_NOVA_WRITE_FIXTURE=1 pytest ml/tests/test_feature_parity_fixture.py`).
+
+## Contract `isl-nova-fc-2.0.0` (non-manual features)
+
+`2.0.0` = the 204 features of `1.0.0`, unchanged and in the same order, followed by a **face block of
+51 values** per time step (total 255). Models record the contract they were trained with; the server
+and the browser compute exactly that contract (`Predictor.features`, `extractFeaturesFor`), so 1.0.0
+and 2.0.0 models can be served side by side.
+
+| | |
+|---|---|
+| Landmarks | MediaPipe FaceLandmarker (478 points), 22 kept: nose tip, 3 points per eyebrow, 4 per eye, 6 mouth/lip points, chin (`contract.FACE_KEEP`). Frames carry them as `face` |
+| Positions (44) | x, y of the 22 points relative to the nose tip, divided by the distance between the outer eye corners (scale- and position-invariant; aspect-corrected like the other blocks) |
+| Measures (6) | mouth opening, mouth width, left/right eyebrow raise (brow to upper eyelid), left/right eye opening, all divided by the eye-corner distance |
+| Presence (1) | 1 if a face was found in either neighbouring source frame |
+| Missing faces | linear interpolation between present frames, else the nearest present frame, else zeros (as for hands and pose) |
+| Extraction (offline) | the head is cropped from the full-resolution frame around the pose nose and upscaled to 384 px, because the face is too small for the face detector in full-body recordings (coverage on a trial part: 99.98 % of frames) |
+| Browser | the camera stage loads FaceLandmarker only when the active model needs face (`/model/info → needs_face`) |
+| Parity | `frontend/tests/fixtures/feature_parity_v2.json` (Python ↔ TypeScript) |

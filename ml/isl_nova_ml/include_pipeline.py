@@ -683,8 +683,10 @@ def cmd_ensemble(a) -> int:
         m = json.loads((d / "metrics.json").read_text())
         rows.append((m["validation"]["macro_f1"], d, info))
     built = []
-    for ncls in sorted({len(r[2]["classes"]) for r in rows}):
-        group = sorted((r for r in rows if len(r[2]["classes"]) == ncls), key=lambda r: -r[0])
+    groups = sorted({(len(r[2]["classes"]), r[2]["contract"]["version"]) for r in rows})
+    for ncls, ver in groups:  # members must share the class list and the feature contract
+        group = sorted((r for r in rows if len(r[2]["classes"]) == ncls and r[2]["contract"]["version"] == ver),
+                       key=lambda r: -r[0])
         cands = []
         best_per_kind = {}
         for r in group:

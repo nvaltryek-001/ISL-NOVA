@@ -1,0 +1,21 @@
+{
+  "data_run_id": 42957883286,
+  "artifact": "landmarks-include-face-v1",
+  "dataset_version": "include-face-v1",
+  "epochs": 60,
+  "baseline_model_tag": "model-bilstm_attn-20261110T162800Z-s7",
+  "publish_release": true,
+  "purpose": "v4: non-manual (face) features, feature contract 2.0.0, same architectures, augmentation and seeds as v3; the v3 default competes on validation",
+  "models": [
+    {"name": "bilstm_attn_face_s7", "config": "ml/configs/bilstm-attn_fps_aug_face.json", "seed": 7},
+    {"name": "bilstm_attn_face_s13", "config": "ml/configs/bilstm-attn_fps_aug_face.json", "seed": 13},
+    {"name": "bilstm_attn_face_s21", "config": "ml/configs/bilstm-attn_fps_aug_face.json", "seed": 21},
+    {"name": "transformer_face_s7", "config": "ml/configs/transformer_fps_aug_face.json", "seed": 7},
+    {"name": "transformer_face_s13", "config": "ml/configs/transformer_fps_aug_face.json", "seed": 13},
+    {"name": "transformer_face_s21", "config": "ml/configs/transformer_fps_aug_face.json", "seed": 21},
+    {"name": "tcn_face_s7", "config": "ml/configs/tcn_fps_aug_face.json", "seed": 7},
+    {"name": "tcn_face_s13", "config": "ml/configs/tcn_fps_aug_face.json", "seed": 13},
+    {"name": "tcn_face_s21", "config": "ml/configs/tcn_fps_aug_face.json", "seed": 21},
+    {"name": "lstm_face_s13", "config": "ml/configs/lstm_fps_aug_face.json", "seed": 13}
+  ]
+}
