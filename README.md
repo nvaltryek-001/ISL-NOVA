@@ -51,6 +51,13 @@
 
 ---
 
+## 🎬 Demo
+
+<p align="center">
+  <img src="docs/demo/isl-nova-demo.gif" width="760" alt="ISL NOVA walkthrough: sign in, dashboard, live recognition, sign explorer, academy, communication, dataset lab, evaluation and dark theme" />
+  <br/><sub>Built from real screenshots of the running app · <a href="docs/demo/isl-nova-demo.mp4">MP4 version</a></sub>
+</p>
+
 ## 📚 Contents
 
 <table>
