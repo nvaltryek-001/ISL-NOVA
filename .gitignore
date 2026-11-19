@@ -21,6 +21,8 @@ artifacts/
 *.task
 *.tflite
 *.mp4
+# walkthrough built from app screenshots (no people); all other videos stay ignored
+!docs/demo/*.mp4
 *.mov
 *.MOV
 *.webm
